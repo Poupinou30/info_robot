@@ -3,6 +3,9 @@
 #define HEADERS
 #endif
 
+float* positionReceived;
+pthread_mutex_t lockPosition;
+
 
 
 int mainPattern(){
