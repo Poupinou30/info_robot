@@ -11,7 +11,6 @@
 #include <rplidar.h>
 #include <iostream>
 #include <fstream>
-#define VERBOSE 1
 
 //#include "matplotlibcpp.h"
 using namespace sl;
@@ -71,7 +70,7 @@ int w_plot(float x[], float y[], float angle[], float distance[], int length) {/
 }
 float distance (float a1,float a2,float d1,float d2){
     float dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
-    return dist; //Fonction pour plot
+    return dist;
 }
 
 std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::vector<float> newd,int counter){
@@ -81,7 +80,6 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
     //std::cout<<"tu entres ici ouhouuuuu";
     for(int i=0; i<counter;i++){
 	if(newd[i]<0.3){
-
 	    obstacle_a.push_back(newa[i]);
 	    obstacle_d.push_back(newd[i]);
 	    printf("ATTENTION ATTENTION OBSTACLE/SIMON à %f degrés", newa[i]);
@@ -100,7 +98,9 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
 
 
 std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
-    std::cout<<"c'est beacons qui marche pas?";
+    //std::ifstream file;
+    //file.open("lidar_2112_v2.txt");
+    //std::cout<<"c'est beacons qui marche pas?";
     //printf("counter=%d", counter);
     int obj_counter=0;
     std::vector<float> newa;
@@ -141,7 +141,6 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
 	    obj_iter+=1;
 	}
     }
-    if(VERBOSE) printf("Filterage et moyenne effectués dans beacon data \n");
     //printf("obj_iter=%d", obj_iter);
     /*
     for (int i=0; i<obj_iter;++i){
@@ -170,8 +169,11 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
                 float triangle= distance(a1,a2,d1,d2)+distance(a1,a3,d1,d3)+distance(a2,a3,d2,d3); //sensé être 3+2.5+2.5 donc 8
                 //printf("triangle: %f, i: %d, j: %d, k: %d \n", triangle, i, j, k);
 		//printf("ai: %f, aj: %f, ak: %f \n", newa[i], newa[j], newa[k]);
-        if(VERBOSE) printf("Avant de trouver triangle balises OK \n");
-		if(triangle<=8.1 && triangle>=7.7 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
+		float dij=distance(newa[i],newa[j],newd[i],newd[j])
+		float djk=distance(newa[j],newa[k],newd[j],newd[k])
+		float dik=distance(newa[i],newa[k],newd[i],newd[k])
+		
+		if(triangle<=8.0 && triangle>=7.89 && dij<=3.3 && dij>=1.9 && djk<=3.3 && djk>=1.9 && dik<=3.3 && dik>=1.9 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    coord[0]=i;//en théorie ce seront les bonnes
 		    coord[1]=j;
 		    coord[2]=k;
@@ -185,12 +187,12 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
 		    balises[2][1]=newd[coord[2]];
 		    
 		    printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
-		    //printf("triangle: %f \n", triangle);
+		    printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
-		    w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
-		    detect_obstacle(newa, newd, obj_iter);
-		    return balises;
+		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
+		    //detect_obstacle(newa, newd, obj_iter);
+		    //return balises;
 		    //break;//ici voir comment en sortir totalement
 		    
                 }
@@ -206,9 +208,9 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     on va d'abord checker quelles sont les balises sur le bord, puis en poser une en 0,0, l'autre en 0,3, l'autre en 2,1.5 et le robot au milieu de ses coords là
     */
     //printf("balise 1: dist1: %f, angle1: %f - balise 2: dist2: %f, angle2: %f - balise 3: dist3: %f, angle3: %f",newd[coord[0]], newa[coord[0]], newd[coord[1]], newa[coord[1]], newd[coord[2]], newa[coord[2]] ); 
-    printf("test x1:%f, y1: %f", newd[coord[0]]*cosf( -newa[coord[0]]*(M_PI/180)), newd[coord[0]]*sinf( -newa[coord[0]]*(M_PI/180)));
-    printf("test x2:%f, y2: %f", newd[coord[1]]*cosf( -newa[coord[1]]*(M_PI/180)), newd[coord[1]]*sinf( -newa[coord[1]]*(M_PI/180)));
-    printf("test x3:%f, y3: %f", newd[coord[2]]*cosf( -newa[coord[2]]*(M_PI/180)), newd[coord[2]]*sinf( -newa[coord[2]]*(M_PI/180)));
+    //printf("test x1:%f, y1: %f", newd[coord[0]]*cosf( -newa[coord[0]]*(M_PI/180)), newd[coord[0]]*sinf( -newa[coord[0]]*(M_PI/180)));
+    //printf("test x2:%f, y2: %f", newd[coord[1]]*cosf( -newa[coord[1]]*(M_PI/180)), newd[coord[1]]*sinf( -newa[coord[1]]*(M_PI/180)));
+    //printf("test x3:%f, y3: %f", newd[coord[2]]*cosf( -newa[coord[2]]*(M_PI/180)), newd[coord[2]]*sinf( -newa[coord[2]]*(M_PI/180)));
 
 
     /*float x1=newd[coord[0]]*cosf( -newa[coord[0]]*(M_PI/180));
@@ -218,17 +220,17 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     float x3=newd[coord[2]]*cosf( -newa[coord[2]]*(M_PI/180));
     float y3=newd[coord[2]]*sinf( -newa[coord[2]]*(M_PI/180));
     */
-    /*
+    
     float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
     float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
     float d12=distance(newa[coord[2]],newa[coord[1]], newd[coord[2]],newd[coord[1]]);
     
-    float x3=-2.0;
+    float x3=2.0;
     float y3= 0.0;
-    float x2=0.0;
-    float y2=0.0;
-    float x1=-1.0;
-    float y1=-3.0;
+    float x2=1.0;
+    float y2=3.0;
+    float x1=0.0;
+    float y1=0.0;
     
     //now nex modified coordinates
     float x1n = x1-x2;
@@ -257,17 +259,8 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     float xr=x2+((k31n*(y12n-y23n))/D);
     float yr=y2+((k31n*(x23n-x12n))/D);
     printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
-    */
-    int pipefd[2];
-    pipe(pipefd);
-
-    std::vector<float> numbers = {1.1, 2.2, 3.3, 4.4, 5.5};
-    write(pipefd[1], numbers.data(), numbers.size() * sizeof(float));
-
-    close(pipefd[0]);
-    close(pipefd[1]);
-
-
+    
+    return balises;
 }
 /*
 
@@ -315,22 +308,21 @@ void plot_histogram(sl_lidar_response_measurement_node_hq_t * nodes, size_t coun
 }
 */
 
-        int main(int argc, const char * argv[]){
-            //clock_t begin= clock();
-            ///  Create a communication channel instance
-            IChannel* _channel;//oskur il connait pas ça
-            Result<IChannel*> channel = createSerialPortChannel("/dev/ttyUSB0", 115200);//on crée le canal pour le port, on a un usb donc c'est good (checker la valeur mais c'est good normalement)
-            //std::cout << "found the lidar at the port 115200";
-            ILidarDriver * lidar = *createLidarDriver();//le driver
-
-            auto res = (*lidar).connect(*channel);//on connecte le driver au channel
-            if(SL_IS_OK(res)){//si ça marche
-                //std::cout<<"et ici ça passe?";
-                sl_lidar_response_device_info_t deviceInfo;//récupérer les infos de l'appareil
+int main(int argc, const char * argv[]){
+    //clock_t begin= clock();
+    ///  Create a communication channel instance
+    IChannel* _channel;//oskur il connait pas ça
+    Result<IChannel*> channel = createSerialPortChannel("/dev/ttyUSB0", 115200);//on crée le canal pour le port, on a un usb donc c'est good (checker la valeur mais c'est good normalement)
+    //std::cout << "found the lidar at the port 115200";
+    ILidarDriver * lidar = *createLidarDriver();//le driver
+    auto res = (*lidar).connect(*channel);//on connecte le driver au channel
+    if(SL_IS_OK(res)){//si ça marche
+	//std::cout<<"et ici ça passe?";
+	sl_lidar_response_device_info_t deviceInfo;//récupérer les infos de l'appareil
         res = (*lidar).getDeviceInfo(deviceInfo);//on les stocke la
         if(SL_IS_OK(res)){//si ça va
-		//std::ifstream file;
-		//file.open("lidar_2112_v2.txt");
+		std::ifstream file;
+		file.open("lidar_bord_g_vers2.txt");
 		printf("Model: %d, Firmware Version: %d.%d, Hardware Version: %d\n",//print les donner
 		deviceInfo.model,
 		deviceInfo.firmware_version >> 8, deviceInfo.firmware_version & 0xffu,
@@ -340,7 +332,6 @@ void plot_histogram(sl_lidar_response_measurement_node_hq_t * nodes, size_t coun
 		std::vector<LidarScanMode> scanModes;  // ça c'est si on veut choisir le mode de scan
 		lidar->getAllSupportedScanModes(scanModes);
 		lidar->startScanExpress(false, scanModes[0].id);
-        if(VERBOSE) printf("Lidar initialized and scan runned \n");
 		//lidar->setMotorSpeed(0);
 
 		LidarScanMode scanMode;//on utilise le mode standard de scan(on peut aussi choisir)
@@ -354,7 +345,7 @@ void plot_histogram(sl_lidar_response_measurement_node_hq_t * nodes, size_t coun
 		if (IS_OK(res_gscan)){
 		    fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
 		    lidar->ascendScanData(nodes, nodeCount);
-		    //std::ofstream out("lidar_2112_v2.txt");
+		    std::ofstream out("lidar_bord_g_vers2.txt");
 		    float angle[nodeCount]={};
 		    float distance[nodeCount]={};
 		    int counter=0;
@@ -362,22 +353,24 @@ void plot_histogram(sl_lidar_response_measurement_node_hq_t * nodes, size_t coun
 			
 			float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
 			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
-			//std::cout << angle_in_degrees << " , " << distance_in_meters << "\n";
+			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
 			    
 			if(distance_in_meters<=3.6 && distance_in_meters!=0.0){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;
 			    counter+=1;
+			    out << angle_in_degrees << " , " << distance_in_meters << "\n";
 			    //printf("Angle : %f, Distance : %f \n", angle_in_degrees,distance_in_meters);
 			}
 			
 		    }
-            if(VERBOSE) printf("On arrive a beacon data \n");
-		    beacon_data(angle, distance, counter);
-		    std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
-		    printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
 		    
-		    //out.close();
+		    //beacon_data(angle, distance, counter);
+		    std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
+		    out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
+		    //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
+		    
+		    out.close();
 		    //std::cout<<"alors tu arrives jusqu'ici ou pas?";
 		    //plot_histogram(nodes, nodeCount);
 		}
