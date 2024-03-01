@@ -65,7 +65,20 @@ void* executeProgram(void* arg){
     int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur
     char cmd[256];
     sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
-    system(cmd);
+
+    signal(SIGINT, handle_sigint);
+
+    child_pid = fork();
+    if (child_pid == 0) {
+        execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
+        _exit(EXIT_FAILURE);
+    } else if (child_pid < 0) {
+        // Handle error
+    } else {
+        int status;
+        waitpid(child_pid, &status, 0);
+    }
+
     fprintf(stderr,"Lidar program correctly launched \n");
     return NULL;
 }
