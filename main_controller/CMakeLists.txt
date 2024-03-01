@@ -11,6 +11,6 @@ add_executable(main_controller main.c
         spi_com.c
         utils.c
         controller.c)
-target_link_libraries(main_controller pthread)
+
 target_include_directories(main_controller PRIVATE ${pigpio_INCLUDE_DIR})
-target_link_libraries(main_controller PRIVATE ${pigpio_LIBRARY} m)
+target_link_libraries(main_controller PRIVATE ${pigpio_LIBRARY} m pthread)
