@@ -403,7 +403,7 @@ int main(int argc, const char * argv[]){
             }
 
             //fin de la bouboucle
-            std::cout << "fin de programme, arrête toi sale bête";
+            if(verbose) std::cout << "fin de programme, arrête toi sale bête";
         }
 	    
 	}else{
