@@ -19,6 +19,12 @@ using namespace sl;
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
 
+typedef struct positionBot{
+    float x;
+    float y;
+    float theta;
+} positionBot;
+
 
 int w_plot(float x[], float y[], float angle[], float distance[], int length) {//x c'est angle
 
@@ -96,8 +102,8 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
 
 }
 
-
-std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
+//Fonction calculs
+std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,positionBot* position ){
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
     //std::cout<<"c'est beacons qui marche pas?";
@@ -258,6 +264,11 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     }
     float xr=x2+((k31n*(y12n-y23n))/D);
     float yr=y2+((k31n*(x23n-x12n))/D);
+    float theta = 0;
+    position->x = xr;
+    position->y = yr;
+    position->theta = theta;
+
     printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
     
     return balises;
@@ -337,51 +348,60 @@ int main(int argc, const char * argv[]){
 		LidarScanMode scanMode;//on utilise le mode standard de scan(on peut aussi choisir)
 		lidar->startScan(false, true, 0, &scanMode);
 
+
+
+
+
 		sl_lidar_response_measurement_node_hq_t nodes[8192];//on définit un format de réponse
 		size_t nodeCount = sizeof(nodes)/sizeof(sl_lidar_response_measurement_node_hq_t);//on définit la taille du truc
-		
-		sl_result res_gscan = lidar->grabScanDataHq(nodes, nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
-		//res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
-		if (IS_OK(res_gscan)){
-		    fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
-		    lidar->ascendScanData(nodes, nodeCount);
-		    std::ofstream out("lidar_bord_g_vers2.txt");
-		    float angle[nodeCount]={};
-		    float distance[nodeCount]={};
-		    int counter=0;
-		    for(int i=0;i<(int)nodeCount;i++){
-			
-			float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
-			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
-			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
-			    
-			if(distance_in_meters<=3.6 && distance_in_meters!=0.0){
-			    angle[counter]=angle_in_degrees;
-			    distance[counter]=distance_in_meters;
-			    counter+=1;
-			    out << angle_in_degrees << " , " << distance_in_meters << "\n";
-			    //printf("Angle : %f, Distance : %f \n", angle_in_degrees,distance_in_meters);
-			}
-			
-		    }
-		    
-		    //beacon_data(angle, distance, counter);
-		    std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
-		    out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
-		    //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
-		    
-		    out.close();
-		    //std::cout<<"alors tu arrives jusqu'ici ou pas?";
-		    //plot_histogram(nodes, nodeCount);
-		}
-		else{
-			fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
-		
-		    //ici faut recup les donner de res scan
-		}
-	    
-	    //fin de la bouboucle
-	    std::cout<<"fin de programme, arrête toi sale bête";
+
+        while(1) {
+
+            sl_result res_gscan = lidar->grabScanDataHq(nodes,
+                                                        nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
+            //res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
+            if (IS_OK(res_gscan)) {
+                fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
+                lidar->ascendScanData(nodes, nodeCount);
+                std::ofstream out("lidar_bord_g_vers2.txt");
+                float angle[nodeCount] = {};
+                float distance[nodeCount] = {};
+                int counter = 0;
+                for (int i = 0; i < (int) nodeCount; i++) {
+
+                    float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
+                    float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
+                    //out << angle_in_degrees << " , " << distance_in_meters << "\n";
+
+                    if (distance_in_meters <= 3.6 && distance_in_meters != 0.0) {
+                        angle[counter] = angle_in_degrees;
+                        distance[counter] = distance_in_meters;
+                        counter += 1;
+                        out << angle_in_degrees << " , " << distance_in_meters << "\n";
+                        //printf("Angle : %f, Distance : %f \n", angle_in_degrees,distance_in_meters);
+                    }
+
+                }
+
+                //beacon_data(angle, distance, counter);
+                std::vector <std::vector<float>> balises = beacon_data(angle, distance, counter);
+                out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||"
+                    << balises[2][0] << "," << balises[2][1] << "\n";
+                //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
+
+                out.close();
+                //std::cout<<"alors tu arrives jusqu'ici ou pas?";
+                //plot_histogram(nodes, nodeCount);
+            } else {
+                fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n",
+                        res_gscan);//erreur si je sais pas grab les data
+
+                //ici faut recup les donner de res scan
+            }
+
+            //fin de la bouboucle
+            std::cout << "fin de programme, arrête toi sale bête";
+        }
 	    
 	}else{
             fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
