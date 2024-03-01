@@ -81,7 +81,7 @@ void* executeProgram(void* arg){
         execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
         _exit(EXIT_FAILURE);
     } else if (child_pid < 0) {
-        // Handle error
+        fprintf(stderr,"Error occured \n");
     } else {
         int status;
         waitpid(child_pid, &status, 0);

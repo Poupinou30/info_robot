@@ -107,6 +107,7 @@ int main(){
     //Initialisation thread qui execute le programme lidar
     pthread_t lidarExecuteThread;
     pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipefd[1]); // Passage de l'adresse de pipefd[1] à pthread_create
+    fprintf(stderr,"Thread launched \n");
 
     //initialisation thread qui récupère les données du pipe provenant du programme lidar
     void* positionReceived;
