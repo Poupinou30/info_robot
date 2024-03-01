@@ -104,8 +104,7 @@ void myController(double* speedTab, double currentX, double currentY, double cur
         
         fprintf(stderr,"speedX = %f \n",speedX);
         fprintf(stderr,"speedY = %f \n",speedY);
-        fprintf(stderr,"Omega = %f \n",s
-        peedTheta);
+        fprintf(stderr,"Omega = %f \n",speedTheta);
         fprintf(stderr,"x-position = %lf and targetX = %lf \n",currentX,targetX);
         fprintf(stderr,"y-position = %lf and targetY = %lf \n",currentY,targetY);
         //fprintf(stderr,"target theta = %f \n", targetTheta);
