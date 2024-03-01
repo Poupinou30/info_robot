@@ -11,6 +11,7 @@
 #include <rplidar.h>
 #include <iostream>
 #include <fstream>
+#define verbose 0
 
 //#include "matplotlibcpp.h"
 using namespace sl;
