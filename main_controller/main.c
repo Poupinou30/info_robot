@@ -115,7 +115,6 @@ int main(){
 
 
     fprintf(stderr,"Sender program correctly launched \n");
-    pthread_join(pipeComThread, &positionReceived);
 
 
     close(pipefd[0]);

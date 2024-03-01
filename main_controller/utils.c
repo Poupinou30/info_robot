@@ -72,29 +72,30 @@ void* executeProgram(void* arg){
 void* receptionPipe(void* pipefdvoid){
     float *buffer = positionReceived;
     int* pipefd = (int*) pipefdvoid;
-    fd_set set;
-    int ret;
-    FD_ZERO(&set); // Initialiser le set à zéro
-    FD_SET(pipefd[0], &set); // Ajouter le descripteur de fichier de lecture du pipe au set
+    while(1){
+        fd_set set;
+        int ret;
+        FD_ZERO(&set); // Initialiser le set à zéro
+        FD_SET(pipefd[0], &set); // Ajouter le descripteur de fichier de lecture du pipe au set
 
-    struct timeval timeout;
-    timeout.tv_sec = 1; // Timeout de 1 seconde
-    timeout.tv_usec = 0;
+        struct timeval timeout;
+        timeout.tv_sec = 1; // Timeout de 1 seconde
+        timeout.tv_usec = 0;
 
-    ret = select(pipefd[0] + 1, &set, NULL, NULL, &timeout);
-    if (ret == -1) {
-        perror("select");
-        exit(EXIT_FAILURE);
-    } else if (ret == 0) {
-        printf("No data within one seconds.\n");
-    } else {
-        // Des données sont disponibles, lire les données
-        pthread_mutex_lock(&lockPosition);
-        read(pipefd[0], buffer, sizeof(buffer));
-        pthread_mutex_unlock(&lockPosition);
-        fprintf(stderr,"Readed \n");
-
-        pthread_exit((void*) buffer);
+        ret = select(pipefd[0] + 1, &set, NULL, NULL, &timeout);
+        if (ret == -1) {
+            perror("select");
+            exit(EXIT_FAILURE);
+        } else if (ret == 0) {
+            printf("No data within one seconds.\n");
+        } else {
+            // Des données sont disponibles, lire les données
+            pthread_mutex_lock(&lockPosition);
+            read(pipefd[0], buffer, sizeof(buffer));
+            pthread_mutex_unlock(&lockPosition);
+            fprintf(stderr,"Readed \n");
+        }
     }
+
 
 }
