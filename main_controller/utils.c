@@ -107,7 +107,7 @@ void* receptionPipe(void* pipefdvoid){
 
         ret = select(pipefd[0] + 1, &set, NULL, NULL, &timeout);
         if (ret == -1) {
-            perror("select\n");
+            perror("select");
             exit(EXIT_FAILURE);
         } else if (ret == 0) {
             printf("No data within one seconds.\n");

@@ -111,8 +111,8 @@ int main(){
     //initialisation thread qui récupère les données du pipe provenant du programme lidar
     void* positionReceived;
 
-    pthread_t pipeComThread;
-    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
+    //pthread_t pipeComThread;
+    //pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
 
 
 
