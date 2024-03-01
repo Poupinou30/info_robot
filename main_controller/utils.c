@@ -92,6 +92,7 @@ void* executeProgram(void* arg){
 }
 
 void* receptionPipe(void* pipefdvoid){
+    fprintf(stderr,"waiting for reading \n");
     float *buffer = positionReceived;
     int* pipefd = (int*) pipefdvoid;
     while(1){
@@ -106,7 +107,7 @@ void* receptionPipe(void* pipefdvoid){
 
         ret = select(pipefd[0] + 1, &set, NULL, NULL, &timeout);
         if (ret == -1) {
-            perror("select");
+            perror("select\n");
             exit(EXIT_FAILURE);
         } else if (ret == 0) {
             printf("No data within one seconds.\n");

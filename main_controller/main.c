@@ -103,10 +103,11 @@ int main(){
     pipe(pipefd);
 
      //Buffer pour reprendre les données du Lidar
-    fprintf(stderr,"waiting for reading \n");
+
     //Initialisation thread qui execute le programme lidar
     pthread_t lidarExecuteThread;
     pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipefd[1]); // Passage de l'adresse de pipefd[1] à pthread_create
+
     //initialisation thread qui récupère les données du pipe provenant du programme lidar
     void* positionReceived;
 
