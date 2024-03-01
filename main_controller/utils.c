@@ -66,6 +66,7 @@ void* executeProgram(void* arg){
     char cmd[256];
     sprintf(cmd,"../lidar_dir/output/Linux/release/main_folder %d", pipefd);
     system(cmd);
+    fprintf(stderr,"Lidar program correctly launched \n");
     return NULL;
 }
 
