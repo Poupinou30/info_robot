@@ -191,9 +191,10 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,pos
 		    balises[1][1]=newd[coord[1]];
 		    balises[2][0]=newa[coord[2]];
 		    balises[2][1]=newd[coord[2]];
-		    
-		    printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
-		    printf("triangle: %f \n", triangle);
+		    if(verbose){
+                printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
+                printf("triangle: %f \n", triangle);}
+
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
 		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
@@ -269,7 +270,7 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,pos
     position->y = yr;
     position->theta = theta;
 
-    printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
+    if(verbose) printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
     
     return balises;
 }
@@ -361,7 +362,7 @@ int main(int argc, const char * argv[]){
                                                         nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
             //res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
             if (IS_OK(res_gscan)) {
-                fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
+                if(verbose) fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
                 lidar->ascendScanData(nodes, nodeCount);
                 std::ofstream out("lidar_bord_g_vers2.txt");
                 float angle[nodeCount] = {};
