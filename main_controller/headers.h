@@ -13,6 +13,11 @@
 
 #endif //MAIN_CONTROLLER_HEADERS_H
 #define VERBOSE 1
+#define timeDelay 100 //ms
+
+
+extern volatile float* positionReceived;
+extern volatile pthread_mutex_t lock;
 
 void createArray(int16_t num1, int16_t num2, uint8_t* output);
 double degToRad(double deg);
@@ -29,5 +34,4 @@ void* executeProgram(void* arg);
 
 void extractBytes(uint16_t nombre, uint8_t *octet_haut, uint8_t *octet_bas) ;
 void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e);
-void receptionPipe(void* pipefdvoid);
-#define timeDelay 100 //ms
+void receptionPipe(void* pipefdvoid, void* buffervoid);

@@ -69,8 +69,8 @@ void* executeProgram(void* arg){
     return NULL;
 }
 
-void receptionPipe(void* pipefdvoid){
-    float *buffer = (float*) malloc(3*sizeof(float));
+void receptionPipe(void* pipefdvoid, void* buffervoid){
+    float *buffer = (float*) buffervoid;
     int* pipefd = (int*) pipefdvoid;
     fd_set set;
     int ret;
