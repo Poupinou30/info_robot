@@ -175,9 +175,9 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,pos
                 float triangle= distance(a1,a2,d1,d2)+distance(a1,a3,d1,d3)+distance(a2,a3,d2,d3); //sensé être 3+2.5+2.5 donc 8
                 //printf("triangle: %f, i: %d, j: %d, k: %d \n", triangle, i, j, k);
 		//printf("ai: %f, aj: %f, ak: %f \n", newa[i], newa[j], newa[k]);
-		float dij=distance(newa[i],newa[j],newd[i],newd[j])
-		float djk=distance(newa[j],newa[k],newd[j],newd[k])
-		float dik=distance(newa[i],newa[k],newd[i],newd[k])
+		float dij=distance(newa[i],newa[j],newd[i],newd[j]);
+		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
+		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
 		
 		if(triangle<=8.0 && triangle>=7.89 && dij<=3.3 && dij>=1.9 && djk<=3.3 && djk>=1.9 && dik<=3.3 && dik>=1.9 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    coord[0]=i;//en théorie ce seront les bonnes
