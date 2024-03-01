@@ -89,7 +89,9 @@ void receptionPipe(void* pipefdvoid, void* buffervoid){
         printf("No data within one seconds.\n");
     } else {
         // Des données sont disponibles, lire les données
+        pthread_mutex_lock(&lockPosition);
         read(pipefd[0], buffer, sizeof(buffer));
+        pthread_mutex_unlock(&lockPosition);
         fprintf(stderr,"Readed \n");
 
         pthread_exit((void*) buffer);

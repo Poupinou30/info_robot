@@ -107,7 +107,7 @@ void main_lidar{
     void* positionReceived;
 
     pthread_t pipeComThread;
-    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
+    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd,&(void*)positionReceived);
 
 
     fprintf(stderr,"Sender program correctly launched \n");

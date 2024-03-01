@@ -6,4 +6,4 @@
 #define HEADERS
 #endif
 volatile float* positionReceived= (float*) malloc(sizeof(float)*3);
-//volatile pthread_mutex_t lockPosition;
+volatile pthread_mutex_t lockPosition;
