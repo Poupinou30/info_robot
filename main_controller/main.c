@@ -95,6 +95,7 @@ int mainPattern(){
 
 int main(){
     //initialisation du pipe LIDAR - CONTROLLER
+    fprintf(stderr,"program launching \n")
     int pipefd[2];
     pipe(pipefd);
 
