@@ -1,0 +1,98 @@
+#ifndef HEADERS
+#include "headers.h"
+#define HEADERS
+#endif
+
+
+void createArray(int16_t num1, int16_t num2, uint8_t* output) {
+    output[0] = (num1 >> 8) & 0xFF; // Premier octet du premier nombre
+    output[1] = num1 & 0xFF;        // Deuxième octet du premier nombre
+    output[2] = (num2 >> 8) & 0xFF; // Premier octet du deuxième nombre
+    output[3] = num2 & 0xFF;        // Deuxième octet du deuxième nombre
+}
+
+double degToRad(double deg) {
+    return deg * 3.14 / 180.0;
+}
+
+void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
+    double radius = 0.029;
+    double l_x = 0.175;
+    double l_y = 0.21;
+    double omega_fl = 1.0/radius *(v_x-v_y-(l_x+l_y)*omega); //front left
+    double omega_fr = 1.0/radius *(v_x+v_y+(l_x+l_y)*omega); //front right
+    double omega_rl = 1.0/radius *(v_x+v_y-(l_x+l_y)*omega); //rear left
+    double omega_rr = 1.0/radius *(v_x-v_y+(l_x+l_y)*omega); //rear right
+    output_speed[0] = omega_fl;
+    output_speed[1] = omega_fr;
+    output_speed[2] = omega_rl;
+    output_speed[3] = omega_rr;
+
+}
+
+double randomDouble(double min, double max) {
+    double range = (max - min); 
+    double div = RAND_MAX / range;
+    return min + (rand() / div);
+}
+
+void extractBytes(uint16_t nombre, uint8_t *octet_haut, uint8_t *octet_bas) {
+    *octet_haut = (nombre >> 8) & 0xFF;
+    *octet_bas = nombre & 0xFF;
+}
+
+void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e){
+    uint8_t *PIDTab = (uint8_t*) malloc(sizeof(uint8_t)*4);
+    PIDTab[3] = 254;
+    extractBytes(Kp_m,&PIDTab[2],&PIDTab[1]);
+    PIDTab[0] = Kp_e;
+    SPI_send(PIDTab,spi_handle_front,NULL);
+
+    SPI_send(PIDTab,spi_handle_rear,NULL);
+
+    extractBytes(Ki_m,&PIDTab[2],&PIDTab[1]);
+    PIDTab[0] = Ki_e;
+    PIDTab[3] = 255;
+
+    SPI_send(PIDTab,spi_handle_front,NULL);
+
+    SPI_send(PIDTab,spi_handle_rear,NULL);
+    free(PIDTab);
+
+}
+
+void* executeProgram(void* arg){
+    int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur
+    char cmd[256];
+    sprintf(cmd,"../lidar_dir/output/Linux/release/main_folder %d", pipefd);
+    system(cmd);
+    return NULL;
+}
+
+void receptionPipe(void* pipefdvoid){
+    float *buffer = (float*) malloc(3*sizeof(float));
+    int* pipefd = (int*) pipefdvoid;
+    fd_set set;
+    int ret;
+    FD_ZERO(&set); // Initialiser le set à zéro
+    FD_SET(pipefd[0], &set); // Ajouter le descripteur de fichier de lecture du pipe au set
+
+    struct timeval timeout;
+    timeout.tv_sec = 1; // Timeout de 1 seconde
+    timeout.tv_usec = 0;
+
+    ret = select(pipefd[0] + 1, &set, NULL, NULL, &timeout);
+    if (ret == -1) {
+        perror("select");
+        exit(EXIT_FAILURE);
+    } else if (ret == 0) {
+        printf("No data within one seconds.\n");
+    } else {
+        // Des données sont disponibles, lire les données
+        read(pipefd[0], buffer, sizeof(buffer));
+        fprintf(stderr,"Readed \n");
+
+        pthread_exit((void*) buffer);
+    }
+
+}

@@ -1,0 +1,3 @@
+/home/pi/Documents/controller/main_controller/build/CMakeFiles/rebuild_cache.dir
+/home/pi/Documents/controller/main_controller/build/CMakeFiles/main_controller.dir
+/home/pi/Documents/controller/main_controller/build/CMakeFiles/edit_cache.dir

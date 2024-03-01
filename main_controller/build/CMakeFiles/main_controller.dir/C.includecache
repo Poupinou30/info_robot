@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/pi/Documents/controller/main_controller/headers.h
+stdio.h
+-
+pigpio.h
+-
+stdint.h
+-
+stdlib.h
+-
+string.h
+-
+unistd.h
+-
+math.h
+-
+sys/time.h
+-
+
+/home/pi/Documents/controller/main_controller/main.c
+headers.h
+/home/pi/Documents/controller/main_controller/headers.h
+
