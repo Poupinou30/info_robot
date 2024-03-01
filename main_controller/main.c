@@ -108,7 +108,7 @@ int main(){
     void* positionReceived;
 
     pthread_t pipeComThread;
-    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd,&(void*)positionReceived);
+    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd,(void*)positionReceived);
 
 
     fprintf(stderr,"Sender program correctly launched \n");
