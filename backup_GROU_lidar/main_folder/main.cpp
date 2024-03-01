@@ -11,6 +11,7 @@
 #include <rplidar.h>
 #include <iostream>
 #include <fstream>
+#define VERBOSE 1
 
 //#include "matplotlibcpp.h"
 using namespace sl;
@@ -70,7 +71,7 @@ int w_plot(float x[], float y[], float angle[], float distance[], int length) {/
 }
 float distance (float a1,float a2,float d1,float d2){
     float dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
-    return dist;
+    return dist; //Fonction pour plot
 }
 
 std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::vector<float> newd,int counter){
@@ -80,6 +81,7 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
     //std::cout<<"tu entres ici ouhouuuuu";
     for(int i=0; i<counter;i++){
 	if(newd[i]<0.3){
+
 	    obstacle_a.push_back(newa[i]);
 	    obstacle_d.push_back(newd[i]);
 	    printf("ATTENTION ATTENTION OBSTACLE/SIMON à %f degrés", newa[i]);
@@ -139,6 +141,7 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
 	    obj_iter+=1;
 	}
     }
+    if(VERBOSE) printf("Filterage et moyenne effectués dans beacon data \n");
     //printf("obj_iter=%d", obj_iter);
     /*
     for (int i=0; i<obj_iter;++i){
@@ -167,6 +170,7 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
                 float triangle= distance(a1,a2,d1,d2)+distance(a1,a3,d1,d3)+distance(a2,a3,d2,d3); //sensé être 3+2.5+2.5 donc 8
                 //printf("triangle: %f, i: %d, j: %d, k: %d \n", triangle, i, j, k);
 		//printf("ai: %f, aj: %f, ak: %f \n", newa[i], newa[j], newa[k]);
+        if(VERBOSE) printf("Avant de trouver triangle balises OK \n");
 		if(triangle<=8.1 && triangle>=7.7 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    coord[0]=i;//en théorie ce seront les bonnes
 		    coord[1]=j;
@@ -302,17 +306,18 @@ void plot_histogram(sl_lidar_response_measurement_node_hq_t * nodes, size_t coun
 }
 */
 
-int main(int argc, const char * argv[]){
-    //clock_t begin= clock();
-    ///  Create a communication channel instance
-    IChannel* _channel;//oskur il connait pas ça
-    Result<IChannel*> channel = createSerialPortChannel("/dev/ttyUSB0", 115200);//on crée le canal pour le port, on a un usb donc c'est good (checker la valeur mais c'est good normalement)
-    //std::cout << "found the lidar at the port 115200";
-    ILidarDriver * lidar = *createLidarDriver();//le driver
-    auto res = (*lidar).connect(*channel);//on connecte le driver au channel
-    if(SL_IS_OK(res)){//si ça marche
-	//std::cout<<"et ici ça passe?";
-	sl_lidar_response_device_info_t deviceInfo;//récupérer les infos de l'appareil
+        int main(int argc, const char * argv[]){
+            //clock_t begin= clock();
+            ///  Create a communication channel instance
+            IChannel* _channel;//oskur il connait pas ça
+            Result<IChannel*> channel = createSerialPortChannel("/dev/ttyUSB0", 115200);//on crée le canal pour le port, on a un usb donc c'est good (checker la valeur mais c'est good normalement)
+            //std::cout << "found the lidar at the port 115200";
+            ILidarDriver * lidar = *createLidarDriver();//le driver
+
+            auto res = (*lidar).connect(*channel);//on connecte le driver au channel
+            if(SL_IS_OK(res)){//si ça marche
+                //std::cout<<"et ici ça passe?";
+                sl_lidar_response_device_info_t deviceInfo;//récupérer les infos de l'appareil
         res = (*lidar).getDeviceInfo(deviceInfo);//on les stocke la
         if(SL_IS_OK(res)){//si ça va
 		//std::ifstream file;
@@ -326,6 +331,7 @@ int main(int argc, const char * argv[]){
 		std::vector<LidarScanMode> scanModes;  // ça c'est si on veut choisir le mode de scan
 		lidar->getAllSupportedScanModes(scanModes);
 		lidar->startScanExpress(false, scanModes[0].id);
+        if(VERBOSE) printf("Lidar initialized and scan runned \n");
 		//lidar->setMotorSpeed(0);
 
 		LidarScanMode scanMode;//on utilise le mode standard de scan(on peut aussi choisir)
@@ -357,7 +363,7 @@ int main(int argc, const char * argv[]){
 			}
 			
 		    }
-		    
+            if(VERBOSE) printf("On arrive a beacon data \n");
 		    beacon_data(angle, distance, counter);
 		    std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
 		    printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
