@@ -64,9 +64,10 @@ pid_t child_pid = 0;
 
 void handle_sigint(int sig) {
     if (child_pid > 0) {
-        kill(child_pid, SIGTERM);
+        kill(-child_pid, SIGTERM);  // Notez le signe moins ici, qui signifie que nous envoyons le signal au groupe de processus
     }
 }
+
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur
     char cmd[256];
@@ -76,6 +77,7 @@ void* executeProgram(void* arg){
 
     child_pid = fork();
     if (child_pid == 0) {
+        setpgid(0, 0);  // Crée un nouveau groupe de processus avec le PID du processus enfant
         execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
         _exit(EXIT_FAILURE);
     } else if (child_pid < 0) {
