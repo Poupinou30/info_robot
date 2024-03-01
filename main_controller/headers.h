@@ -7,6 +7,8 @@
 #include <math.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #define _Pi 3.1415927
 #ifndef MAIN_CONTROLLER_HEADERS_H
 #define MAIN_CONTROLLER_HEADERS_H
