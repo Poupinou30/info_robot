@@ -69,7 +69,7 @@ void* executeProgram(void* arg){
     return NULL;
 }
 
-void receptionPipe(void* pipefdvoid){
+void* receptionPipe(void* pipefdvoid){
     float *buffer = positionReceived;
     int* pipefd = (int*) pipefdvoid;
     fd_set set;
