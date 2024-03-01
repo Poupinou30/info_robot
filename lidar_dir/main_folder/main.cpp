@@ -384,7 +384,8 @@ int main(int argc, const char * argv[]){
                 }
 
                 //beacon_data(angle, distance, counter);
-                std::vector <std::vector<float>> balises = beacon_data(angle, distance, counter);
+                positionBot *position = (positionBot*) malloc(sizeof(positionBot));
+                std::vector <std::vector<float>> balises = beacon_data(angle, distance, counter,position);
                 out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||"
                     << balises[2][0] << "," << balises[2][1] << "\n";
                 //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
