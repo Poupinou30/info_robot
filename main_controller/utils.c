@@ -60,7 +60,13 @@ void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_
     free(PIDTab);
 
 }
+pid_t child_pid = 0;
 
+void handle_sigint(int sig) {
+    if (child_pid > 0) {
+        kill(child_pid, SIGTERM);
+    }
+}
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur
     char cmd[256];
