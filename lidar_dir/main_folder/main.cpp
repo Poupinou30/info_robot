@@ -356,7 +356,7 @@ int main(int argc, const char * argv[]){
 
 		sl_lidar_response_measurement_node_hq_t nodes[8192];//on définit un format de réponse
 		size_t nodeCount = sizeof(nodes)/sizeof(sl_lidar_response_measurement_node_hq_t);//on définit la taille du truc
-
+            int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
         while(1) {
 
             sl_result res_gscan = lidar->grabScanDataHq(nodes,
@@ -393,6 +393,17 @@ int main(int argc, const char * argv[]){
                 //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
 
                 out.close();
+
+                if (argc != 2) { // Vérification du nombre d'arguments
+                    fprintf(stderr, "Usage: %s <write pipe fd>\n", argv[0]); // Affichage d'un message d'erreur si le nombre d'arguments est incorrect
+                    exit(1); // Arrêt du programme
+                }
+
+
+
+                std::vector<float> numbers = {position->x,position->y,position->theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+                write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
+
                 //std::cout<<"alors tu arrives jusqu'ici ou pas?";
                 //plot_histogram(nodes, nodeCount);
             } else {
@@ -405,6 +416,7 @@ int main(int argc, const char * argv[]){
             //fin de la bouboucle
             if(verbose) std::cout << "fin de programme, arrête toi sale bête";
         }
+            close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
 	    
 	}else{
             fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
