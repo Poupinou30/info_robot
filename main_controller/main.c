@@ -5,7 +5,7 @@
 
 
 
-int main(){
+int mainPattern(){
     gpioInitialise();
     int spi_handle_front = initializeSPI(0);
     int spi_handle_rear = initializeSPI(1);
@@ -93,7 +93,7 @@ int main(){
 
 }
 
-void main_lidar{
+int main(){
     //initialisation du pipe LIDAR - CONTROLLER
     int pipefd[2];
     pipe(pipefd);
