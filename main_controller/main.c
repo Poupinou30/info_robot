@@ -114,7 +114,7 @@ int main(){
     pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
 
 
-    fprintf(stderr,"Sender program correctly launched \n");
+    fprintf(stderr,"Lidar program correctly launched \n");
 
 
     close(pipefd[0]);
