@@ -258,6 +258,14 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     float yr=y2+((k31n*(x23n-x12n))/D);
     printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
     */
+    int pipefd[2];
+    pipe(pipefd);
+
+    std::string message = "Hello from C++!";
+    write(pipefd[1], message.c_str(), message.size() + 1);
+
+    close(pipefd[0]);
+    close(pipefd[1]);
     
 }
 /*
