@@ -16,8 +16,8 @@
 #define timeDelay 100 //ms
 
 
-extern volatile float* positionReceived;
-extern volatile pthread_mutex_t lockPosition;
+extern float* positionReceived;
+extern pthread_mutex_t lockPosition;
 
 void createArray(int16_t num1, int16_t num2, uint8_t* output);
 double degToRad(double deg);
