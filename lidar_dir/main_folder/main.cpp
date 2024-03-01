@@ -261,12 +261,13 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     int pipefd[2];
     pipe(pipefd);
 
-    std::string message = "Hello from C++!";
-    write(pipefd[1], message.c_str(), message.size() + 1);
+    std::vector<float> numbers = {1.1, 2.2, 3.3, 4.4, 5.5};
+    write(pipefd[1], numbers.data(), numbers.size() * sizeof(float));
 
     close(pipefd[0]);
     close(pipefd[1]);
-    
+
+
 }
 /*
 
