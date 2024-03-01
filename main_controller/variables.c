@@ -5,5 +5,3 @@
 #include "headers.h"
 #define HEADERS
 #endif
-float* positionReceived= (float*) malloc(sizeof(float)*3);
-pthread_mutex_t lockPosition;
