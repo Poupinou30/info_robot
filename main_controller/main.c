@@ -3,8 +3,7 @@
 #define HEADERS
 #endif
 
-float* positionReceived = malloc(sizeof(float)*3); // Variable globale partagée
-pthread_mutex_t lock; // Déclaration du mutex
+
 
 int main(){
     gpioInitialise();
