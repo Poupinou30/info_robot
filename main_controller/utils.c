@@ -64,7 +64,7 @@ void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur
     char cmd[256];
-    sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/main_folder/output/Linux/Release/main_folder %d", pipefd);
+    sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
     system(cmd);
     fprintf(stderr,"Lidar program correctly launched \n");
     return NULL;
