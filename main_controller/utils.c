@@ -99,7 +99,7 @@ void* executeProgram(void* arg){
 
 void handle_sigint(int sig) {
     fprintf(stderr,"signit handeled \n");
-    kill(child_pid, SIGINT);
+    killpg(getpgid(child_pid), SIGINT);
 }
 
 
