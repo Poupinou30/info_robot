@@ -133,7 +133,6 @@ void* receptionPipe(void* pipefdvoid){
     float *buffer = positionReceived; //Position stored in positionRecevived and buffer
     int* pipefd = (int*) pipefdvoid;
     while(1){
-        sleep(1);//TO REMOVE!!!
         fd_set set;
         int ret;
         FD_ZERO(&set); // Initialiser le set à zéro
@@ -152,7 +151,7 @@ void* receptionPipe(void* pipefdvoid){
         } else {
             // Des données sont disponibles, lire les données
             pthread_mutex_lock(&lockPosition);
-            read(pipefd[0], buffer, sizeof(buffer));
+            read(pipefd[0], buffer, 3*sizeof(buffer));
             pthread_mutex_unlock(&lockPosition);
             fprintf(stderr,"Readed \n");
             for (int i = 0; i < 3; ++i) {
