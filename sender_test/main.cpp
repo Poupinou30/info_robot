@@ -16,12 +16,13 @@ int main(int argc, char* argv[]) {
     write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
     sleep(3);
     numbers = {6,5,4}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+    write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
     while(1){
         fprintf(stderr,"Programm still running \n");
         sleep(1);
     }
 
-    write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
+
 
     close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
 
