@@ -133,6 +133,7 @@ void* receptionPipe(void* pipefdvoid){
     float *buffer = positionReceived; //Position stored in positionRecevived and buffer
     int* pipefd = (int*) pipefdvoid;
     while(1){
+        sleep(1);//TO REMOVE!!!
         fd_set set;
         int ret;
         FD_ZERO(&set); // Initialiser le set à zéro
