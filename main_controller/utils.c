@@ -62,7 +62,7 @@ void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_
 }
 pid_t child_pid = 0;
 
-void handle_sigint(int sig) {
+/*void handle_sigint(int sig) {
     killpg(getpgid(child_pid), SIGINT);
 }
 
@@ -91,6 +91,31 @@ void* executeProgram(void* arg){
     } else {
         int status;
         fprintf(stderr,"Entered in else waitpid \n");
+        waitpid(child_pid, &status, 0);
+    }
+
+    fprintf(stderr,"Lidar program correctly launched \n");
+    return NULL;*/
+
+void handle_sigint(int sig) {
+    killpg(getpgid(child_pid), SIGINT);
+}
+
+void* executeProgram(void* arg){
+    int pipefd = *((int*)arg);
+    char cmd[256];
+    sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
+
+    child_pid = fork();
+    if (child_pid == 0) {
+        signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
+        setpgid(0, 0);
+        execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
+        _exit(EXIT_FAILURE);
+    } else if (child_pid < 0) {
+        fprintf(stderr,"Error occured \n");
+    } else {
+        int status;
         waitpid(child_pid, &status, 0);
     }
 
