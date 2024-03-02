@@ -100,6 +100,8 @@ void* executeProgram(void* arg){
 void handle_sigint(int sig) {
     fprintf(stderr,"signit handeled \n");
     killpg(getpgid(child_pid), SIGINT);
+    signal(SIGINT, SIG_DFL);  // Restaure le comportement par défaut du signal SIGINT
+    raise(SIGINT);  // Envoie un signal SIGINT au processus parent
 }
 
 
