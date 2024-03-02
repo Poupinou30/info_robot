@@ -63,10 +63,9 @@ void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_
 pid_t child_pid = 0;
 
 void handle_sigint(int sig) {
-    if (child_pid > 0) {
-        kill(-child_pid, SIGTERM);  // Notez le signe moins ici, qui signifie que nous envoyons le signal au groupe de processus
-    }
+    killpg(getpgid(child_pid), SIGINT);
 }
+
 
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur

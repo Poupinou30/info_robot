@@ -44,3 +44,4 @@ typedef struct position{
 } position;
 
 extern position myPos;
+extern pid_t child_pid;
