@@ -76,7 +76,7 @@ void* executeProgram(void* arg){
     fprintf(stderr,"sprintf wtfq\n");
     sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/sender_test/build/sender_test %d", pipefd);
     fprintf(stderr,"Before signal function\n");
-    //signal(SIGINT, handle_sigint);
+    signal(SIGINT, handle_sigint);
     fprintf(stderr,"After signal function\n");
     fprintf(stderr,"Before fork function\n");
     child_pid = fork();
