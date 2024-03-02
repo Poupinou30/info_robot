@@ -98,7 +98,7 @@ void* executeProgram(void* arg){
     return NULL;*/
 
 void handle_sigint(int sig) {
-    fprintf(stderr,"signit handeled \n")
+    fprintf(stderr,"signit handeled \n");
     kill(child_pid, SIGINT);
 }
 
