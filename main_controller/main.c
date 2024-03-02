@@ -3,8 +3,13 @@
 #define HEADERS
 #endif
 
-float* positionReceived;
+float* positionReceived = malloc(3*sizeof(float));
 pthread_mutex_t lockPosition;
+position myPos;
+myPos.x = &positionReceived[0];
+myPos.y = &positionReceived[1];
+myPos.theta = &positionReceived[2];
+
 
 
 
@@ -110,7 +115,7 @@ int main(){
     fprintf(stderr,"Thread launched \n");
 
     //initialisation thread qui récupère les données du pipe provenant du programme lidar
-    void* positionReceived;
+
 
     //pthread_t pipeComThread;
     //pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);

@@ -93,7 +93,7 @@ void* executeProgram(void* arg){
 
 void* receptionPipe(void* pipefdvoid){
     fprintf(stderr,"waiting for reading \n");
-    float *buffer = positionReceived;
+    float *buffer = positionReceived; //Position stored in positionRecevived and buffer
     int* pipefd = (int*) pipefdvoid;
     while(1){
         fd_set set;
