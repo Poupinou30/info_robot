@@ -68,6 +68,7 @@ void handle_sigint(int sig) {
 
 
 void* executeProgram(void* arg){
+    fprintf(stderr,"Entered correcyly in executeProgram function\n")
     int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur
     char cmd[256];
     //sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
@@ -76,6 +77,7 @@ void* executeProgram(void* arg){
 
     child_pid = fork();
     if (child_pid == 0) {
+        fprintf(stderr,"Entered correcyly in childpid==0\n")
         setpgid(0, 0);  // Crée un nouveau groupe de processus avec le PID du processus enfant
         execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
         _exit(EXIT_FAILURE);
@@ -83,6 +85,7 @@ void* executeProgram(void* arg){
         fprintf(stderr,"Error occured \n");
     } else {
         int status;
+        fprintf(stderr,"Entered in else waitpid \n")
         waitpid(child_pid, &status, 0);
     }
 
