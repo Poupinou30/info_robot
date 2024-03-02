@@ -12,14 +12,15 @@ int main(int argc, char* argv[]) {
 
     int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
 
-    std::vector<float> numbers = {1.1, 2.2, 3.3, 4.4, 5.5}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+    std::vector<float> numbers = {9.9,2.6,-1.4}; // Déclaration du tableau de nombres à virgule flottante à envoyer
     write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
     sleep(3);
+    numbers = {6,5,4}; // Déclaration du tableau de nombres à virgule flottante à envoyer
     while(1){
         fprintf(stderr,"Programm still running \n");
         sleep(1);
     }
-    numbers = {6,5,4,32}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+
     write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
 
     close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
