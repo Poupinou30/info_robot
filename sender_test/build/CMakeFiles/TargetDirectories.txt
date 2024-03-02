@@ -1,0 +1,3 @@
+/home/augustin/Documents/receiver_test/sender_test/build/CMakeFiles/sender_test.dir
+/home/augustin/Documents/receiver_test/sender_test/build/CMakeFiles/edit_cache.dir
+/home/augustin/Documents/receiver_test/sender_test/build/CMakeFiles/rebuild_cache.dir

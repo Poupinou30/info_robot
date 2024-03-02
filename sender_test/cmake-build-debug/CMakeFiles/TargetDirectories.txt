@@ -1,0 +1,3 @@
+C:/Users/adepe/Documents/cours/projet mecatro/codes rpi/sender_test/cmake-build-debug/CMakeFiles/sender_test.dir
+C:/Users/adepe/Documents/cours/projet mecatro/codes rpi/sender_test/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/adepe/Documents/cours/projet mecatro/codes rpi/sender_test/cmake-build-debug/CMakeFiles/rebuild_cache.dir
