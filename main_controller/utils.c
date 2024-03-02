@@ -80,6 +80,7 @@ void* executeProgram(void* arg){
     fprintf(stderr,"After signal function\n");
     fprintf(stderr,"Before fork function\n");
     child_pid = fork();
+    fprintf(stderr,"After fork function\n");
     if (child_pid == 0) {
         fprintf(stderr,"Entered correcyly in childpid==0\n");
         setpgid(0, 0);  // Crée un nouveau groupe de processus avec le PID du processus enfant
