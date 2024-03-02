@@ -15,6 +15,10 @@ int main(int argc, char* argv[]) {
     std::vector<float> numbers = {1.1, 2.2, 3.3, 4.4, 5.5}; // Déclaration du tableau de nombres à virgule flottante à envoyer
     write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
     sleep(3);
+    while(1){
+        fprintf(stderr,"Programm still running \n");
+        sleep(1);
+    }
     numbers = {6,5,4,32}; // Déclaration du tableau de nombres à virgule flottante à envoyer
     write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
 
