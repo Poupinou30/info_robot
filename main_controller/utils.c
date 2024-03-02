@@ -154,9 +154,12 @@ void* receptionPipe(void* pipefdvoid){
             read(pipefd[0], buffer, 3*sizeof(buffer));
             pthread_mutex_unlock(&lockPosition);
             fprintf(stderr,"Readed \n");
-            for (int i = 0; i < 3; ++i) {
+            /*for (int i = 0; i < 3; ++i) {
                 fprintf(stderr,"%f \n", buffer[i]);
-            }
+            }*/
+            fprintf(stderr,"X = %f \n",position->x);
+            fprintf(stderr,"Y = %f \n",position->x);
+            fprintf(stderr,"Theta = %f \n",position->theta);
         }
     }
 
