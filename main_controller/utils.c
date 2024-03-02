@@ -109,8 +109,9 @@ void* executeProgram(void* arg){
     sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/sender_test/build/sender_test %d", pipefd);
 
     child_pid = fork();
+    signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
     if (child_pid == 0) {
-        signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
+
         setpgid(0, 0);
         execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
         _exit(EXIT_FAILURE);
