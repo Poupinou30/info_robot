@@ -157,9 +157,9 @@ void* receptionPipe(void* pipefdvoid){
             /*for (int i = 0; i < 3; ++i) {
                 fprintf(stderr,"%f \n", buffer[i]);
             }*/
-            fprintf(stderr,"X = %f \n",position->x);
-            fprintf(stderr,"Y = %f \n",position->x);
-            fprintf(stderr,"Theta = %f \n",position->theta);
+            fprintf(stderr,"X = %f \n",myPos->x);
+            fprintf(stderr,"Y = %f \n",myPos->x);
+            fprintf(stderr,"Theta = %f \n",myPos->theta);
         }
     }
 
