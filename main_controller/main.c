@@ -3,12 +3,10 @@
 #define HEADERS
 #endif
 
-float* positionReceived = malloc(3*sizeof(float));
+float* positionReceived;
 pthread_mutex_t lockPosition;
 position myPos;
-myPos.x = &positionReceived[0];
-myPos.y = &positionReceived[1];
-myPos.theta = &positionReceived[2];
+
 
 
 
@@ -102,6 +100,10 @@ int mainPattern(){
 }
 
 int main(){
+    positionReceived; = malloc(3*sizeof(float));
+    myPos.x = &positionReceived[0];
+    myPos.y = &positionReceived[1];
+    myPos.theta = &positionReceived[2];
     //initialisation du pipe LIDAR - CONTROLLER
     fprintf(stderr,"program launching \n");
     int pipefd[2];
