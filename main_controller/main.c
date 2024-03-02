@@ -121,7 +121,9 @@ int main(){
 
     //pthread_t pipeComThread;
     //pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
-    sleep(5);
+    while(1){
+        ;
+    }
 
 
 
