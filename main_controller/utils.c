@@ -70,8 +70,10 @@ void handle_sigint(int sig) {
 void* executeProgram(void* arg){
     fprintf(stderr,"Entered correcyly in executeProgram function\n");
     int pipefd = *((int*)arg); // Récupération du descripteur de fichier à partir du pointeur
+    fprintf(stderr,"int pipefd wtfq\n");
     char cmd[256];
     //sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
+    fprintf(stderr,"sprintf wtfq\n");
     sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
     fprintf(stderr,"Before signal function\n");
     signal(SIGINT, handle_sigint);
