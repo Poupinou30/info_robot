@@ -104,7 +104,7 @@ void handle_sigint(int sig) {
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg);
     char cmd[256];
-    sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
+    sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/sender_test/build/sender_test %d", pipefd);
 
     child_pid = fork();
     if (child_pid == 0) {
