@@ -98,8 +98,10 @@ void* executeProgram(void* arg){
     return NULL;*/
 
 void handle_sigint(int sig) {
-    killpg(getpgid(child_pid), SIGINT);
+    fprintf(stderr,"signit handeled \n")
+    kill(child_pid, SIGINT);
 }
+
 
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg);
