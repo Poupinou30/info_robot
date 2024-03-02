@@ -100,7 +100,7 @@ int mainPattern(){
 }
 
 int main(){
-    positionReceived; = malloc(3*sizeof(float));
+    positionReceived = malloc(3*sizeof(float));
     myPos.x = &positionReceived[0];
     myPos.y = &positionReceived[1];
     myPos.theta = &positionReceived[2];
