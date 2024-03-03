@@ -16,6 +16,7 @@ float computeRectangleDistance(double x1, double y1, double x2, double y2, doubl
 }
 
 void computeAttractiveField(position destination){ //position convertie en cm
+    fprintf(stderr,"Entered in computeAttractiveField \n");
     //Cette fonction calcule le champ d'attraction pour le potential field path planning
     //Elle ne sera exécutée qu'à chaque fois qu'on changera l'objectif final en terme de destination (ex: quand on arrive a une plante)
     int posX = (int) *(destination.x)*100;
@@ -23,11 +24,13 @@ void computeAttractiveField(position destination){ //position convertie en cm
     int posTheta = (int) *(destination.theta)*100;
     float scalingFactor = 1;
     double euclidianDistance;
+    fprintf(stderr,"before loop \n");
     for (int i = 0; i < sizeY; ++i) {
         for (int j = 0; j < sizeX; ++j) {
             myField.attractiveField[i][j] = 0.5*scalingFactor* computeEuclidianDistance(i,j,posX,posY);
         }
     }
+    fprintf(stderr,"afterloop \n");
 }
 
 void computeInitialRepulsiveField(){
