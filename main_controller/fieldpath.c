@@ -10,8 +10,8 @@ float computeEuclidianDistance(int x1, int y1, int x2, int y2){
 }
 
 float computeRectangleDistance(double x1, double y1, double x2, double y2, double x3, double y3) {
-    double dx = max(min(x3, x2), x1) - x3;
-    double dy = max(min(y3, y2), y1) - y3;
+    double dx = fmax(fmin(x3, x2), x1) - x3;
+    double dy = fmax(fmin(y3, y2), y1) - y3;
     return sqrt(dx*dx + dy*dy);
 }
 
@@ -38,13 +38,13 @@ void computeInitialRepulsiveField(){
 void updateRepulsiveField(int x1,int y1, int x2, int y2){
 
     float scalingFactor = 1;
-    int X1 = min(x1,x2);
-    int X2 = max(x1,x2);
-    int Y1 = min(y1,y2);
-    int Y2 = max(y1,y2);
+    int X1 = fmin(x1,x2);
+    int X2 = fmax(x1,x2);
+    int Y1 = fmin(y1,y2);
+    int Y2 = fmax(y1,y2);
     float euclidianDistance;
-    int activeX1 = max(X1-actionDistance,0);
-    int activeY1 = max(Y1-actionDistance,0);
+    int activeX1 = fmax(X1-actionDistance,0);
+    int activeY1 = fmax(Y1-actionDistance,0);
     int activeX2 = min(X2+actionDistance,sizeX);
     int activeY2 = min(Y2+actionDistance,sizeY);//Définit la zone mise à jour
 
@@ -67,10 +67,10 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2){
 }
 
 void resetRepulsiveField(int x1,int y1, int x2, int y2){
-    int X1 = min(x1,x2);
-    int X2 = max(x1,x2);
-    int Y1 = min(y1,y2);
-    int Y2 = max(y1,y2);
+    int X1 = fmin(x1,x2);
+    int X2 = fmax(x1,x2);
+    int Y1 = fmin(y1,y2);
+    int Y2 = fmax(y1,y2);
     for (int i = Y1; i < Y2; ++i) {
         for (int j = X1; j < X2; ++j) {
             myField.repulsiveField[i][j] = 0;
@@ -92,12 +92,12 @@ void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2){
     }
 
     else{
-        int X1 = min(x1,x2);
-        int X2 = max(x1,x2);
-        int Y1 = min(y1,y2);
-        int Y2 = max(y1,y2);
-        for (int i = max(Y1-actionDistance,0); i < min(Y2+actionDistance,sizeY); ++i) {
-            for (int j = max(X1-actionDistance,0); j < min(X2+actionDistance,sizeX); ++j) {
+        int X1 = fmin(x1,x2);
+        int X2 = fmax(x1,x2);
+        int Y1 = fmin(y1,y2);
+        int Y2 = fmax(y1,y2);
+        for (int i = fmax(Y1-actionDistance,0); i < fmin(Y2+actionDistance,sizeY); ++i) {
+            for (int j = fmax(X1-actionDistance,0); j < fmin(X2+actionDistance,sizeX); ++j) {
                 myField.totalField[i][j] = myField.attractiveField[i][j] + myField.repulsiveField[i][j];
             }
         }
