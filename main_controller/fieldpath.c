@@ -45,8 +45,8 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2){
     float euclidianDistance;
     int activeX1 = fmax(X1-actionDistance,0);
     int activeY1 = fmax(Y1-actionDistance,0);
-    int activeX2 = min(X2+actionDistance,sizeX);
-    int activeY2 = min(Y2+actionDistance,sizeY);//Définit la zone mise à jour
+    int activeX2 = fmin(X2+actionDistance,sizeX);
+    int activeY2 = fmin(Y2+actionDistance,sizeY);//Définit la zone mise à jour
 
     for (int i = activeY1; i < activeY2; ++i) {
         for (int j = activeX1; j < activeX2; ++j) {
