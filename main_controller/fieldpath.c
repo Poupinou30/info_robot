@@ -108,10 +108,10 @@ void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2){
     }
 }
 
-void print2DArray(int m, int n, int** arr) {
+void print2DArray(int m, int n, double** arr) {
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            printf("%d ", arr[i][j]);
+            printf("%lf ", arr[i][j]);
         }
         printf("\n");
     }

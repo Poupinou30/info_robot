@@ -56,7 +56,7 @@ void computeInitialRepulsiveField();
 void updateRepulsiveField(int x1,int y1, int x2, int y2);
 void resetRepulsiveField(int x1,int y1, int x2, int y2);
 void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
-void print2DArray(int m, int n, int** arr);
+void print2DArray(int m, int n, double** arr);
 
 
 extern position myPos;

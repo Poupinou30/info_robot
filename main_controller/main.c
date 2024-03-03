@@ -62,6 +62,7 @@ int main(){
     fprintf(stderr,"Position set \n");
     computeAttractiveField(destination);
     fprintf(stderr,"Compute attractive done \n");
+    print2DArray(sizeY,sizeX,myField.totalField);
 
     return 0;
 
