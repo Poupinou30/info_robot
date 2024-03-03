@@ -54,8 +54,8 @@ int main(){
     updateRepulsiveField(290,90,300,110);
     fprintf(stderr,"updateRepulsive done \n");
     position destination;
-    *destination.x = 12;
-    *destination.y = 127;
+    destination.x = 12;
+    destination.y = 127;
     fprintf(stderr,"Position set \n");
     computeAttractiveField(destination);
     fprintf(stderr,"Compute attractive done \n");
