@@ -356,7 +356,7 @@ int main(int argc, const char * argv[]){
 
 		sl_lidar_response_measurement_node_hq_t nodes[8192];//on définit un format de réponse
 		size_t nodeCount = sizeof(nodes)/sizeof(sl_lidar_response_measurement_node_hq_t);//on définit la taille du truc
-            int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
+        int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
         while(1) {
 
             sl_result res_gscan = lidar->grabScanDataHq(nodes,
@@ -400,7 +400,7 @@ int main(int argc, const char * argv[]){
                 }
 
 
-
+                //Attention boucle while, pour optimiser la mémoire et la rapidité peut être ne pas déclarer de variables dans la boucle
                 std::vector<float> numbers = {position->x,position->y,position->theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
                 write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
 

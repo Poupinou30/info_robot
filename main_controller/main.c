@@ -6,6 +6,7 @@
 float* positionReceived;
 pthread_mutex_t lockPosition;
 position myPos;
+field myField;
 
 
 
@@ -100,6 +101,7 @@ int mainPattern(){
 }
 
 int main(){
+    //Initialiser la structure de position
     positionReceived = malloc(3*sizeof(float));
     myPos.x = &positionReceived[0];
     myPos.y = &positionReceived[1];
@@ -109,16 +111,24 @@ int main(){
     int pipefd[2];
     pipe(pipefd);
 
+    //Initialiser la structure du field on // on a une arène de
+
+    myField.attractiveField = (double**) malloc(sizeof(double*)*sizeX);
+    myField.repulsiveField = (double**) malloc(sizeof(double*)*sizeX);
+    myField.totalField = (double**) malloc(sizeof(double*)*sizeX);
+    for (int i = 0; i < sizeX; ++i) {
+        myField.attractiveField[i] = (double*) calloc(sizeY,sizeof(double));
+        myField.repulsiveField[i] = (double*) calloc(sizeY,sizeof(double));
+        myField.totalField[i] = (double*) calloc(sizeY,sizeof(double));
+    }
+
      //Buffer pour reprendre les données du Lidar
 
     //Initialisation thread qui execute le programme lidar
     pthread_t lidarExecuteThread;
     pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipefd[1]); // Passage de l'adresse de pipefd[1] à pthread_create
     fprintf(stderr,"Thread for execution launched \n");
-
     //initialisation thread qui récupère les données du pipe provenant du programme lidar
-
-
     pthread_t pipeComThread;
     pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
     fprintf(stderr,"Thread for capture launched \n");

@@ -43,5 +43,14 @@ typedef struct position{
     float *theta;
 } position;
 
+typedef struct field{
+    double** attractiveField;
+    double** repulsiveField;
+    double** totalField;
+} field;
+
 extern position myPos;
+extern field myField;
 extern pid_t child_pid;
+extern int sizeX;
+extern int sizeY;
