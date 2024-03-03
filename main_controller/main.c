@@ -23,9 +23,9 @@ int main(){
 
     //Initialiser la structure du field on // on a une arène de
 
-    myField.attractiveField = (double**) malloc(sizeof(double*)*sizeX);
-    myField.repulsiveField = (double**) malloc(sizeof(double*)*sizeX);
-    myField.totalField = (double**) malloc(sizeof(double*)*sizeX);
+    myField.attractiveField = (double**) malloc(sizeof(double*)*sizeY);
+    myField.repulsiveField = (double**) malloc(sizeof(double*)*sizeY);
+    myField.totalField = (double**) malloc(sizeof(double*)*sizeY);
     fprintf(stderr,"First malloc \n");
     for (int i = 0; i < sizeY; ++i) {
         myField.attractiveField[i] = (double*) calloc(sizeX,sizeof(double));
