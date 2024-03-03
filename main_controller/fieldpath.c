@@ -56,7 +56,7 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2){
             } //Si on est DANS la zone de l'objet
 
             else if(euclidianDistance <= actionDistance){
-                myField.repulsiveField[i][j] = 1/2 *pow((1/euclidianDistance - 1/actionDistance),2)
+                myField.repulsiveField[i][j] = 1/2 *pow((1/euclidianDistance - 1/actionDistance),2);
             }
             else myField.repulsiveField[i][j] = 0;
 
