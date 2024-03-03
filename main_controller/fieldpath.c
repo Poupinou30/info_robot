@@ -23,7 +23,7 @@ void computeAttractiveField(position destination){ //position convertie en cm
     int posY = (int) *(destination.y)*100;
     int posTheta = (int) *(destination.theta)*100;
     fprintf(stderr,"posX posY done \n");
-    float scalingFactor = 1;
+    float scalingFactor = 0.01;
     double euclidianDistance;
     fprintf(stderr,"before loop \n");
     for (int i = 0; i < sizeY; ++i) {
@@ -43,7 +43,7 @@ void computeInitialRepulsiveField(){
 
 void updateRepulsiveField(int x1,int y1, int x2, int y2){
 
-    float scalingFactor = 1;
+    float scalingFactor = 100;
     int X1 = fmin(x1,x2);
     int X2 = fmax(x1,x2);
     int Y1 = fmin(y1,y2);
