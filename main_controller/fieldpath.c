@@ -116,3 +116,37 @@ void print2DArray(int m, int n, double** arr) {
         printf("\n");
     }
 }
+
+void makeHeatmap(){
+    // Créer un tableau 2D
+    double** array = myField.totalField;
+
+
+    // Écrire les données du tableau dans un fichier
+    FILE *file = fopen("data.txt", "w");
+    if(file == NULL) {
+        printf("Erreur lors de l'ouverture du fichier\n");
+        return 1;
+    }
+    for(int i = 0; i < sizeY; i++) {
+        for(int j = 0; j < sizeX; j++) {
+            fprintf(file, "%f ", array[i][j]);
+        }
+        fprintf(file, "\n");
+    }
+    fclose(file);
+
+    // Utiliser gnuplot pour générer la heatmap
+    FILE *gnuplotPipe = popen ("gnuplot -persistent", "w");
+    if(gnuplotPipe == NULL) {
+        printf("Erreur lors de l'ouverture du pipe vers gnuplot\n");
+        return 1;
+    }
+    fprintf(gnuplotPipe, "set view map\n"); // Pour créer une heatmap
+    fprintf(gnuplotPipe, "splot 'data.txt' matrix with image\n"); // Pour lire les données du fichier et générer l'image
+    fflush(gnuplotPipe);
+
+    // Libérer la mémoire allouée pour le tableau
+
+
+}
