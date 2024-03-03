@@ -33,6 +33,7 @@ void computeAttractiveField(position destination){ //position convertie en cm
         }
     }
     fprintf(stderr,"afterloop \n");
+    computeTotalField(0,NULL,NULL,NULL,NULL);
 }
 
 void computeInitialRepulsiveField(){
