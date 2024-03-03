@@ -5,5 +5,5 @@
 #include "headers.h"
 #define HEADERS
 #endif
-int sizeX = 300; //taille de l'arène en cm
-int sizeY = 200; //taille de l'arène en cm
+int sizeX = 200; //taille de l'arène en cm
+int sizeY = 300; //taille de l'arène en cm
