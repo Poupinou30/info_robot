@@ -116,11 +116,13 @@ int main(){
     myField.attractiveField = (double**) malloc(sizeof(double*)*sizeX);
     myField.repulsiveField = (double**) malloc(sizeof(double*)*sizeX);
     myField.totalField = (double**) malloc(sizeof(double*)*sizeX);
+    fprintf(stderr,"First malloc \n")
     for (int i = 0; i < sizeX; ++i) {
         myField.attractiveField[i] = (double*) calloc(sizeY,sizeof(double));
         myField.repulsiveField[i] = (double*) calloc(sizeY,sizeof(double));
         myField.totalField[i] = (double*) calloc(sizeY,sizeof(double));
     }
+    fprintf(stderr,"All mallocs done \n")
 
      //Buffer pour reprendre les données du Lidar
 
@@ -142,10 +144,12 @@ int main(){
     close(pipefd[0]);
     close(pipefd[1]);*/
     updateRepulsiveField(290,90,300,110);
+    fprintf(stderr,"updateRepulsive done \n")
     position destination;
     *destination.x = 12;
     *destination.y = 127;
     computeAttractiveField(destination);
+    fprintf(stderr,"Compute attractive done \n")
 
     return 0;
 
