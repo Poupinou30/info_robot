@@ -23,7 +23,7 @@ void computeAttractiveField(position destination){ //position convertie en cm
     int posTheta = (int) *(destination.theta)*100;
     float scalingFactor = 1;
     double euclidianDistance;
-    for (int i = ; i < sizeY; ++i) {
+    for (int i = 0; i < sizeY; ++i) {
         for (int j = 0; j < sizeX; ++j) {
             myField.attractiveField[i][j] = 0.5*scalingFactor* computeEuclidianDistance(i,j,posX,posY);
         }
