@@ -94,7 +94,7 @@ void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2){
     if(mode == 0){
         for (int i = 0; i < sizeY; ++i) {
             for (int j = 0; j < sizeX; ++j) {
-                myField.totalField[i][j] = myField.attractiveField[i][j] + myField.repulsiveField[i][j];
+                myField.totalField[i][j] = myField.attractiveField[i][j] - myField.repulsiveField[i][j];
             }
 
         }
