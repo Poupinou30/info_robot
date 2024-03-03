@@ -51,7 +51,7 @@ int main(){
     close(pipefd[0]);
     close(pipefd[1]);*/
 
-    updateRepulsiveField(90,290,110,300);
+    updateRepulsiveField(50,50,60,60);
     fprintf(stderr,"updateRepulsive done \n");
     position destination;
     destination.x = (float*)malloc(sizeof(float));
