@@ -60,8 +60,8 @@ int main(){
     *destination.x = 12;
     *destination.y = 127;
     fprintf(stderr,"Position set \n");
-    //computeAttractiveField(destination);
-    //fprintf(stderr,"Compute attractive done \n");
+    computeAttractiveField(destination);
+    fprintf(stderr,"Compute attractive done \n");
     makeHeatmap();
 
     return 0;
