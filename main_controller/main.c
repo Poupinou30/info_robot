@@ -51,7 +51,7 @@ int main(){
     close(pipefd[0]);
     close(pipefd[1]);*/
 
-    updateRepulsiveField(290,90,300,110);
+    updateRepulsiveField(90,290,110,300);
     fprintf(stderr,"updateRepulsive done \n");
     position destination;
     destination.x = (float*)malloc(sizeof(float));
@@ -60,8 +60,8 @@ int main(){
     *destination.x = 12;
     *destination.y = 127;
     fprintf(stderr,"Position set \n");
-    computeAttractiveField(destination);
-    fprintf(stderr,"Compute attractive done \n");
+    //computeAttractiveField(destination);
+    //fprintf(stderr,"Compute attractive done \n");
     makeHeatmap();
 
     return 0;
