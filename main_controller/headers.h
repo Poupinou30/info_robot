@@ -21,6 +21,18 @@
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
 
+typedef struct position{
+    float *x;
+    float *y;
+    float *theta;
+} position;
+
+typedef struct field{
+    double** attractiveField;
+    double** repulsiveField;
+    double** totalField;
+} field;
+
 void createArray(int16_t num1, int16_t num2, uint8_t* output);
 double degToRad(double deg);
 int initializeSPI(int channel);
@@ -45,17 +57,7 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2);
 void resetRepulsiveField(int x1,int y1, int x2, int y2);
 void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
 void print2DArray(int m, int n, int** arr);
-typedef struct position{
-    float *x;
-    float *y;
-    float *theta;
-} position;
 
-typedef struct field{
-    double** attractiveField;
-    double** repulsiveField;
-    double** totalField;
-} field;
 
 extern position myPos;
 extern field myField;
