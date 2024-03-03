@@ -29,7 +29,7 @@ void computeAttractiveField(position destination){ //position convertie en cm
     for (int i = 0; i < sizeY; ++i) {
         for (int j = 0; j < sizeX; ++j) {
             myField.attractiveField[i][j] = 0.5*scalingFactor* computeEuclidianDistance(j,i,posX,posY);
-            fprintf(stderr,"attractive in x = %d and y = %d is updated to %lf \n",j,i,myField.attractiveField[i][j]);
+            //fprintf(stderr,"attractive in x = %d and y = %d is updated to %lf \n",j,i,myField.attractiveField[i][j]);
         }
     }
     fprintf(stderr,"afterloop \n");
@@ -94,7 +94,7 @@ void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2){
     if(mode == 0){
         for (int i = 0; i < sizeY; ++i) {
             for (int j = 0; j < sizeX; ++j) {
-                myField.totalField[i][j] = myField.attractiveField[i][j] - myField.repulsiveField[i][j];
+                myField.totalField[i][j] = myField.attractiveField[i][j] + myField.repulsiveField[i][j];
             }
 
         }
