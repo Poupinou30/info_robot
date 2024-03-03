@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-float actionDistance = 10; //en cm
+float actionDistance = 20; //en cm
 
 float computeEuclidianDistance(int x1, int y1, int x2, int y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
