@@ -140,7 +140,6 @@ void makeHeatmap(){
     FILE *gnuplotPipe = popen ("gnuplot -persistent", "w");
     if(gnuplotPipe == NULL) {
         printf("Erreur lors de l'ouverture du pipe vers gnuplot\n");
-        return 1;
     }
     fprintf(gnuplotPipe, "set view map\n"); // Pour créer une heatmap
     fprintf(gnuplotPipe, "splot 'data.txt' matrix with image\n"); // Pour lire les données du fichier et générer l'image
