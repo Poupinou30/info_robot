@@ -29,6 +29,7 @@ void computeAttractiveField(position destination){ //position convertie en cm
     for (int i = 0; i < sizeY; ++i) {
         for (int j = 0; j < sizeX; ++j) {
             myField.attractiveField[i][j] = 0.5*scalingFactor* computeEuclidianDistance(i,j,posX,posY);
+            fprintf(stderr,"repulsive in x = %d and y = %d is updated to %lf \n",j,i,myField.attractiveField[i][j]);
         }
     }
     fprintf(stderr,"afterloop \n");
@@ -57,13 +58,13 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2){
             euclidianDistance = computeRectangleDistance(X1,Y1,X2,Y2,j,i);
             if(j >= X1 && j <= X2 && i >= Y1 && i <= Y2){
                 myField.repulsiveField[i][j] = 0.5*pow((1-(1/actionDistance)),2);
-                fprintf(stderr,"repulsive in x = %d and y = %d is updated to %lf \n",j,i,myField.repulsiveField[i][j]);
-                fprintf(stderr,"Computation was %lf \n",0.5*pow((1-(1/actionDistance)),2));
+                //fprintf(stderr,"repulsive in x = %d and y = %d is updated to %lf \n",j,i,myField.repulsiveField[i][j]);
+                //fprintf(stderr,"Computation was %lf \n",0.5*pow((1-(1/actionDistance)),2));
             } //Si on est DANS la zone de l'objet
 
             else if(euclidianDistance <= actionDistance){
                 myField.repulsiveField[i][j] = 0.5*pow(((1/euclidianDistance)-(1/actionDistance)),2);
-                fprintf(stderr,"repulsive in x = %d and y = %d is updated to %lf \n",j,i,myField.repulsiveField[i][j]);
+                //fprintf(stderr,"repulsive in x = %d and y = %d is updated to %lf \n",j,i,myField.repulsiveField[i][j]);
             }
             else myField.repulsiveField[i][j] = 0;
 
