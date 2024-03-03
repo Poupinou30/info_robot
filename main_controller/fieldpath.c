@@ -21,6 +21,7 @@ void computeAttractiveField(position destination){ //position convertie en cm
     //Elle ne sera exécutée qu'à chaque fois qu'on changera l'objectif final en terme de destination (ex: quand on arrive a une plante)
     int posX = (int) *(destination.x)*100;
     int posY = (int) *(destination.y)*100;
+    fprintf(stderr,"posX posY done \n");
     int posTheta = (int) *(destination.theta)*100;
     float scalingFactor = 1;
     double euclidianDistance;
