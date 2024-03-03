@@ -56,9 +56,9 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2){
         for (int j = activeX1; j < activeX2; ++j) {
             euclidianDistance = computeRectangleDistance(X1,Y1,X2,Y2,j,i);
             if(j >= X1 && j <= X2 && i >= Y1 && i <= Y2){
-                myField.repulsiveField[i][j] = 1/2 * pow((1-1/actionDistance),2);
+                myField.repulsiveField[i][j] = 1/2 * pow((1-(1/actionDistance)),2);
                 fprintf(stderr,"repulsive in x = %d and y = %d is updated to %lf \n",j,i,myField.repulsiveField[i][j]);
-                fprintf(stderr,"Computation was %lf \n",(1-(1/actionDistance)));
+                fprintf(stderr,"Computation was %lf \n",pow((1-(1/actionDistance)),2));
             } //Si on est DANS la zone de l'objet
 
             else if(euclidianDistance <= actionDistance){
