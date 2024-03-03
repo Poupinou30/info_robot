@@ -27,10 +27,10 @@ int main(){
     myField.repulsiveField = (double**) malloc(sizeof(double*)*sizeX);
     myField.totalField = (double**) malloc(sizeof(double*)*sizeX);
     fprintf(stderr,"First malloc \n");
-    for (int i = 0; i < sizeX; ++i) {
-        myField.attractiveField[i] = (double*) calloc(sizeY,sizeof(double));
-        myField.repulsiveField[i] = (double*) calloc(sizeY,sizeof(double));
-        myField.totalField[i] = (double*) calloc(sizeY,sizeof(double));
+    for (int i = 0; i < sizeY; ++i) {
+        myField.attractiveField[i] = (double*) calloc(sizeX,sizeof(double));
+        myField.repulsiveField[i] = (double*) calloc(sizeX,sizeof(double));
+        myField.totalField[i] = (double*) calloc(sizeX,sizeof(double));
     }
     fprintf(stderr,"All mallocs done \n");
 
