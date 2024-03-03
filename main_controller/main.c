@@ -57,8 +57,8 @@ int main(){
     destination.x = (float*)malloc(sizeof(float));
     destination.y = (float*)malloc(sizeof(float));
     destination.theta = (float*)malloc(sizeof(float));
-    *destination.x = 100;
-    *destination.y = 200;
+    *destination.x = 1.00;
+    *destination.y = 2.00;
     fprintf(stderr,"Position set \n");
     computeAttractiveField(destination);
     fprintf(stderr,"Compute attractive done \n");

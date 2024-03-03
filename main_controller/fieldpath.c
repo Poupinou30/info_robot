@@ -28,7 +28,7 @@ void computeAttractiveField(position destination){ //position convertie en cm
     fprintf(stderr,"before loop \n");
     for (int i = 0; i < sizeY; ++i) {
         for (int j = 0; j < sizeX; ++j) {
-            myField.attractiveField[i][j] = 0.5*scalingFactor* computeEuclidianDistance(i,j,posX,posY);
+            myField.attractiveField[i][j] = 0.5*scalingFactor* computeEuclidianDistance(j,i,posX,posY);
             fprintf(stderr,"attractive in x = %d and y = %d is updated to %lf \n",j,i,myField.attractiveField[i][j]);
         }
     }
