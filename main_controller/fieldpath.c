@@ -43,9 +43,13 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2){
     int Y1 = min(y1,y2);
     int Y2 = max(y1,y2);
     float euclidianDistance;
+    int activeX1 = max(X1-actionDistance,0);
+    int activeY1 = max(Y1-actionDistance,0);
+    int activeX2 = min(X2+actionDistance,sizeX);
+    int activeY2 = min(Y2+actionDistance,sizeY);//Définit la zone mise à jour
 
-    for (int i = max(Y1-actionDistance,0); i < min(Y2+actionDistance,sizeY); ++i) {
-        for (int j = max(X1-actionDistance,0); j < min(X2+actionDistance,sizeX); ++j) {
+    for (int i = activeY1; i < activeY2; ++i) {
+        for (int j = activeX1; j < activeX2; ++j) {
             euclidianDistance = computeRectangleDistance(X1,Y1,X2,Y2,j,i);
             if(j >= X1 && j <= X2 && i >= Y1 && i <= Y2){
                 myField.repulsiveField[i][j] = 1/2 * pow((1-1/actionDistance),2);
@@ -58,6 +62,7 @@ void updateRepulsiveField(int x1,int y1, int x2, int y2){
 
         }
     }
+    computeTotalField(1,activeX1,activeY1,activeX2,activeY2);
 
 }
 
@@ -96,5 +101,14 @@ void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2){
                 myField.totalField[i][j] = myField.attractiveField[i][j] + myField.repulsiveField[i][j];
             }
         }
+    }
+}
+
+void print2DArray(int m, int n, int** arr) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%d ", arr[i][j]);
+        }
+        printf("\n");
     }
 }

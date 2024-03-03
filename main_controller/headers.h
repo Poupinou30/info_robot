@@ -37,6 +37,14 @@ void* executeProgram(void* arg);
 void extractBytes(uint16_t nombre, uint8_t *octet_haut, uint8_t *octet_bas) ;
 void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e);
 void* receptionPipe(void* pipefdvoid);
+float computeEuclidianDistance(int x1, int y1, int x2, int y2);
+float computeRectangleDistance(double x1, double y1, double x2, double y2, double x3, double y3);
+void computeAttractiveField(position destination);
+void computeInitialRepulsiveField();
+void updateRepulsiveField(int x1,int y1, int x2, int y2);
+void resetRepulsiveField(int x1,int y1, int x2, int y2);
+void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
+void print2DArray(int m, int n, int** arr);
 typedef struct position{
     float *x;
     float *y;

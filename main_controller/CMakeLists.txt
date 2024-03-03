@@ -7,6 +7,8 @@ include_directories(.)
 find_package(pigpio REQUIRED)
 
 add_executable(main_controller main.c
+        variables.c
+        fieldpath.c
         headers.h
         spi_com.c
         utils.c
