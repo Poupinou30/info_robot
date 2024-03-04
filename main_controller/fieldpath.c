@@ -191,26 +191,21 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
 }
 
 void removeMovingObstacles(){
-    for (int j = 0; j < myForce.movingNumber+1; ++j) {
-        fprintf(stderr,"j = %d and movingIndex[j] = %d \n",j,myForce.movingIndexes[j]);
-        //myForce.obstacleList[myForce.movingIndexes[j]] = (obstacle) NULL;
+    int j = 0;
+    while (j < myForce.movingNumber) {
         for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
-
-            fprintf(stderr,"k = %d \n",k);
-            myForce.obstacleList[k] = myForce.obstacleList[k+1]; //Decale toute la liste
+            myForce.obstacleList[k] = myForce.obstacleList[k+1];
         }
-
-        for (int i = 0; i < myForce.movingNumber; ++i) {
-            myForce.movingIndexes[i] = myForce.movingIndexes[i] -1
+        myForce.obstacleNumber--;
+        for (int k = j; k < myForce.movingNumber; ++k) {
+            myForce.movingIndexes[k]--;
         }
-        myForce.obstacleNumber --;
-
+        j++;
     }
-    fprintf(stderr,"Realloc problem 3 \n");
-    myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*myForce.obstacleNumber);
-    myForce.movingNumber =0;
-
+    myForce.movingNumber = 0;
+    myForce.obstacleList = realloc(myForce.obstacleList, sizeof(obstacle)*myForce.obstacleNumber);
 }
+
 
 void printObstacleLists(){
     fprintf(stderr,"There are %d obstacles in the list\n",myForce.obstacleNumber);
