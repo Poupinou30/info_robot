@@ -253,8 +253,8 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     float yr=y2+((k31n*(x23n-x12n))/D);
     printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
     lidarPos myPos;
-    //myPos.x = xr;
-    //myPos.y = yr;
+    myPos.x = xr;
+    myPos.y = yr;
     fprintf(stderr,"beacon data\n");
     return myPos;
 }
