@@ -168,7 +168,7 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
         fprintf(stderr,"Obstacle added, size of list was 0 and is 1 now\n");
     }
     else{
-        fprintf("Realloc problem 1 \n");
+        fprintf(stderr,"Realloc problem 1 \n");
         myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber)+1);
         myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
         myForce.obstacleNumber ++;
@@ -179,7 +179,7 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
             myForce.movingNumber ++;
         }
         else{
-            fprintf("Realloc problem 2 \n");
+            fprintf(stderr,"Realloc problem 2 \n");
             myForce.movingIndexes = (int*) realloc(myForce.movingIndexes,sizeof(int)*(myForce.movingNumber+1));
             myForce.movingIndexes[myForce.obstacleNumber] = myForce.obstacleNumber-1;
             myForce.movingNumber ++;
@@ -198,13 +198,13 @@ void removeMovingObstacles(){
         myForce.obstacleNumber --;
         myForce.movingNumber --;
     }
-    fprintf("Realloc problem 3 \n");
+    fprintf(stderr,"Realloc problem 3 \n");
     myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*myForce.obstacleNumber);
 
 }
 
 void printObstacleLists(){
-    fprintf("There are %d obstacles in the list\n",myForce.obstacleNumber);
+    fprintf(stderr,"There are %d obstacles in the list\n",myForce.obstacleNumber);
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
         fprintf(stderr,"Obstacle %d is at x = %lf, y = %lf and has size of %lf and has moving to %d\n",i,myForce.obstacleList[i].posX,myForce.obstacleList[i].posY,myForce.obstacleList[i].size,myForce.obstacleList[i].moving);
     }
