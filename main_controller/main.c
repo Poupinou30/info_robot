@@ -7,9 +7,10 @@ float* positionReceived;
 pthread_mutex_t lockPosition;
 position myPos;
 field myField;
+forceVector myForce;
 
 int main(){
-    forceVector myForce;
+
     myForce.obstacleNumber = 0;
     obstacle myObstacle;
     myObstacle.posX = 100;
