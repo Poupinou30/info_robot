@@ -19,6 +19,11 @@ using namespace sl;
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
 
+typedef struct lidarPos{
+    float x;
+    float y;
+    float theta;
+} lidarPos;
 
 int w_plot(float x[], float y[], float angle[], float distance[], int length) {//x c'est angle
 
@@ -103,7 +108,7 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
 }
 
 
-std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
+lidarPos beacon_data(float a[] ,float d[],int counter){
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
     //std::cout<<"c'est beacons qui marche pas?";
@@ -246,8 +251,10 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     float xr=x2+((k31n*(y12n-y23n))/D);
     float yr=y2+((k31n*(x23n-x12n))/D);
     printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
-    
-    return balises;
+    lidarPos myPos;
+    myPos.x = xr;
+    myPos.y = yr;
+    return myPos;
 }
 
 float angle_robot(std::vector<std::vector<float>> balises){
@@ -354,6 +361,3 @@ int main(int argc, const char * argv[]){
     //double time_spent= (double)(end-begin)/CLOCKS_PER_SEC;
     //printf("execution time: %f \n", time_spent);
 }
-
-
-
