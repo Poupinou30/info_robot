@@ -90,7 +90,7 @@ int mainField(){
 
     return 0;
 
-};
+}
 
 void processInstruction(float v_x, float v_y, float omega, double* speedTab, int spi_handle_rear,int spi_handle_front,uint8_t *dataFront, uint8_t *dataRear){
     convertsVelocity(v_x,v_y,omega,speedTab);
