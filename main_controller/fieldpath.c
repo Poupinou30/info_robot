@@ -155,11 +155,11 @@ void makeHeatmap(){
 
 }
 
-void addObstacle(double posX, double posY, double size){
+void addObstacle(double posX, double posY, double size, uint8_t moving){
     obstacle myObstacle;
     myObstacle.posX = posX;
     myObstacle.posY = posY;
-    myObstacle.size = size
+    myObstacle.size = size;
     if(myForce.obstacleNumber == 0){
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
         myForce.obstacleList[0] = myObstacle;
@@ -171,6 +171,19 @@ void addObstacle(double posX, double posY, double size){
         myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber)+1);
         myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
         myForce.obstacleNumber ++;
+    }
+    if(moving){
+        if(myForce.movingNumber == 0){
+            myForce.movingIndexes = (int*) malloc(sizeof(int)*1);
+            myForce.movingNumber ++;
+        }
+        else{
+            myForce.movingIndexes = (int*) realloc(myForce.movingIndexes,sizeof(int)*(myForce.movingNumber+1));
+            myForce.movingIndexes[myForce.obstacleNumber] = myForce.obstacleNumber-1;
+            myForce.movingNumber ++;
+        }
+
+
     }
 }
 

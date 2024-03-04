@@ -31,12 +31,15 @@ typedef struct obstacle{
     double posX;
     double posY;
     double size;
+    uint8_t moving;
 } obstacle;
 
 
 typedef struct forceVector{
     int obstacleNumber;
     obstacle* obstacleList;
+    int movingNumber;
+    int* movingIndexes;
     double fx;
     double fy;
     double ftheta;
