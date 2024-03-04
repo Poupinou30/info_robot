@@ -11,21 +11,24 @@ forceVector myForce;
 position destination;
 
 int main(){
-
+    fprintf("check 1\n");
     myForce.obstacleNumber = 0;
     myForce.movingNumber = 0;
     destination.x = (float*)malloc(sizeof(float));
     destination.y = (float*)malloc(sizeof(float));
     destination.theta = (float*)malloc(sizeof(float));
+    fprintf("check 2\n");
     *destination.x = 1.00;
     *destination.y = 2.00;
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 0;
+    fprintf("check 3\n");
     //addObstacle(0.12,0.42,1,0);
     computeForceVector();
     fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
     fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+    fprintf("check 4\n");
 
 
 }
