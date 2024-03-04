@@ -255,6 +255,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     lidarPos myPos;
     myPos.x = xr;
     myPos.y = yr;
+    fpritnf(stderr,"beacon data\n");
     return myPos;
 }
 
@@ -311,14 +312,15 @@ int main(int argc, const char * argv[]){
 		    lidar->ascendScanData(nodes, nodeCount);
 		    //std::ofstream out("lidar_bord_g_vers2.txt");
 		    float angle[nodeCount]={};
+            fprintf(stderr,"Check 1\n");
 		    float distance[nodeCount]={};
 		    int counter=0;
 		    for(int i=0;i<(int)nodeCount;i++){
-			
+                fprintf(stderr,"Check 2\n");
 			float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
 			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
 			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
-			    
+                fprintf(stderr,"Check 3\n");
 			if(distance_in_meters<=3.6 && distance_in_meters!=0.0){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;
@@ -328,6 +330,7 @@ int main(int argc, const char * argv[]){
 			}
 			
 		    }
+            fprintf(stderr,"Check 4\n");
 		    position = beacon_data(angle, distance, counter);
 		    //std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
 		    //angle_robot(balises);
