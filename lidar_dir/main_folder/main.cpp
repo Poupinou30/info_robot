@@ -332,6 +332,7 @@ int main(int argc, const char * argv[]){
 		    }
             fprintf(stderr,"Check 4\n");
 		    position = beacon_data(angle, distance, counter);
+            fprintf(stderr,"Check 5\n");
 		    //std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
 		    //angle_robot(balises);
 		    //out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
