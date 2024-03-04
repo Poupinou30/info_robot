@@ -18,6 +18,7 @@ int main(){
     myObstacle.size = 5;
     addObstacle(myObstacle);
 
+
 }
 
 int mainField(){

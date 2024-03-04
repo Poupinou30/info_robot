@@ -77,6 +77,7 @@ void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
 void print2DArray(int m, int n, double** arr);
 void makeHeatmap();
 void addObstacle(obstacle myObstacle);
+void printObstacleLists();
 
 extern position myPos;
 extern field myField;
