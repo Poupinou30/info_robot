@@ -48,7 +48,7 @@ typedef struct field{
     double** repulsiveField;
     double** totalField;
     double** attractiveForceX;
-    double** attractiveForceY
+    double** attractiveForceY;
 } field;
 
 void createArray(int16_t num1, int16_t num2, uint8_t* output);
