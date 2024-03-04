@@ -154,3 +154,17 @@ void makeHeatmap(){
 
 
 }
+
+void addObstacle(obstacle myObstacle){
+    if(myForce.obstacleNumber == 0){
+        myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
+        myForce.obstacleList[0] = myObstacle;
+        myForce.obstacleNumber ++;
+        fprintf(stderr,"Obstacle added, size of list was 0 and is 1 now\n");
+    }
+    else{
+        myForce.obstacleNumber ++;
+        myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*myForce.obstacleNumber);
+        myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
+    }
+}

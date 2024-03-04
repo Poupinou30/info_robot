@@ -8,14 +8,27 @@ pthread_mutex_t lockPosition;
 position myPos;
 field myField;
 
-
-
 int main(){
+    forceVector myForce;
+    myForce.obstacleNumber = 0;
+    obstacle myObstacle;
+    myObstacle.posX = 100;
+    myObstacle.posY = 150;
+    myObstacle.size = 5;
+    addObstacle(myObstacle);
+}
+
+int mainField(){
     //Initialiser la structure de position
     positionReceived = malloc(3*sizeof(float));
     myPos.x = &positionReceived[0];
     myPos.y = &positionReceived[1];
     myPos.theta = &positionReceived[2];
+
+
+
+
+
     //initialisation du pipe LIDAR - CONTROLLER
     fprintf(stderr,"program launching \n");
     int pipefd[2];

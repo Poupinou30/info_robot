@@ -27,10 +27,28 @@ typedef struct position{
     float *theta;
 } position;
 
+typedef struct obstacle{
+    double posX;
+    double posY;
+    double size;
+} obstacle;
+
+
+typedef struct forceVector{
+    int obstacleNumber;
+    obstacle* obstacleList;
+    double fx;
+    double fy;
+    double ftheta;
+} forceVector;
+
+
 typedef struct field{
     double** attractiveField;
     double** repulsiveField;
     double** totalField;
+    double** attractiveForceX;
+    double** attractiveForceY
 } field;
 
 void createArray(int16_t num1, int16_t num2, uint8_t* output);
@@ -58,10 +76,11 @@ void resetRepulsiveField(int x1,int y1, int x2, int y2);
 void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
 void print2DArray(int m, int n, double** arr);
 void makeHeatmap();
-
+void addObstacle(obstacle myObstacle)
 
 extern position myPos;
 extern field myField;
 extern pid_t child_pid;
 extern int sizeX;
 extern int sizeY;
+extern forceVector myForce;
