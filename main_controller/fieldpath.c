@@ -163,9 +163,10 @@ void addObstacle(obstacle myObstacle){
         fprintf(stderr,"Obstacle added, size of list was 0 and is 1 now\n");
     }
     else{
-        myForce.obstacleNumber ++;
-        myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*myForce.obstacleNumber);
+
+        myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber)+1);
         myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
+        myForce.obstacleNumber ++;
     }
 }
 
