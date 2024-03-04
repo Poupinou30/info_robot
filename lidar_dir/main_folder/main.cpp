@@ -11,7 +11,6 @@
 #include <rplidar.h>
 #include <iostream>
 #include <fstream>
-#define verbose 0
 
 //#include "matplotlibcpp.h"
 using namespace sl;
@@ -19,12 +18,6 @@ using namespace sl;
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
-
-typedef struct positionBot{
-    float x;
-    float y;
-    float theta;
-} positionBot;
 
 
 int w_plot(float x[], float y[], float angle[], float distance[], int length) {//x c'est angle
@@ -79,6 +72,12 @@ float distance (float a1,float a2,float d1,float d2){
     float dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
     return dist;
 }
+float pyth_gen(float a, float b, float c){
+    printf("test:%f", pow(b,2));
+    float cos= (pow(b,2)+pow(c,2)-pow(a,2))/2*b*c;
+    printf("test:%f", acos(cos));
+    return acos(cos);
+}
 
 std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::vector<float> newd,int counter){
     std::vector<std::vector<float>> obstacles(2);
@@ -103,8 +102,8 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
 
 }
 
-//Fonction calculs
-std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,positionBot* position ){
+
+std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
     //std::cout<<"c'est beacons qui marche pas?";
@@ -192,10 +191,9 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,pos
 		    balises[1][1]=newd[coord[1]];
 		    balises[2][0]=newa[coord[2]];
 		    balises[2][1]=newd[coord[2]];
-		    if(verbose){
-                printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
-                printf("triangle: %f \n", triangle);}
-
+		    
+		    //printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
+		    //printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
 		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
@@ -209,25 +207,6 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,pos
         }
 	
     }
-    
-    //printf("a1: %f, a2: %f, a3: %f \n",newa[coord[0]], newa[coord[1]], newa[coord[2]] );
-    //maintenant partie calculs des coords
-    /*
-    on va d'abord checker quelles sont les balises sur le bord, puis en poser une en 0,0, l'autre en 0,3, l'autre en 2,1.5 et le robot au milieu de ses coords là
-    */
-    //printf("balise 1: dist1: %f, angle1: %f - balise 2: dist2: %f, angle2: %f - balise 3: dist3: %f, angle3: %f",newd[coord[0]], newa[coord[0]], newd[coord[1]], newa[coord[1]], newd[coord[2]], newa[coord[2]] ); 
-    //printf("test x1:%f, y1: %f", newd[coord[0]]*cosf( -newa[coord[0]]*(M_PI/180)), newd[coord[0]]*sinf( -newa[coord[0]]*(M_PI/180)));
-    //printf("test x2:%f, y2: %f", newd[coord[1]]*cosf( -newa[coord[1]]*(M_PI/180)), newd[coord[1]]*sinf( -newa[coord[1]]*(M_PI/180)));
-    //printf("test x3:%f, y3: %f", newd[coord[2]]*cosf( -newa[coord[2]]*(M_PI/180)), newd[coord[2]]*sinf( -newa[coord[2]]*(M_PI/180)));
-
-
-    /*float x1=newd[coord[0]]*cosf( -newa[coord[0]]*(M_PI/180));
-    float y1=newd[coord[0]]*sinf( -newa[coord[0]]*(M_PI/180));
-    float x2=newd[coord[1]]*cosf( -newa[coord[1]]*(M_PI/180));
-    float y2=newd[coord[1]]*sinf( -newa[coord[1]]*(M_PI/180));
-    float x3=newd[coord[2]]*cosf( -newa[coord[2]]*(M_PI/180));
-    float y3=newd[coord[2]]*sinf( -newa[coord[2]]*(M_PI/180));
-    */
     
     float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
     float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
@@ -266,60 +245,23 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter,pos
     }
     float xr=x2+((k31n*(y12n-y23n))/D);
     float yr=y2+((k31n*(x23n-x12n))/D);
-    float theta = 0;
-    position->x = xr;
-    position->y = yr;
-    position->theta = theta;
-
-    if(verbose) printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
+    printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
     
     return balises;
 }
-/*
 
-void plot_histogram(sl_lidar_response_measurement_node_hq_t * nodes, size_t count)//ça vient de la lib sdk
-{
-    const int BARCOUNT =  75;
-    const int MAXBARHEIGHT = 20;
-    // const float ANGLESCALE = 360.0f/BARCOUNT;
-
-    float histogram[BARCOUNT];
-    for (int pos = 0; pos < _countof(histogram); ++pos) {
-        histogram[pos] = 0.0f;
-    }
-
-    float max_val = 0;
-    for (int pos =0 ; pos < (int)count; ++pos) {
-        int int_deg = (int)(nodes[pos].angle_z_q14 * 90.f / 16384.f);
-        if (int_deg >= BARCOUNT) int_deg = 0;
-        float cachedd = histogram[int_deg];
-        if (cachedd == 0.0f ) {
-            cachedd = nodes[pos].dist_mm_q2/4.0f;
-        } else {
-            cachedd = (nodes[pos].dist_mm_q2/4.0f + cachedd)/2.0f;
-        }
-
-        if (cachedd > max_val) max_val = cachedd;
-        histogram[int_deg] = cachedd;
-    }
-
-    for (int height = 0; height < MAXBARHEIGHT; ++height) {
-        float threshold_h = (MAXBARHEIGHT - height - 1) * (max_val/MAXBARHEIGHT);
-        for (int xpos = 0; xpos < BARCOUNT; ++xpos) {
-            if (histogram[xpos] >= threshold_h) {
-                putc('*', stdout);
-            }else {
-                putc(' ', stdout);
-            }
-        }
-        printf("\n");
-    }
-    for (int xpos = 0; xpos < BARCOUNT; ++xpos) {
-        putc('-', stdout);
-    }
-    printf("\n");
+float angle_robot(std::vector<std::vector<float>> balises){
+    /*
+     * le but est de retourner l'angle du robot par rapport à l'orientation de la table
+     * on va faire un triangle formé du robot et des 2 balises du même coté et utilisé pythagore généralisé
+     */
+    
+    float yRm= balises[0][1]*sin((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    float xRm= balises[0][1]*cos((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    float theta=balises[2][0]-acos(yRm/balises[2][1]);
+    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xRm, yRm);
+    return theta;
 }
-*/
 
 int main(int argc, const char * argv[]){
     //clock_t begin= clock();
@@ -350,73 +292,52 @@ int main(int argc, const char * argv[]){
 		LidarScanMode scanMode;//on utilise le mode standard de scan(on peut aussi choisir)
 		lidar->startScan(false, true, 0, &scanMode);
 
-
-
-
-
 		sl_lidar_response_measurement_node_hq_t nodes[8192];//on définit un format de réponse
 		size_t nodeCount = sizeof(nodes)/sizeof(sl_lidar_response_measurement_node_hq_t);//on définit la taille du truc
-        int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
-        while(1) {
-
-            sl_result res_gscan = lidar->grabScanDataHq(nodes,
-                                                        nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
-            //res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
-            if (IS_OK(res_gscan)) {
-                if(verbose) fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
-                lidar->ascendScanData(nodes, nodeCount);
-                std::ofstream out("lidar_bord_g_vers2.txt");
-                float angle[nodeCount] = {};
-                float distance[nodeCount] = {};
-                int counter = 0;
-                for (int i = 0; i < (int) nodeCount; i++) {
-
-                    float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
-                    float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
-                    //out << angle_in_degrees << " , " << distance_in_meters << "\n";
-
-                    if (distance_in_meters <= 3.6 && distance_in_meters != 0.0) {
-                        angle[counter] = angle_in_degrees;
-                        distance[counter] = distance_in_meters;
-                        counter += 1;
-                        out << angle_in_degrees << " , " << distance_in_meters << "\n";
-                        //printf("Angle : %f, Distance : %f \n", angle_in_degrees,distance_in_meters);
-                    }
-
-                }
-
-                //beacon_data(angle, distance, counter);
-                positionBot *position = (positionBot*) malloc(sizeof(positionBot));
-                std::vector <std::vector<float>> balises = beacon_data(angle, distance, counter,position);
-                out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||"
-                    << balises[2][0] << "," << balises[2][1] << "\n";
-                //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
-
-                out.close();
-
-                if (argc != 2) { // Vérification du nombre d'arguments
-                    fprintf(stderr, "Usage: %s <write pipe fd>\n", argv[0]); // Affichage d'un message d'erreur si le nombre d'arguments est incorrect
-                    exit(1); // Arrêt du programme
-                }
-
-
-                //Attention boucle while, pour optimiser la mémoire et la rapidité peut être ne pas déclarer de variables dans la boucle
-                std::vector<float> numbers = {position->x,position->y,position->theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
-                write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
-
-                //std::cout<<"alors tu arrives jusqu'ici ou pas?";
-                //plot_histogram(nodes, nodeCount);
-            } else {
-                fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n",
-                        res_gscan);//erreur si je sais pas grab les data
-
-                //ici faut recup les donner de res scan
-            }
-
-            //fin de la bouboucle
-            if(verbose) std::cout << "fin de programme, arrête toi sale bête";
-        }
-            close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
+		
+		sl_result res_gscan = lidar->grabScanDataHq(nodes, nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
+		//res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
+		if (IS_OK(res_gscan)){
+		    fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
+		    lidar->ascendScanData(nodes, nodeCount);
+		    std::ofstream out("lidar_bord_g_vers2.txt");
+		    float angle[nodeCount]={};
+		    float distance[nodeCount]={};
+		    int counter=0;
+		    for(int i=0;i<(int)nodeCount;i++){
+			
+			float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
+			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
+			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
+			    
+			if(distance_in_meters<=3.6 && distance_in_meters!=0.0){
+			    angle[counter]=angle_in_degrees;
+			    distance[counter]=distance_in_meters;
+			    counter+=1;
+			    out << angle_in_degrees << " , " << distance_in_meters << "\n";
+			    //printf("Angle : %f, Distance : %f \n", angle_in_degrees,distance_in_meters);
+			}
+			
+		    }
+		    
+		    //beacon_data(angle, distance, counter);
+		    std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
+		    angle_robot(balises);
+		    out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
+		    //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
+		    
+		    out.close();
+		    //std::cout<<"alors tu arrives jusqu'ici ou pas?";
+		    //plot_histogram(nodes, nodeCount);
+		}
+		else{
+			fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
+		
+		    //ici faut recup les donner de res scan
+		}
+	    
+	    //fin de la bouboucle
+	    std::cout<<"fin de programme, arrête toi sale bête";
 	    
 	}else{
             fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
