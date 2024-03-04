@@ -27,7 +27,7 @@ int main(){
     *myPos.y = 2;
     *myPos.theta = 0;
     fprintf(stderr,"check 3\n");
-    addObstacle(0,0.10,1,0);
+    addObstacle(0,0.10,0.01,0);
     computeForceVector();
     fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
     fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
