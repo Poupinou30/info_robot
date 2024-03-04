@@ -208,4 +208,7 @@ void printObstacleLists(){
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
         fprintf(stderr,"Obstacle %d is at x = %lf, y = %lf and has size of %lf and has moving to %d\n",i,myForce.obstacleList[i].posX,myForce.obstacleList[i].posY,myForce.obstacleList[i].size,myForce.obstacleList[i].moving);
     }
+    for (int i = 0; i < myForce.movingNumber; ++i) {
+        fprintf(stderr,"index of moving is %d\n",myForce.movingIndexes[i]);
+    }
 }
