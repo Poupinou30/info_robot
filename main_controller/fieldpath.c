@@ -5,7 +5,7 @@
 
 float actionDistance = 20; //en cm
 
-float computeEuclidianDistance(int x1, int y1, int x2, int y2){
+float computeEuclidianDistance(double x1, double y1, double x2, double y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
 }
 
@@ -215,4 +215,34 @@ void printObstacleLists(){
     for (int i = 0; i < myForce.movingNumber; ++i) {
         fprintf(stderr,"index of moving is %d\n",myForce.movingIndexes[i]);
     }
+}
+
+void computeForceVector(){
+    float k_att_xy = 1;
+    float k_att_theta;
+    float k_repul = 1;
+    double f_att_x = -k_att_xy * (*myPos.x- *destination.x);
+    double f_att_y = -k_att_xy * (*myPos.y - *destination.y);
+    double f_att_theta = k_att_theta * (*myPos.theta-*destination.theta);
+    double f_repul_x = 0;
+    double f_repul_y = 0;
+    double tempoX;
+    double tempoY;
+    double distance;
+    //Calcul de la force de répulsion totale
+    for (int i = 0; i < myForce.obstacleNumber; ++i) {
+        tempoX = myForce.obstacleList[i].posX;
+        tempoY = myForce.obstacleList[i].posY;
+        distance = computeEuclidianDistance(tempoX,tempoY,*myPos.x,*myPos.y);
+        if(distance < actionDistance){
+            f_repul_x = f_repul_x + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoX - *myPos.x);
+            f_repul_y = f_repul_y + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoy - *myPos.y);
+
+        }
+    }
+    f_tot_x = f_att_x+f_repul_x;
+    f_tot_y = f_att_y + f_repul_y;
+
+
+
 }

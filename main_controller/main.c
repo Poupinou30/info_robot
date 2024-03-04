@@ -8,17 +8,22 @@ pthread_mutex_t lockPosition;
 position myPos;
 field myField;
 forceVector myForce;
+position destination;
 
 int main(){
 
     myForce.obstacleNumber = 0;
     myForce.movingNumber = 0;
+    destination.x = (float*)malloc(sizeof(float));
+    destination.y = (float*)malloc(sizeof(float));
+    destination.theta = (float*)malloc(sizeof(float));
+    *destination.x = 1.00;
+    *destination.y = 2.00;
+    *myPos.x = 0;
+    *myPos.y = 0;
+    *myPos.theta = 0;
+    //addObstacle(0.12,0.42,1,0);
 
-    addObstacle(12,42,1,0);
-    addObstacle(31,91,4,1);
-    addObstacle(-12,48,98,0);
-    addObstacle(2,87,1,1);
-    addObstacle(1,9,4,0);
     printObstacleLists();
     removeMovingObstacles();
     printObstacleLists();
@@ -74,7 +79,7 @@ int mainField(){
 
     updateRepulsiveField(50,50,60,60);
     fprintf(stderr,"updateRepulsive done \n");
-    position destination;
+
     destination.x = (float*)malloc(sizeof(float));
     destination.y = (float*)malloc(sizeof(float));
     destination.theta = (float*)malloc(sizeof(float));
