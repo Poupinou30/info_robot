@@ -155,7 +155,11 @@ void makeHeatmap(){
 
 }
 
-void addObstacle(obstacle myObstacle){
+void addObstacle(double posX, double posY, double size){
+    obstacle myObstacle;
+    myObstacle.posX = posX;
+    myObstacle.posY = posY;
+    myObstacle.size = size
     if(myForce.obstacleNumber == 0){
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
         myForce.obstacleList[0] = myObstacle;

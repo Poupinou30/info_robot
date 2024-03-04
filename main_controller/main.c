@@ -12,14 +12,9 @@ forceVector myForce;
 int main(){
 
     myForce.obstacleNumber = 0;
-    obstacle myObstacle;
-    myObstacle.posX = 100;
-    myObstacle.posY = 150;
-    myObstacle.size = 5;
-    addObstacle(myObstacle);
-    myObstacle.posX = 140;
-    myObstacle.posY = 12;
-    addObstacle(myObstacle);
+
+    addObstacle(12,42,1);
+    addObstacle(31,91,4);
     printObstacleLists();
 
 
