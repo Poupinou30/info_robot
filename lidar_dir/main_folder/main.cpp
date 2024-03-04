@@ -303,7 +303,7 @@ int main(int argc, const char * argv[]){
 
 		sl_lidar_response_measurement_node_hq_t nodes[8192];//on définit un format de réponse
 		size_t nodeCount = sizeof(nodes)/sizeof(sl_lidar_response_measurement_node_hq_t);//on définit la taille du truc
-		
+        while(1){
 		sl_result res_gscan = lidar->grabScanDataHq(nodes, nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
 		//res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
 		if (IS_OK(res_gscan)){
@@ -346,8 +346,14 @@ int main(int argc, const char * argv[]){
 	    
 	    //fin de la bouboucle
 	    std::cout<<"fin de programme, arrête toi sale bête";
-	    
-	}else{
+        int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
+
+        std::vector<float> numbers = {position.x,position.y,position.theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+        write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
+        sleep(0.5);
+
+        }
+        }else{
             fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
         }
 	
@@ -361,4 +367,5 @@ int main(int argc, const char * argv[]){
     //clock_t end= clock();
     //double time_spent= (double)(end-begin)/CLOCKS_PER_SEC;
     //printf("execution time: %f \n", time_spent);
+    close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
 }
