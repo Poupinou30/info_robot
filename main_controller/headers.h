@@ -81,6 +81,7 @@ void print2DArray(int m, int n, double** arr);
 void makeHeatmap();
 void addObstacle(double posX, double posY, double size, uint8_t moving);
 void printObstacleLists();
+void removeMovingObstacles()
 
 extern position myPos;
 extern field myField;

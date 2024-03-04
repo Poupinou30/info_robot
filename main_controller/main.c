@@ -19,6 +19,7 @@ int main(){
     addObstacle(-12,48,98,0);
     addObstacle(2,87,1,1);
     addObstacle(1,9,4,0);
+
     printObstacleLists();
 
 
