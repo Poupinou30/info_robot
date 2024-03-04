@@ -26,12 +26,27 @@ int main(){
     *myPos.x = 0;
     *myPos.y = 2;
     *myPos.theta = 0;
+
+    //Pipe et thread
+    int pipefd[2];
+    pipe(pipefd);
+    pthread_t lidarExecuteThread;
+    pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipefd[1]); // Passage de l'adresse de pipefd[1] à pthread_create
+    fprintf(stderr,"Thread for execution launched \n");
+    //initialisation thread qui récupère les données du pipe provenant du programme lidar
+    pthread_t pipeComThread;
+    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
+    fprintf(stderr,"Thread for capture launched \n");
+
+
     fprintf(stderr,"check 3\n");
     addObstacle(0,0.10,0.01,0);
     computeForceVector();
     fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
     fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
     fprintf(stderr,"check 4\n");
+    close(pipefd[0]);
+    close(pipefd[1]);
 
 
 }
