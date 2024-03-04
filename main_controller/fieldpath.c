@@ -176,12 +176,13 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
     if(moving){
         if(myForce.movingNumber == 0){
             myForce.movingIndexes = (int*) malloc(sizeof(int)*1);
+            myForce.movingIndexes[myForce.movingNumber] = myForce.obstacleNumber-1;
             myForce.movingNumber ++;
         }
         else{
             //fprintf(stderr,"Realloc problem 2 \n");
             myForce.movingIndexes = (int*) realloc(myForce.movingIndexes,sizeof(int)*(myForce.movingNumber+1));
-            myForce.movingIndexes[myForce.obstacleNumber] = myForce.obstacleNumber-1;
+            myForce.movingIndexes[myForce.movingNumber] = myForce.obstacleNumber-1;
             myForce.movingNumber ++;
         }
 
