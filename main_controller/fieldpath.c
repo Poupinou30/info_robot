@@ -190,7 +190,7 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
 
 void removeMovingObstacles(){
     for (int j = 0; j < myForce.movingNumber; ++j) {
-        myForce.obstacleList[myForce.movingIndexes[j]] = (obstacle) NULL;
+        //myForce.obstacleList[myForce.movingIndexes[j]] = (obstacle) NULL;
         for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
             myForce.obstacleList[k] = myForce.obstacleList[k+1]; //Decale toute la liste
         }
