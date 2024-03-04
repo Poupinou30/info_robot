@@ -82,6 +82,7 @@ void makeHeatmap();
 void addObstacle(double posX, double posY, double size, uint8_t moving);
 void printObstacleLists();
 void removeMovingObstacles();
+void computeForceVector();
 
 extern position myPos;
 extern field myField;
