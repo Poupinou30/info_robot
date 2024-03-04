@@ -188,6 +188,19 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
     }
 }
 
+void removeMovingObstacles(){
+    for (int j = 0; j < myForce.movingNumber; ++j) {
+        myForce.obstacleList[myForce.movingIndexes[j]] = NULL;
+        for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
+            myForce.obstacleList[k] = myForce.obstacleList[k+1]; //Decale toute la liste
+        }
+        myForce.obstacleNumber --;
+        myForce.movingNumber --;
+    }
+    myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*myForce.obstacleNumber);
+
+}
+
 void printObstacleLists(){
     fprintf("There are %d obstacles in the list\n",myForce.obstacleNumber);
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
