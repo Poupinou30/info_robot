@@ -168,3 +168,10 @@ void addObstacle(obstacle myObstacle){
         myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
     }
 }
+
+void printObstacleLists(){
+    fprintf("There are %d obstacles in the list\n",myForce.obstacleNumber);
+    for (int i = 0; i < myForce.obstacleNumber; ++i) {
+        fprintf(stderr,"Obstacle %d is at x = %lf, y = %ld and has size of %lf\n",i,myForce.obstacleList[i].posX,myForce.obstacleList[i].posY,myForce.obstacleList[i].size);
+    }
+}
