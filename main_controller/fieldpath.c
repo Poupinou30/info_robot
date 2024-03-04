@@ -169,7 +169,7 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
     }
     else{
         fprintf(stderr,"Realloc problem 1 with obstacle number = %d \n",myForce.obstacleNumber);
-        myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber)+1);
+        myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber+1));
         myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
         myForce.obstacleNumber ++;
     }
