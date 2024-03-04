@@ -23,6 +23,7 @@ int main(){
     *myPos.y = 0;
     *myPos.theta = 0;
     //addObstacle(0.12,0.42,1,0);
+    computeForceVector();
     fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
     fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
 
