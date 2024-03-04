@@ -192,7 +192,7 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
 
 void removeMovingObstacles(){
     for (int j = 0; j < myForce.movingNumber+1; ++j) {
-        fprintf(stderr,"j = %d and movingIndex[j] = %lf \n",j,myForce.movingIndexes[j]);
+        fprintf(stderr,"j = %d and movingIndex[j] = %d \n",j,myForce.movingIndexes[j]);
         //myForce.obstacleList[myForce.movingIndexes[j]] = (obstacle) NULL;
         for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
 
