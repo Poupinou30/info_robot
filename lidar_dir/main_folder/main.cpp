@@ -367,5 +367,5 @@ int main(int argc, const char * argv[]){
     //clock_t end= clock();
     //double time_spent= (double)(end-begin)/CLOCKS_PER_SEC;
     //printf("execution time: %f \n", time_spent);
-    close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
+    //close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
 }
