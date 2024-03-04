@@ -200,10 +200,11 @@ void removeMovingObstacles(){
             myForce.obstacleList[k] = myForce.obstacleList[k+1]; //Decale toute la liste
         }
         myForce.obstacleNumber --;
-        myForce.movingNumber --;
+
     }
     fprintf(stderr,"Realloc problem 3 \n");
     myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*myForce.obstacleNumber);
+    myForce.movingNumber =0;
 
 }
 
