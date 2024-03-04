@@ -255,7 +255,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     lidarPos myPos;
     myPos.x = xr;
     myPos.y = yr;
-    fpritnf(stderr,"beacon data\n");
+    fprintf(stderr,"beacon data\n");
     return myPos;
 }
 
