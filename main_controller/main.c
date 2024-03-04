@@ -47,6 +47,7 @@ int main(){
     fprintf(stderr,"check 4\n");
     close(pipefd[0]);
     close(pipefd[1]);
+    while(1);
 
 
 }
