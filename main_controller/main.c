@@ -19,7 +19,7 @@ int main(){
     addObstacle(myObstacle);
     myObstacle.posX = 140;
     myObstacle.posY = 12;
-    addObstacle();
+    addObstacle(myObstacle);
     printObstacleLists();
 
 
