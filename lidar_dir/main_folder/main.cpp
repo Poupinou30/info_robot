@@ -350,10 +350,13 @@ int main(int argc, const char * argv[]){
 	    
 	    //fin de la bouboucle
 	    std::cout<<"fin de programme, arrête toi sale bête";
+        fprintf(stderr,"Check 6\n");
         int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
 
         std::vector<float> numbers = {position.x,position.y,position.theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+        fprintf(stderr,"Check 7\n");
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
+        fprintf(stderr,"Check 8\n");
         sleep(0.5);
 
         }
