@@ -233,7 +233,7 @@ void computeForceVector(){
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
         tempoX = myForce.obstacleList[i].posX;
         tempoY = myForce.obstacleList[i].posY;
-        distance = computeEuclidianDistance(tempoX,tempoY,*myPos.x,*myPos.y);
+        distance = computeEuclidianDistance(tempoX,tempoY,*myPos.x,*myPos.y)-myForce.obstacleList[i].size;
         if(distance < actionDistance){
             f_repul_x = f_repul_x + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoX - *myPos.x);
             f_repul_y = f_repul_y + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoY - *myPos.y);
