@@ -20,6 +20,9 @@ int main(){
     fprintf(stderr,"check 2\n");
     *destination.x = 1.00;
     *destination.y = 2.00;
+    myPos.x = (float*)malloc(sizeof(float));
+    myPos.y = (float*)malloc(sizeof(float));
+    myPos.theta = (float*)malloc(sizeof(float));
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 0;
