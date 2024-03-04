@@ -17,7 +17,7 @@ int main(){
     destination.x = (float*)malloc(sizeof(float));
     destination.y = (float*)malloc(sizeof(float));
     destination.theta = (float*)malloc(sizeof(float));
-    fprintf("check 2\n");
+    fprintf(stderr,"check 2\n");
     *destination.x = 1.00;
     *destination.y = 2.00;
     *myPos.x = 0;
