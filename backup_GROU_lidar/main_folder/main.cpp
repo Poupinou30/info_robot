@@ -72,6 +72,12 @@ float distance (float a1,float a2,float d1,float d2){
     float dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
     return dist;
 }
+float pyth_gen(float a, float b, float c){
+    printf("test:%f", pow(b,2));
+    float cos= (pow(b,2)+pow(c,2)-pow(a,2))/2*b*c;
+    printf("test:%f", acos(cos));
+    return acos(cos);
+}
 
 std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::vector<float> newd,int counter){
     std::vector<std::vector<float>> obstacles(2);
@@ -169,9 +175,9 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
                 float triangle= distance(a1,a2,d1,d2)+distance(a1,a3,d1,d3)+distance(a2,a3,d2,d3); //sensé être 3+2.5+2.5 donc 8
                 //printf("triangle: %f, i: %d, j: %d, k: %d \n", triangle, i, j, k);
 		//printf("ai: %f, aj: %f, ak: %f \n", newa[i], newa[j], newa[k]);
-		float dij=distance(newa[i],newa[j],newd[i],newd[j])
-		float djk=distance(newa[j],newa[k],newd[j],newd[k])
-		float dik=distance(newa[i],newa[k],newd[i],newd[k])
+		float dij=distance(newa[i],newa[j],newd[i],newd[j]);
+		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
+		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
 		
 		if(triangle<=8.0 && triangle>=7.89 && dij<=3.3 && dij>=1.9 && djk<=3.3 && djk>=1.9 && dik<=3.3 && dik>=1.9 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    coord[0]=i;//en théorie ce seront les bonnes
@@ -186,8 +192,8 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
 		    balises[2][0]=newa[coord[2]];
 		    balises[2][1]=newd[coord[2]];
 		    
-		    printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
-		    printf("triangle: %f \n", triangle);
+		    //printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
+		    //printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
 		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
@@ -201,25 +207,6 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
         }
 	
     }
-    
-    //printf("a1: %f, a2: %f, a3: %f \n",newa[coord[0]], newa[coord[1]], newa[coord[2]] );
-    //maintenant partie calculs des coords
-    /*
-    on va d'abord checker quelles sont les balises sur le bord, puis en poser une en 0,0, l'autre en 0,3, l'autre en 2,1.5 et le robot au milieu de ses coords là
-    */
-    //printf("balise 1: dist1: %f, angle1: %f - balise 2: dist2: %f, angle2: %f - balise 3: dist3: %f, angle3: %f",newd[coord[0]], newa[coord[0]], newd[coord[1]], newa[coord[1]], newd[coord[2]], newa[coord[2]] ); 
-    //printf("test x1:%f, y1: %f", newd[coord[0]]*cosf( -newa[coord[0]]*(M_PI/180)), newd[coord[0]]*sinf( -newa[coord[0]]*(M_PI/180)));
-    //printf("test x2:%f, y2: %f", newd[coord[1]]*cosf( -newa[coord[1]]*(M_PI/180)), newd[coord[1]]*sinf( -newa[coord[1]]*(M_PI/180)));
-    //printf("test x3:%f, y3: %f", newd[coord[2]]*cosf( -newa[coord[2]]*(M_PI/180)), newd[coord[2]]*sinf( -newa[coord[2]]*(M_PI/180)));
-
-
-    /*float x1=newd[coord[0]]*cosf( -newa[coord[0]]*(M_PI/180));
-    float y1=newd[coord[0]]*sinf( -newa[coord[0]]*(M_PI/180));
-    float x2=newd[coord[1]]*cosf( -newa[coord[1]]*(M_PI/180));
-    float y2=newd[coord[1]]*sinf( -newa[coord[1]]*(M_PI/180));
-    float x3=newd[coord[2]]*cosf( -newa[coord[2]]*(M_PI/180));
-    float y3=newd[coord[2]]*sinf( -newa[coord[2]]*(M_PI/180));
-    */
     
     float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
     float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
@@ -262,51 +249,19 @@ std::vector<std::vector<float>> beacon_data(float a[] ,float d[],int counter){
     
     return balises;
 }
-/*
 
-void plot_histogram(sl_lidar_response_measurement_node_hq_t * nodes, size_t count)//ça vient de la lib sdk
-{
-    const int BARCOUNT =  75;
-    const int MAXBARHEIGHT = 20;
-    // const float ANGLESCALE = 360.0f/BARCOUNT;
-
-    float histogram[BARCOUNT];
-    for (int pos = 0; pos < _countof(histogram); ++pos) {
-        histogram[pos] = 0.0f;
-    }
-
-    float max_val = 0;
-    for (int pos =0 ; pos < (int)count; ++pos) {
-        int int_deg = (int)(nodes[pos].angle_z_q14 * 90.f / 16384.f);
-        if (int_deg >= BARCOUNT) int_deg = 0;
-        float cachedd = histogram[int_deg];
-        if (cachedd == 0.0f ) {
-            cachedd = nodes[pos].dist_mm_q2/4.0f;
-        } else {
-            cachedd = (nodes[pos].dist_mm_q2/4.0f + cachedd)/2.0f;
-        }
-
-        if (cachedd > max_val) max_val = cachedd;
-        histogram[int_deg] = cachedd;
-    }
-
-    for (int height = 0; height < MAXBARHEIGHT; ++height) {
-        float threshold_h = (MAXBARHEIGHT - height - 1) * (max_val/MAXBARHEIGHT);
-        for (int xpos = 0; xpos < BARCOUNT; ++xpos) {
-            if (histogram[xpos] >= threshold_h) {
-                putc('*', stdout);
-            }else {
-                putc(' ', stdout);
-            }
-        }
-        printf("\n");
-    }
-    for (int xpos = 0; xpos < BARCOUNT; ++xpos) {
-        putc('-', stdout);
-    }
-    printf("\n");
+float angle_robot(std::vector<std::vector<float>> balises){
+    /*
+     * le but est de retourner l'angle du robot par rapport à l'orientation de la table
+     * on va faire un triangle formé du robot et des 2 balises du même coté et utilisé pythagore généralisé
+     */
+    
+    float yRm= balises[0][1]*sin((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    float xRm= balises[0][1]*cos((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    float theta=balises[2][0]-acos(yRm/balises[2][1]);
+    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xRm, yRm);
+    return theta;
 }
-*/
 
 int main(int argc, const char * argv[]){
     //clock_t begin= clock();
@@ -367,6 +322,7 @@ int main(int argc, const char * argv[]){
 		    
 		    //beacon_data(angle, distance, counter);
 		    std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
+		    angle_robot(balises);
 		    out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
 		    //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
 		    
