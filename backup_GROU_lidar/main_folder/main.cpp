@@ -201,6 +201,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		    //printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
+		    //angle_robot(balises);
 		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
 		    //detect_obstacle(newa, newd, obj_iter);
 		    //return balises;
@@ -271,6 +272,7 @@ float angle_robot(std::vector<std::vector<float>> balises){
 }
 
 int main(int argc, const char * argv[]){
+    lidarPos position;
     //clock_t begin= clock();
     ///  Create a communication channel instance
     IChannel* _channel;//oskur il connait pas ça
@@ -283,8 +285,8 @@ int main(int argc, const char * argv[]){
 	sl_lidar_response_device_info_t deviceInfo;//récupérer les infos de l'appareil
         res = (*lidar).getDeviceInfo(deviceInfo);//on les stocke la
         if(SL_IS_OK(res)){//si ça va
-		std::ifstream file;
-		file.open("lidar_bord_g_vers2.txt");
+		//std::ifstream file;
+		//file.open("lidar_bord_g_vers2.txt");
 		printf("Model: %d, Firmware Version: %d.%d, Hardware Version: %d\n",//print les donner
 		deviceInfo.model,
 		deviceInfo.firmware_version >> 8, deviceInfo.firmware_version & 0xffu,
@@ -307,7 +309,7 @@ int main(int argc, const char * argv[]){
 		if (IS_OK(res_gscan)){
 		    fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
 		    lidar->ascendScanData(nodes, nodeCount);
-		    std::ofstream out("lidar_bord_g_vers2.txt");
+		    //std::ofstream out("lidar_bord_g_vers2.txt");
 		    float angle[nodeCount]={};
 		    float distance[nodeCount]={};
 		    int counter=0;
@@ -321,19 +323,18 @@ int main(int argc, const char * argv[]){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;
 			    counter+=1;
-			    out << angle_in_degrees << " , " << distance_in_meters << "\n";
+			    //out << angle_in_degrees << " , " << distance_in_meters << "\n";
 			    //printf("Angle : %f, Distance : %f \n", angle_in_degrees,distance_in_meters);
 			}
 			
 		    }
-		    
-		    //beacon_data(angle, distance, counter);
-		    std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
-		    angle_robot(balises);
-		    out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
+		    position = beacon_data(angle, distance, counter);
+		    //std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
+		    //angle_robot(balises);
+		    //out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
 		    //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
 		    
-		    out.close();
+		    //out.close();
 		    //std::cout<<"alors tu arrives jusqu'ici ou pas?";
 		    //plot_histogram(nodes, nodeCount);
 		}
