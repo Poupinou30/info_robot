@@ -24,7 +24,7 @@ int main(){
     myPos.y = (float*)malloc(sizeof(float));
     myPos.theta = (float*)malloc(sizeof(float));
     *myPos.x = 0;
-    *myPos.y = 0;
+    *myPos.y = 2;
     *myPos.theta = 0;
     fprintf(stderr,"check 3\n");
     //addObstacle(0.12,0.42,1,0);
