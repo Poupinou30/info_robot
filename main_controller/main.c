@@ -14,8 +14,8 @@ int main(){
     myForce.obstacleNumber = 0;
     myForce.movingNumber = 0;
 
-    addObstacle(12,42,1);
-    addObstacle(31,91,4);
+    addObstacle(12,42,1,0);
+    addObstacle(31,91,4,0);
     printObstacleLists();
 
 

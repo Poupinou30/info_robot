@@ -190,6 +190,6 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
 void printObstacleLists(){
     fprintf("There are %d obstacles in the list\n",myForce.obstacleNumber);
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
-        fprintf(stderr,"Obstacle %d is at x = %lf, y = %lf and has size of %lf\n",i,myForce.obstacleList[i].posX,myForce.obstacleList[i].posY,myForce.obstacleList[i].size);
+        fprintf(stderr,"Obstacle %d is at x = %lf, y = %lf and has size of %lf and has moving to %d\n",i,myForce.obstacleList[i].posX,myForce.obstacleList[i].posY,myForce.obstacleList[i].size,myForce.obstacleList[i].moving);
     }
 }

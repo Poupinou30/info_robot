@@ -79,7 +79,7 @@ void resetRepulsiveField(int x1,int y1, int x2, int y2);
 void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
 void print2DArray(int m, int n, double** arr);
 void makeHeatmap();
-void addObstacle(double posX, double posY, double size);
+void addObstacle(double posX, double posY, double size, uint8_t moving);
 void printObstacleLists();
 
 extern position myPos;
