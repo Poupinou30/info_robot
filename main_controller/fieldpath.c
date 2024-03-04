@@ -199,6 +199,10 @@ void removeMovingObstacles(){
             fprintf(stderr,"k = %d \n",k);
             myForce.obstacleList[k] = myForce.obstacleList[k+1]; //Decale toute la liste
         }
+
+        for (int i = 0; i < myForce.movingNumber; ++i) {
+            myForce.movingIndexes[i] = myForce.movingIndexes[i] -1
+        }
         myForce.obstacleNumber --;
 
     }
