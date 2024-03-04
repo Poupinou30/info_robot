@@ -160,6 +160,7 @@ void addObstacle(double posX, double posY, double size, uint8_t moving){
     myObstacle.posX = posX;
     myObstacle.posY = posY;
     myObstacle.size = size;
+    myObstacle.moving = moving;
     if(myForce.obstacleNumber == 0){
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
         myForce.obstacleList[0] = myObstacle;
