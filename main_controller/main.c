@@ -12,6 +12,7 @@ position destination;
 
 int main(){
     //Initialisation variables
+    positionReceived = malloc(3*sizeof(float));
     myForce.obstacleNumber = 0;
     myForce.movingNumber = 0;
     destination.x = (float*)malloc(sizeof(float));
