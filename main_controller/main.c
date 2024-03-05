@@ -46,9 +46,10 @@ int main(){
     fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
     fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
     fprintf(stderr,"check 4\n");
+
+    while(1);
     close(pipefd[0]);
     close(pipefd[1]);
-    while(1);
 
 
 }
