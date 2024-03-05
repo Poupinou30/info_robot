@@ -21,6 +21,9 @@ int main(){
     myPos.x = (float*)malloc(sizeof(float));
     myPos.y = (float*)malloc(sizeof(float));
     myPos.theta = (float*)malloc(sizeof(float));
+    myPos.x = &positionReceived[0];
+    myPos.y = &positionReceived[1];
+    myPos.theta = &positionReceived[2];
     //Assignation des valeurs
     *destination.x = 1.00;
     *destination.y = 2.00;
