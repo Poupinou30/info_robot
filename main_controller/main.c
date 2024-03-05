@@ -48,6 +48,7 @@ int main(){
     fprintf(stderr,"check 4\n");
 
     while(1);
+    //Attention, les lignes qui close le pipe doivent être placées tout à la fin du code sinon on a une erreur de lecture!!
     close(pipefd[0]);
     close(pipefd[1]);
 
