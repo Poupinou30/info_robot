@@ -312,15 +312,15 @@ int main(int argc, const char * argv[]){
 		    lidar->ascendScanData(nodes, nodeCount);
 		    //std::ofstream out("lidar_bord_g_vers2.txt");
 		    float angle[nodeCount]={};
-            fprintf(stderr,"Check 1\n");
+            //fprintf(stderr,"Check 1\n");
 		    float distance[nodeCount]={};
 		    int counter=0;
 		    for(int i=0;i<(int)nodeCount;i++){
-                fprintf(stderr,"Check 2\n");
+                //fprintf(stderr,"Check 2\n");
 			float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
 			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
 			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
-                fprintf(stderr,"Check 3\n");
+                //fprintf(stderr,"Check 3\n");
 			if(distance_in_meters<=3.6 && distance_in_meters!=0.0){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;
@@ -330,9 +330,9 @@ int main(int argc, const char * argv[]){
 			}
 			
 		    }
-            fprintf(stderr,"Check 4\n");
+            //fprintf(stderr,"Check 4\n");
 		    position = beacon_data(angle, distance, counter);
-            fprintf(stderr,"Check 5\n");
+            //fprintf(stderr,"Check 5\n");
 		    //std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
 		    //angle_robot(balises);
 		    //out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
@@ -350,17 +350,17 @@ int main(int argc, const char * argv[]){
 	    
 	    //fin de la bouboucle
 	    std::cout<<"fin de programme, arrête toi sale bête";
-        fprintf(stderr,"Check 6\n");
+        //fprintf(stderr,"Check 6\n");
         int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
-        fprintf(stderr,"Check 6,5\n");
-        fprintf(stderr,"position x = %f \n",position.x);
-        fprintf(stderr,"position y = %f \n",position.y);
-        fprintf(stderr,"position theta = %f \n",position.theta);
+        //fprintf(stderr,"Check 6,5\n");
+        //fprintf(stderr,"position x = %f \n",position.x);
+        //fprintf(stderr,"position y = %f \n",position.y);
+        //fprintf(stderr,"position theta = %f \n",position.theta);
         std::vector<float> numbers = {position.x,position.y,position.theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
-        fprintf(stderr,"Check 7\n");
+        //fprintf(stderr,"Check 7\n");
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
-        fprintf(stderr,"Check 8\n");
-        sleep(0.5);
+        //fprintf(stderr,"Check 8\n");
+        sleep(1);
 
         }
         }else{
