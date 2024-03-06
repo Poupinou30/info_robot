@@ -308,7 +308,7 @@ int main(int argc, const char * argv[]){
 		sl_result res_gscan = lidar->grabScanDataHq(nodes, nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
 		//res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
 		if (IS_OK(res_gscan)){
-		    fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
+		    //fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
 		    lidar->ascendScanData(nodes, nodeCount);
 		    //std::ofstream out("lidar_bord_g_vers2.txt");
 		    float angle[nodeCount]={};
@@ -349,7 +349,7 @@ int main(int argc, const char * argv[]){
 		}
 	    
 	    //fin de la bouboucle
-	    std::cout<<"fin de programme, arrête toi sale bête";
+	    //std::cout<<"fin de programme, arrête toi sale bête";
         //fprintf(stderr,"Check 6\n");
         int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
         //fprintf(stderr,"Check 6,5\n");
