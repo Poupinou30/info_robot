@@ -12,6 +12,10 @@ forceVector myForce;
 position destination;
 
 int main(){
+    //Initialisation GPIO et SPI
+    gpioInitialise();
+    int spi_handle_front = initializeSPI(0);
+    int spi_handle_rear = initializeSPI(1);
     //Initialisation variables
     positionReceived = malloc(3*sizeof(float));
     myForce.obstacleNumber = 0;
@@ -25,12 +29,21 @@ int main(){
     myPos.x = &positionReceived[0];
     myPos.y = &positionReceived[1];
     myPos.theta = &positionReceived[2];
+    double* outputSpeed = malloc(sizeof(double)*4);
+    uint8_t *dataFront = (uint8_t*) malloc(sizeof(uint8_t)*4);
+    uint8_t *dataRear = (uint8_t*) malloc(sizeof(uint8_t)*4);
+    struct timeval now, end, endPrint;
+
     //Assignation des valeurs
+    double endValue = 0;
+    double nowValue = 0;
+    double endValuePrint = 0;
     *destination.x = 1.00;
     *destination.y = 2.00;
     *myPos.x = 0;
     *myPos.y = 2;
     *myPos.theta = 0;
+
 
     //Pipe et thread
     int pipefd[2];
@@ -42,26 +55,43 @@ int main(){
     pthread_t pipeComThread;
     pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
     fprintf(stderr,"Thread for capture launched \n");
-
-
-    fprintf(stderr,"check 3\n");
-    addObstacle(0,0.10,0.01,0);
+    while(readyToGo != 1){
+        fprintf(stderr,"waiting for position acquisition \n");
+    }
+    fprintf(stderr,"Position acquired \n");
+    //addObstacle(0,0.10,0.01,0);
     computeForceVector();
     fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
     fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
-    fprintf(stderr,"check 4\n");
 
+    gettimeofday(&end, NULL);
+    gettimeofday(&endPrint, NULL);
+    endValue = end.tv_sec*1000+end.tv_usec/1000;
+    endValuePrint = endValue.tv.sec*1000+endValue.tv.usec/1000;
     while(1){
-        fprintf(stderr,"X = %f \n",*(myPos.x));
-        fprintf(stderr,"Y = %f \n",*(myPos.y));
-        fprintf(stderr,"Theta = %f \n",*(myPos.theta));
-        fprintf(stderr,"refreshed %d times \n",refreshCounter);
+        gettimeofday(&now,NULL);
+        nowValue = now.tv_sec*1000+now.tv_usec/1000;
+        if(nowValue - endValuePrint > 5000){
+            fprintf(stderr,"X = %f \n",*(myPos.x));
+            fprintf(stderr,"Y = %f \n",*(myPos.y));
+            fprintf(stderr,"Theta = %f \n",*(myPos.theta));
+            fprintf(stderr,"refreshed %d times \n",refreshCounter);
 
-        pthread_mutex_lock(&lockRefreshCounter);
-        refreshCounter = 0;
-        pthread_mutex_unlock(&lockRefreshCounter);
-        sleep(5);
+            pthread_mutex_lock(&lockRefreshCounter);
+            refreshCounter = 0;
+            pthread_mutex_unlock(&lockRefreshCounter);
+            gettimeofday(&endPrint, NULL);
+            endValuePrint = endPrint.tv_sec*1000+endPrint.tv_usec/1000;
+        }
+        if(nowValue - endValue > 50){
+            myPotentialFieldController(outputSpeed,dataFront,dataRear,spi_handle_front,spi_handle_rear);
+            gettimeofday(&end);
+            endValue = end.tv_sec*1000+end.tv_usec/1000;
+        }
+
     }
+
+
     //Attention, les lignes qui close le pipe doivent être placées tout à la fin du code sinon on a une erreur de lecture!!
     close(pipefd[0]);
     close(pipefd[1]);

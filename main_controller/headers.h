@@ -84,6 +84,7 @@ void addObstacle(double posX, double posY, double size, uint8_t moving);
 void printObstacleLists();
 void removeMovingObstacles();
 void computeForceVector();
+void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear);
 
 extern position myPos;
 extern field myField;
@@ -95,3 +96,5 @@ extern position destination;
 extern double f_tot_x;
 extern double f_tot_y;
 extern int refreshCounter;
+extern uint8_t readyToGo;
+extern double f_theta;

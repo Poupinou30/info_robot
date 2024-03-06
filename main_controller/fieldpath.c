@@ -242,7 +242,13 @@ void computeForceVector(){
     }
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
+}
 
-
+void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear){
+    convertsVelocity(f_tot_x,f_tot_y,f_theta,speedTab);
+    createArray(speedTab[0]/(2*_Pi) *114688/100,speedTab[1]/(2*_Pi) *114688/100,dataFront);
+    createArray(speedTab[2]/(2*_Pi)*114688/100,speedTab[3]/(2*_Pi) *114688/100,dataRear);
+    SPI_send(dataFront,spi_handle_front,NULL); //FRONT
+    SPI_send(dataRear,spi_handle_rear,NULL);
 
 }

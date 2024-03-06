@@ -157,6 +157,7 @@ void* receptionPipe(void* pipefdvoid){
             pthread_mutex_unlock(&lockPosition);
             pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter ++;
+            readyToGo = 1;
             pthread_mutex_unlock(&lockRefreshCounter);
             if(VERBOSE){
                 fprintf(stderr,"Readed \n");
