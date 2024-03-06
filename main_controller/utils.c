@@ -110,7 +110,7 @@ void* executeProgram(void* arg){
     char cmd[256];
     //sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/sender_test/build/sender_test %d", pipefd);
     //sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
-    sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
+    sprintf(cmd,"/home/student/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
 
     child_pid = fork();
     signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
