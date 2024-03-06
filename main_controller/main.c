@@ -5,6 +5,7 @@
 
 float* positionReceived;
 pthread_mutex_t lockPosition;
+pthread_mutex_t lockRefreshCounter;
 position myPos;
 field myField;
 forceVector myForce;
@@ -50,7 +51,17 @@ int main(){
     fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
     fprintf(stderr,"check 4\n");
 
-    while(1);
+    while(1){
+        fprintf(stderr,"X = %f \n",*(myPos.x));
+        fprintf(stderr,"Y = %f \n",*(myPos.y));
+        fprintf(stderr,"Theta = %f \n",*(myPos.theta));
+        fprintf(stderr,"refreshed %d times \n",refreshCounter);
+
+        pthread_mutex_lock(&lockRefreshCounter);
+        refreshCounter = 0;
+        pthread_mutex_unlock(&lockRefreshCounter);
+        sleep(5);
+    }
     //Attention, les lignes qui close le pipe doivent être placées tout à la fin du code sinon on a une erreur de lecture!!
     close(pipefd[0]);
     close(pipefd[1]);

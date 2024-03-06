@@ -155,16 +155,20 @@ void* receptionPipe(void* pipefdvoid){
             pthread_mutex_lock(&lockPosition);
             read(pipefd[0], buffer, 3*sizeof(buffer));
             pthread_mutex_unlock(&lockPosition);
-            fprintf(stderr,"Readed \n");
-            for (int i = 0; i < 3; ++i) {
-                fprintf(stderr,"%f \n", positionReceived[i]);
+            pthread_mutex_lock(&lockRefreshCounter);
+            refreshCounter ++;
+            pthread_mutex_unlock(&lockRefreshCounter);
+            if(VERBOSE){
+                fprintf(stderr,"Readed \n");
+                for (int i = 0; i < 3; ++i) {
+                    fprintf(stderr,"%f \n", positionReceived[i]);
+                }
+                fprintf(stderr,"X = %f \n",*(myPos.x));
+                fprintf(stderr,"Y = %f \n",*(myPos.y));
+                fprintf(stderr,"Theta = %f \n",*(myPos.theta));
+
             }
-            fprintf(stderr,"X = %f \n",*(myPos.x));
-            fprintf(stderr,"Y = %f \n",*(myPos.y));
-            fprintf(stderr,"Theta = %f \n",*(myPos.theta));
 
-        }
     }
-
-
+    }
 }

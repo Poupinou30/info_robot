@@ -251,7 +251,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     }
     float xr=x2+((k31n*(y12n-y23n))/D);
     float yr=y2+((k31n*(x23n-x12n))/D);
-    printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
+    //printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
     lidarPos myPos;
     myPos.x = xr;
     myPos.y = yr;
@@ -360,7 +360,7 @@ int main(int argc, const char * argv[]){
         //fprintf(stderr,"Check 7\n");
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
         //fprintf(stderr,"Check 8\n");
-        sleep(1);
+        //sleep(1);
 
         }
         }else{

@@ -20,6 +20,7 @@
 
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
+extern pthread_mutex_t lockRefreshCounter;
 
 typedef struct position{
     float *x;
@@ -93,3 +94,4 @@ extern forceVector myForce;
 extern position destination;
 extern double f_tot_x;
 extern double f_tot_y;
+extern int refreshCounter;
