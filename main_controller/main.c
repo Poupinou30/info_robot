@@ -67,7 +67,7 @@ int main(){
     gettimeofday(&end, NULL);
     gettimeofday(&endPrint, NULL);
     endValue = end.tv_sec*1000+end.tv_usec/1000;
-    endValuePrint = endPrint.tv.sec*1000+endPrint.tv.usec/1000;
+    endValuePrint = endPrint.tv_sec*1000+endPrint.tv_usec/1000;
     while(1){
         gettimeofday(&now,NULL);
         nowValue = now.tv_sec*1000+now.tv_usec/1000;
