@@ -57,6 +57,7 @@ int main(){
     fprintf(stderr,"Thread for capture launched \n");
     while(readyToGo != 1){
         fprintf(stderr,"waiting for position acquisition \n");
+        sleep(1);
     }
     fprintf(stderr,"Position acquired \n");
     //addObstacle(0,0.10,0.01,0);
