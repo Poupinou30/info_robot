@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/pi/Documents/controller/main_controller/headers.h
+/home/student/Documents/lab_git_augu/info_robot/main_controller/headers.h
 stdio.h
 -
 pigpio.h
@@ -23,8 +23,14 @@ math.h
 -
 sys/time.h
 -
+pthread.h
+-
+sys/wait.h
+-
+sys/types.h
+-
 
-/home/pi/Documents/controller/main_controller/main.c
+/home/student/Documents/lab_git_augu/info_robot/main_controller/main.c
 headers.h
-/home/pi/Documents/controller/main_controller/headers.h
+/home/student/Documents/lab_git_augu/info_robot/main_controller/headers.h
 

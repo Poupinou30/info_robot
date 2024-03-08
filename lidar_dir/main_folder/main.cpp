@@ -24,7 +24,7 @@ typedef struct lidarPos{
     float y;
     float theta;
 } lidarPos;
-
+lidarPos myPos;
 int w_plot(float x[], float y[], float angle[], float distance[], int length) {//x c'est angle
 
   FILE *gnuplot = popen("gnuplot -persist", "w");
@@ -78,9 +78,9 @@ float distance (float a1,float a2,float d1,float d2){
     return dist;
 }
 float pyth_gen(float a, float b, float c){
-    printf("test:%f", pow(b,2));
+    //printf("test:%f", pow(b,2));
     float cos= (pow(b,2)+pow(c,2)-pow(a,2))/2*b*c;
-    printf("test:%f", acos(cos));
+    //printf("test:%f", acos(cos));
     return acos(cos);
 }
 
@@ -106,7 +106,22 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
     return obstacles;
 
 }
-
+float angle_robot(std::vector<std::vector<float>> balises){
+    /*
+     * le but est de retourner l'angle du robot par rapport à l'orientation de la table
+     * on va faire un triangle formé du robot et des 2 balises du même coté et utilisé pythagore généralisé
+     */
+    printf("balises[2][1]: %f , balises[0][1] : %f", balises[2][1], balises[0][1]);
+    printf("test pyth_gen %f", pyth_gen(balises[2][1], balises[0][1], 2.0));
+    float yRm = myPos.y;
+    float xRm = myPos.x;
+    
+    //float yRm= balises[0][1]*sin((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    //float xRm= balises[0][1]*cos((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    float theta=balises[2][0]-acos(yRm/balises[2][1]);
+    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xRm, yRm);
+    return theta;
+}
 
 lidarPos beacon_data(float a[] ,float d[],int counter){
     //std::ifstream file;
@@ -184,7 +199,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
 		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
 		
-		if(triangle<=8.0 && triangle>=7.89 && dij<=3.3 && dij>=1.9 && djk<=3.3 && djk>=1.9 && dik<=3.3 && dik>=1.9 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
+		if(triangle<=9.0 && triangle>=7.0 && dij<=3.3 && dij>=1.9 && djk<=3.3 && djk>=1.9 && dik<=3.3 && dik>=1.9 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    coord[0]=i;//en théorie ce seront les bonnes
 		    coord[1]=j;
 		    coord[2]=k;
@@ -197,11 +212,54 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		    balises[2][0]=newa[coord[2]];
 		    balises[2][1]=newd[coord[2]];
 		    
-		    //printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
-		    //printf("triangle: %f \n", triangle);
+		    printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
+		    printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
-		    //angle_robot(balises);
+		    float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
+		    float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
+		    float d12=distance(newa[coord[2]],newa[coord[1]], newd[coord[2]],newd[coord[1]]);
+		    
+		    float x3=2.0;
+		    float y3= 0.0;
+		    float x2=1.0;
+		    float y2=3.0;
+		    float x1=0.0;
+		    float y1=0.0;
+		    
+		    //now nex modified coordinates
+		    float x1n = x1-x2;
+		    float y1n = y1-y2;
+		    float x3n = x3-x2;
+		    float y3n = y3-y2;
+		    //the three cot
+		    float T12=1.0/(tan( newa[coord[1]]*(M_PI/180)-newa[coord[0]]*(M_PI/180)));
+		    float T23=1.0/(tan(newa[coord[2]]*(M_PI/180)-newa[coord[1]]*(M_PI/180)));
+		    float T31=(1.0-T12*T23)/(T12+T23);
+		    //now the modified circle center coordinates
+		    float x12n= x1n+T12*y1n;
+		    float y12n= y1n-T12*x1n;
+		    float x23n=x3n-T23*y3n;
+		    float y23n=y3n+T23*x3n;
+		    float x31n=(x3n+x1n)+T31*(y3n-y1n);
+		    float y31n=(y3n+y1n)-T31*(x3n-x1n);
+		    
+		    float k31n=x1n*x3n+y1n*y3n+T31*(x1n*y3n-x3n*y1n);
+		    float D=(x12n-x23n)*(y23n-y31n)-(y12n-y23n)*(x23n-x31n);
+		    //printf("D: %f, x1: %f, x2: %f,, y2: %f x3: %f", D, x1, x2, y2, x3);
+		    //printf("k31n: %f, y12n: %f, y23n: %f, x23n : %f, x12n: %f \n", k31n, y12n, y23n, x23n, x12n);
+		    if (D==0.0){
+			//std::cout<<"oula attention D est à 0";
+		    }
+		    float xr=x2+((k31n*(y12n-y23n))/D);
+		    float yr=y2+((k31n*(x23n-x12n))/D);
+		    //printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
+		    myPos.x = xr;
+		    myPos.y = yr;
+		    //fprintf(stderr,"beacon data\n");
+		    return myPos;
+		    
+		    angle_robot(balises);
 		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
 		    //detect_obstacle(newa, newd, obj_iter);
 		    //return balises;
@@ -247,30 +305,18 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     //printf("D: %f, x1: %f, x2: %f,, y2: %f x3: %f", D, x1, x2, y2, x3);
     //printf("k31n: %f, y12n: %f, y23n: %f, x23n : %f, x12n: %f \n", k31n, y12n, y23n, x23n, x12n);
     if (D==0.0){
-	std::cout<<"oula attention D est à 0";
+	//std::cout<<"oula attention D est à 0";
     }
     float xr=x2+((k31n*(y12n-y23n))/D);
     float yr=y2+((k31n*(x23n-x12n))/D);
     //printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
-    lidarPos myPos;
     myPos.x = xr;
     myPos.y = yr;
     //fprintf(stderr,"beacon data\n");
     return myPos;
 }
 
-float angle_robot(std::vector<std::vector<float>> balises){
-    /*
-     * le but est de retourner l'angle du robot par rapport à l'orientation de la table
-     * on va faire un triangle formé du robot et des 2 balises du même coté et utilisé pythagore généralisé
-     */
-    
-    float yRm= balises[0][1]*sin((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
-    float xRm= balises[0][1]*cos((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
-    float theta=balises[2][0]-acos(yRm/balises[2][1]);
-    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xRm, yRm);
-    return theta;
-}
+
 
 int main(int argc, const char * argv[]){
     lidarPos position;
@@ -360,9 +406,10 @@ int main(int argc, const char * argv[]){
         //fprintf(stderr,"Check 7\n");
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
         //fprintf(stderr,"Check 8\n");
-        //sleep(1);
+        sleep(1);
 
         }
+	//sleep(1);
         }else{
             fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
         }
