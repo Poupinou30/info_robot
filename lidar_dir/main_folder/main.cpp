@@ -19,8 +19,6 @@ using namespace sl;
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
 
-//Juste un petit test git
-
 typedef struct lidarPos{
     float x;
     float y;
