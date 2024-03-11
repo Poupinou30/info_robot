@@ -167,6 +167,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     double objectMinWidth = 0.09;
     Beacon myBeacon;
     Beacon* beaconTab = (Beacon*) malloc(3*sizeof(Beacon));
+    double object_width = 0;
     for (int i=1; i<counter;++i){
 	//printf("dist: %f, angle %f \n", d[i],a[i]);
 	//printf("dist: %f", distance(refa, a[i],refd, d[i]));
@@ -181,25 +182,32 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 	    //printf("moya %d \n", moya);
 	    //printf("moyd %d \n", moyd);
 	    moy_count+=1;
+        object_width += distance(a[i],refa,d[i],refd);
         refa=a[i];
 	    refd=d[i];
 
 	}
 	else{
-        fprintf(stderr,"object added with moya = %f\ at distance %f \n",moya/float(moy_count),moyd/float(moy_count));
-        newa.push_back(moya/float(moy_count));
-        newd.push_back(moyd/float(moy_count));
+        
+        if(object_width < 0.3){
+            newa.push_back(moya/float(moy_count));
+            newd.push_back(moyd/float(moy_count));
+            fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
+            obj_iter+=1;
+        }
+        
         
         refa=a[i];
         refd=d[i];
         moyd=refd;
         moya=refa;
         moy_count=1;
-        obj_iter+=1;
+        
+        object_width = 0;
 
 	}
-    if(i == counter-1){
-        fprintf(stderr,"object added with moya = %f\n",moya/float(moy_count));
+    if(i == counter-1 && object_width < 0.3){
+        fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
         newa.push_back(moya/float(moy_count));
         newd.push_back(moyd/float(moy_count));
         
@@ -246,14 +254,15 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		float dij=distance(newa[i],newa[j],newd[i],newd[j]);
 		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
 		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
-		float triangleErrorTolerance = 0.15;//il est à 0.15 par défaut
+		float triangleErrorTolerance = 0.1;//il est à 0.15 par défaut
 		
 		float isoceleTolerance = 0.2;
 		
 		//if(triangle<=8 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    //Ici c'est là où j'ai changé
-        float perimetre = 8.3;
+        float perimetre = 8.2;
         //SORT LES BALISES
+        
         beaconTab[0].distance = d1; beaconTab[0].angle = a1;
         beaconTab[1].distance = d2; beaconTab[1].angle = a2;
         beaconTab[2].distance = d3; beaconTab[2].angle = a3;
@@ -270,13 +279,21 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
             }
         }
     }*/
-        fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle);
+    Beacon tempoBeacon;
+    while(distance(beaconTab[0].angle, beaconTab[1].angle,beaconTab[0].distance, beaconTab[1].distance) < distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance) || distance(beaconTab[1].angle, beaconTab[2].angle,beaconTab[1].distance, beaconTab[2].distance)<distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance)){
+        tempoBeacon = beaconTab[1];
+        beaconTab[1] = beaconTab[0];
+        beaconTab[0] = beaconTab[2];
+        beaconTab[2] = tempoBeacon;
+    }
+        
         dij=distance(beaconTab[0].angle,beaconTab[1].angle,beaconTab[0].distance,beaconTab[1].distance);
 		djk=distance(beaconTab[1].angle,beaconTab[2].angle,beaconTab[1].distance,beaconTab[2].distance);
 		dik=distance(beaconTab[0].angle,beaconTab[2].angle,beaconTab[0].distance,beaconTab[2].distance);
-
+        
 
         uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.2+isoceleTolerance && dij>=3.2-isoceleTolerance && djk<=3.2+isoceleTolerance && djk<=3.2+isoceleTolerance && dik>=2-isoceleTolerance && dik<=2+isoceleTolerance;
+        fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
         ///fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
 		if(condition){//faudrait rajouter une condition brrr genre sur les anngles
         
@@ -514,7 +531,7 @@ int main(int argc, const char * argv[]){
 			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
 			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
                 //fprintf(stderr,"Check 3\n");
-            float limit_of_detection = 3.2;
+            float limit_of_detection = 3;
 			if(distance_in_meters<=limit_of_detection && distance_in_meters!=0.0){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;
