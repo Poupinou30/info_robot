@@ -25,6 +25,12 @@ typedef struct lidarPos{
     float theta;
 } lidarPos;
 lidarPos myPos;
+
+typedef struct {
+    double distance;
+    float angle;
+} Beacon;
+
 int w_plot(float x[], float y[], float angle[], float distance[], int length) {//x c'est angle
 
   FILE *gnuplot = popen("gnuplot -persist", "w");
@@ -125,15 +131,22 @@ float angle_robot(std::vector<std::vector<float>> balises){
     
     float theta=balises[1][0]-acosf(yRm/balises[1][1]);//acos il sort du radian donc c'est ok vu que balises[1][0] est en radians aussi
     theta= theta*180.0/M_PI;//ici j'ai juste mis cette ligne ci sinon on était en radian
-    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xAli, yAli);
+    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xRm, yRm);
     return theta;
 }
 
+float angleDiff(float a1, float a2) {
+    // Calculer la différence entre deux angles en tenant compte de leur nature cyclique
+    float diff = a2 - a1;
+    if (diff < 0) diff += 360;
+    return diff;
+}
+
 lidarPos beacon_data(float a[] ,float d[],int counter){
-    /*for(int i = 0; i<counter; i++){
+    for(int i = 0; i<counter; i++){
         fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
-    }*/
+    }
     fprintf(stderr,"We detected %d points",counter);
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
@@ -152,7 +165,8 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     int moy_count=1;
     double actualDistance;
     double objectMinWidth = 0.09;
-
+    Beacon myBeacon;
+    Beacon* beaconTab = (Beacon*) malloc(3*sizeof(Beacon));
     for (int i=1; i<counter;++i){
 	//printf("dist: %f, angle %f \n", d[i],a[i]);
 	//printf("dist: %f", distance(refa, a[i],refd, d[i]));
@@ -172,7 +186,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 
 	}
 	else{
-        fprintf(stderr,"object added with moya = %f\n",moya/float(moy_count));
+        fprintf(stderr,"object added with moya = %f\ at distance %f \n",moya/float(moy_count),moyd/float(moy_count));
         newa.push_back(moya/float(moy_count));
         newd.push_back(moyd/float(moy_count));
         
@@ -233,13 +247,40 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
 		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
 		float triangleErrorTolerance = 0.15;//il est à 0.15 par défaut
-		if(a1 < 22)        fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f \n",triangle,a1,a2,a3 );
+		
 		float isoceleTolerance = 0.2;
 		
-		if(triangle<=8.2 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
+		//if(triangle<=8 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    //Ici c'est là où j'ai changé
-		//if(triangle<=8+triangleErrorTolerance && triangle>=8-triangleErrorTolerance && dij<=3.2+triangleErrorTolerance && dij>=2-triangleErrorTolerance && djk<=3.2+triangleErrorTolerance && djk>=1.8+triangleErrorTolerance && dik<=3.3 && dik>=1.8+triangleErrorTolerance && (fabs(dij-djk)) < isoceleTolerance){//faudrait rajouter une condition brrr genre sur les anngles
-		    fprintf(stderr,"On trouve un triangle \n");
+        float perimetre = 8.3;
+        //SORT LES BALISES
+        beaconTab[0].distance = d1; beaconTab[0].angle = a1;
+        beaconTab[1].distance = d2; beaconTab[1].angle = a2;
+        beaconTab[2].distance = d3; beaconTab[2].angle = a3;
+        int n = 3;
+        /*
+        for (int i = 0; i < n-1; i++) {
+            for (int j = 0; j < n-i-1; j++) {
+                if (distance(beaconTab[j].angle, beaconTab[j+1].angle,beaconTab[j].distance, beaconTab[j+1].distance) > distance(beaconTab[j+1].angle, beaconTab[j+2].angle,beaconTab[j+1].distance, beaconTab[j+2].distance) || 
+                    (distance(beaconTab[j].angle, beaconTab[j+1].angle,beaconTab[j].distance, beaconTab[j+1].distance) == distance(beaconTab[j+1].angle, beaconTab[j+2].angle,beaconTab[j+1].distance, beaconTab[j+2].distance) && 
+                    angleDiff(beaconTab[j].angle, beaconTab[j+1].angle) > angleDiff(beaconTab[j+1].angle, beaconTab[j+2].angle))) {
+                    Beacon temp = beaconTab[j];
+                    beaconTab[j] = beaconTab[j+1];
+                    beaconTab[j+1] = temp;
+            }
+        }
+    }*/
+        fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle);
+        dij=distance(beaconTab[0].angle,beaconTab[1].angle,beaconTab[0].distance,beaconTab[1].distance);
+		djk=distance(beaconTab[1].angle,beaconTab[2].angle,beaconTab[1].distance,beaconTab[2].distance);
+		dik=distance(beaconTab[0].angle,beaconTab[2].angle,beaconTab[0].distance,beaconTab[2].distance);
+
+
+        uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.2+isoceleTolerance && dij>=3.2-isoceleTolerance && djk<=3.2+isoceleTolerance && djk<=3.2+isoceleTolerance && dik>=2-isoceleTolerance && dik<=2+isoceleTolerance;
+        ///fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+		if(condition){//faudrait rajouter une condition brrr genre sur les anngles
+        
+		    //fprintf(stderr,"On trouve un triangle \n");
 		    coord[0]=i;//en théorie ce seront les bonnes
 		    coord[1]=j;
 		    coord[2]=k;
@@ -252,7 +293,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		    balises[2][0]=newa[coord[2]];
 		    balises[2][1]=newd[coord[2]];
 		    
-		    printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
+		    //printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
 		    printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
@@ -282,7 +323,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		    x1=0.0;
 		    y1=0.0;
 		
-		if(d01 <=2.2 && d01>=1.7){
+		if(d01 <=2.2 && d01>=1.7){ // Il trouve d'abord 
 		    double balise_coords[3][2] = {{2, 0}, {0, 0}, {1, 3}};
 		    x3=1.0;
 		    y3=3.0;
@@ -316,8 +357,8 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
                 double myX = 0, myY = 0;
                 
 		for (int i = 0; i < 3; i++) {
-                    myX += balise_coords[i][0] + balises[i][1] * cos(balises[i][0]);
-                    myY += balise_coords[i][1] + balises[i][1] * sin(balises[i][0]);
+                    myY += balise_coords[i][0] + balises[i][1] * cos(balises[i][0]);
+                    myX += balise_coords[i][1] + balises[i][1] * sin(balises[i][0]);
                 }
 		/*
 		myX = balise_coords[2][0] + balises[2][1] * cos(balises[2][0]);
@@ -473,7 +514,7 @@ int main(int argc, const char * argv[]){
 			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
 			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
                 //fprintf(stderr,"Check 3\n");
-            float limit_of_detection = 3.6;
+            float limit_of_detection = 3.2;
 			if(distance_in_meters<=limit_of_detection && distance_in_meters!=0.0){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;

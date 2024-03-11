@@ -14,7 +14,7 @@
 #define MAIN_CONTROLLER_HEADERS_H
 
 #endif //MAIN_CONTROLLER_HEADERS_H
-#define VERBOSE 0
+#define VERBOSE 1
 #define timeDelay 100 //ms
 
 

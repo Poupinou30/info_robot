@@ -11,7 +11,98 @@ field myField;
 forceVector myForce;
 position destination;
 
+
 int main(){
+    gpioInitialise();
+    int spi_handle_front = initializeSPI(0);
+    int spi_handle_rear = initializeSPI(1);
+    uint8_t *dataFront = (uint8_t*) malloc(sizeof(uint8_t)*4);
+    uint8_t *dataRear = (uint8_t*) malloc(sizeof(uint8_t)*4);
+    uint8_t *receivedData = (uint8_t*) malloc(sizeof(uint8_t)*4);
+
+    double *speedTab = (double*) malloc(sizeof(double)*4);
+    double *absoluteSpeedTab = (double*) malloc(sizeof(double)*3);
+    int *speedMeasurement1 = (int*) malloc(sizeof(int)*1000);
+    // int Kp = 0.03;
+    // int Ki = 10;
+    int Kp = 10; //reference
+    int Ki = 60; //reference
+    //Tune PID
+    tunePID(spi_handle_front,spi_handle_rear,Kp,0,Ki,0);
+
+    createArray(0,0,dataFront);
+    createArray(0,0,dataRear);
+
+    SPI_send(dataFront,spi_handle_front,NULL); //FRONT
+    SPI_send(dataRear,spi_handle_rear,NULL);
+
+    sleep(0.5);
+
+
+
+    // processInstruction(-0.1,-0.05,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    // sleep(3);
+    // createArray(0,0,dataFront);
+    // createArray(0,0,dataRear);
+    // SPI_send(dataFront,spi_handle_front,NULL); //FRONT
+    // SPI_send(dataRear,spi_handle_rear,NULL);
+    // sleep(1);
+    // processInstruction(0,+0.1,-0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    // sleep(6);
+    // createArray(0,0,dataFront);
+    // createArray(0,0,dataRear);
+    // SPI_send(dataFront,spi_handle_front,NULL); //FRONT
+    // SPI_send(dataRear,spi_handle_rear,NULL);
+    // sleep(1);
+
+
+    //Test PATTERN
+    // processInstruction(0.1,0.1,0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    // sleep(6);
+    // createArray(0,0,dataFront);
+    // createArray(0,0,dataRear);
+    // SPI_send(dataFront,spi_handle_front,NULL); //FRONT
+    // SPI_send(dataRear,spi_handle_rear,NULL);
+    // sleep(1);
+    // processInstruction(-0.1,-0.1,0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+
+    // sleep(6);
+    // createArray(0,0,dataFront);
+    // createArray(0,0,dataRear);
+    // SPI_send(dataFront,spi_handle_front,NULL); //FRONT
+    // SPI_send(dataRear,spi_handle_rear,NULL);
+
+    //Pattern DEMO
+
+    processInstruction(0.2,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(2);//2
+    processInstruction(0.5,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(1);
+    processInstruction(0.0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(0.5);
+    processInstruction(0,0.2,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(2);
+    processInstruction(0,0.5,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(1);
+    processInstruction(0.0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(0.5);
+    processInstruction(-0.4,-0.4,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(2.25);
+    processInstruction(0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(0.5);
+    processInstruction(0,0,1,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(3);
+    processInstruction(0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+
+
+
+
+
+}
+
+
+
+int mainPotential(){
     //Initialisation GPIO et SPI
     gpioInitialise();
     int spi_handle_front = initializeSPI(0);
