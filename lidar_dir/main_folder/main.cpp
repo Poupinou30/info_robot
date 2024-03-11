@@ -73,8 +73,9 @@ int w_plot(float x[], float y[], float angle[], float distance[], int length) {/
   //exit(EXIT_SUCCESS);
 
 }
-float distance (float a1,float a2,float d1,float d2){
-    float dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
+double distance (double a1,double a2,double d1,double d2){
+    double dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
+    //fprintf(stderr,"distance is %lf",dist);
     return dist;
 }
 float pyth_gen(float a, float b, float c){
@@ -108,22 +109,32 @@ std::vector<std::vector<float>> detect_obstacle(std::vector<float> newa ,std::ve
 }
 float angle_robot(std::vector<std::vector<float>> balises){
     /*
+     *
      * le but est de retourner l'angle du robot par rapport à l'orientation de la table
      * on va faire un triangle formé du robot et des 2 balises du même coté et utilisé pythagore généralisé
      */
-    printf("balises[2][1]: %f , balises[0][1] : %f", balises[2][1], balises[0][1]);
-    printf("test pyth_gen %f", pyth_gen(balises[2][1], balises[0][1], 2.0));
+     //Attention à partir d'ici les balises sont en radians
     float yRm = myPos.y;
     float xRm = myPos.x;
+    printf("yRm: %f , balises[1][0] : %f, rapport: %f", yRm, balises[1][0], yRm/balises[1][1]);
+    //printf("test pyth_gen %f", pyth_gen(balises[2][1], balises[0][1], 2.0));
     
-    //float yRm= balises[0][1]*sin((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
-    //float xRm= balises[0][1]*cos((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
-    float theta=balises[2][0]-acos(yRm/balises[2][1]);
-    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xRm, yRm);
+    
+    //float yAli= balises[0][1]*sin((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    //float xAli= balises[0][1]*cos((M_PI/180.0)*pyth_gen(balises[2][1], balises[0][1], 2.0));
+    
+    float theta=balises[1][0]-acosf(yRm/balises[1][1]);//acos il sort du radian donc c'est ok vu que balises[1][0] est en radians aussi
+    theta= theta*180.0/M_PI;//ici j'ai juste mis cette ligne ci sinon on était en radian
+    printf("theta: %f, xRobotMan = %f, yRobotMan=%f",theta, xAli, yAli);
     return theta;
 }
 
 lidarPos beacon_data(float a[] ,float d[],int counter){
+    /*for(int i = 0; i<counter; i++){
+        fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
+
+    }*/
+    fprintf(stderr,"We detected %d points",counter);
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
     //std::cout<<"c'est beacons qui marche pas?";
@@ -139,10 +150,16 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     float moya=refa;
     int obj_iter=0;
     int moy_count=1;
+    double actualDistance;
+    double objectMinWidth = 0.09;
+
     for (int i=1; i<counter;++i){
 	//printf("dist: %f, angle %f \n", d[i],a[i]);
 	//printf("dist: %f", distance(refa, a[i],refd, d[i]));
-	if(distance(refa, a[i],refd, d[i])<=0.09 ){
+    actualDistance = distance(refa, a[i],refd, d[i]);
+    //fprintf(stderr,"test distance %lf ", distance(1,180,1,1));
+    //fprintf(stderr,"Distance between point (%f,%f) and (%f,%f) is %lf\n",refa,refd,a[i],d[i],actualDistance);
+	if(actualDistance <= objectMinWidth){
 	//if(d[i]-refd <=0.13){
 	    //printf("a[i] %f \n", a[i]);
 	    moyd+=d[i];
@@ -150,23 +167,40 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 	    //printf("moya %d \n", moya);
 	    //printf("moyd %d \n", moyd);
 	    moy_count+=1;
+        refa=a[i];
+	    refd=d[i];
+
 	}
 	else{
+        fprintf(stderr,"object added with moya = %f\n",moya/float(moy_count));
         newa.push_back(moya/float(moy_count));
         newd.push_back(moyd/float(moy_count));
-	    //newa[obj_iter]=moya/float(moy_count);
-	    //newd[obj_iter]=moyd/float(moy_count);
-	    //printf("i = %d and newa : %f, newd: %f \n",obj_iter,newa[obj_iter],newd[obj_iter]);
-	    //printf("newd : %f \n",newd[obj_iter]);
-	    
-	    refa=a[i];
-	    refd=d[i];
-	    moyd=refd;
-	    moya=refa;
-	    moy_count=1;
-	    obj_iter+=1;
+        
+        refa=a[i];
+        refd=d[i];
+        moyd=refd;
+        moya=refa;
+        moy_count=1;
+        obj_iter+=1;
+
 	}
+    if(i == counter-1){
+        fprintf(stderr,"object added with moya = %f\n",moya/float(moy_count));
+        newa.push_back(moya/float(moy_count));
+        newd.push_back(moyd/float(moy_count));
+        
+        refa=a[i];
+        refd=d[i];
+        moyd=refd;
+        moya=refa;
+        moy_count=1;
+        obj_iter+=1;
     }
+    }
+    for(int i = 0; i< newa.size();i++){
+        fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
+    }
+    
     //printf("obj_iter=%d", obj_iter);
     /*
     for (int i=0; i<obj_iter;++i){
@@ -178,7 +212,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     //(float[2]) coord[3]={};
     int coord[3]={};
     std::vector<std::vector<float>> balises (3,std::vector<float>(2));
-    for (int i = 0; i < obj_iter; i++)
+    for (int i = 0; i < obj_iter; i++) //Boucle pour trouver balises
     {
 	//std::cout<<"il rentre dans la boucle?";
         float a1=newa[i];
@@ -198,8 +232,14 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		float dij=distance(newa[i],newa[j],newd[i],newd[j]);
 		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
 		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
+		float triangleErrorTolerance = 0.15;//il est à 0.15 par défaut
+		if(a1 < 22)        fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f \n",triangle,a1,a2,a3 );
+		float isoceleTolerance = 0.2;
 		
-		if(triangle<=9.0 && triangle>=7.0 && dij<=3.3 && dij>=1.9 && djk<=3.3 && djk>=1.9 && dik<=3.3 && dik>=1.9 && (newd[i]+newd[j]<=3.5 && newd[k]+newd[j]<=3.5) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
+		if(triangle<=8.2 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
+		    //Ici c'est là où j'ai changé
+		//if(triangle<=8+triangleErrorTolerance && triangle>=8-triangleErrorTolerance && dij<=3.2+triangleErrorTolerance && dij>=2-triangleErrorTolerance && djk<=3.2+triangleErrorTolerance && djk>=1.8+triangleErrorTolerance && dik<=3.3 && dik>=1.8+triangleErrorTolerance && (fabs(dij-djk)) < isoceleTolerance){//faudrait rajouter une condition brrr genre sur les anngles
+		    fprintf(stderr,"On trouve un triangle \n");
 		    coord[0]=i;//en théorie ce seront les bonnes
 		    coord[1]=j;
 		    coord[2]=k;
@@ -226,6 +266,68 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		    float y2=3.0;
 		    float x1=0.0;
 		    float y1=0.0;
+
+            //TEST AUGUSTIN CALCUL BALISES
+
+                for (int i = 0; i < 3; i++) {
+                    balises[i][0] = balises[i][0] * M_PI / 180.0;
+                }
+		//ici j'ai juste rajouté ces conditions là
+                // Les coordonnées des balises
+                double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
+		    x3=2.0;
+		    y3=0.0;
+		    x2=1.0;
+		    y2=3.0;
+		    x1=0.0;
+		    y1=0.0;
+		
+		if(d01 <=2.2 && d01>=1.7){
+		    double balise_coords[3][2] = {{2, 0}, {0, 0}, {1, 3}};
+		    x3=1.0;
+		    y3=3.0;
+		    x2=0.0;
+		    y2=0.0;
+		    x1=2.0;
+		    y1=0.0;
+		}
+		else if(d02 <=2.2 && d02>=1.7){
+		    double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
+		    x3=2.0;
+		    y3=0.0;
+		    x2=1.0;
+		    y2=3.0;
+		    x1=0.0;
+		    y1=0.0;
+		}
+		else if(d12 <=2.2 && d12>=1.7){
+		    double balise_coords[3][2] = {{1, 3}, {2, 0}, {0, 0}};
+		    x3=0.0;
+		    y3=0.0;
+		    x2=2.0;
+		    y2=0.0;
+		    x1=1.0;
+		    y1=3.0;
+		}
+		
+		
+
+                // Calculer la position du robot
+                double myX = 0, myY = 0;
+                
+		for (int i = 0; i < 3; i++) {
+                    myX += balise_coords[i][0] + balises[i][1] * cos(balises[i][0]);
+                    myY += balise_coords[i][1] + balises[i][1] * sin(balises[i][0]);
+                }
+		/*
+		myX = balise_coords[2][0] + balises[2][1] * cos(balises[2][0]);
+		myY = balise_coords[2][1] + balises[2][1] * sin(balises[2][0]);
+		* */
+                myX /= 3.0;
+                myY /= 3.0;
+                        printf("myX = %f myY = %f \n",myX,myY);
+
+            //FIN TEST AUGUSTIN
 		    
 		    //now nex modified coordinates
 		    float x1n = x1-x2;
@@ -253,13 +355,14 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		    }
 		    float xr=x2+((k31n*(y12n-y23n))/D);
 		    float yr=y2+((k31n*(x23n-x12n))/D);
-		    //printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
-		    myPos.x = xr;
-		    myPos.y = yr;
+		    printf("Alicia coords robots: xR= %f and Xy= %f \n", xr,yr);
+		    myPos.x = myX;
+		    myPos.y = myY;
 		    //fprintf(stderr,"beacon data\n");
+		    myPos.theta = angle_robot(balises);
 		    return myPos;
 		    
-		    angle_robot(balises);
+		    
 		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
 		    //detect_obstacle(newa, newd, obj_iter);
 		    //return balises;
@@ -310,8 +413,8 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     float xr=x2+((k31n*(y12n-y23n))/D);
     float yr=y2+((k31n*(x23n-x12n))/D);
     //printf("coords robots: xR= %f and Xy= %f \n", xr,yr);
-    myPos.x = xr;
-    myPos.y = yr;
+    myPos.x = 0.0;
+    myPos.y = 0.0;
     //fprintf(stderr,"beacon data\n");
     return myPos;
 }
@@ -319,6 +422,9 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 
 
 int main(int argc, const char * argv[]){
+    fprintf(stderr,"Argc  = %d\n",argc);
+    int write_fd;
+    if(argc > 1) write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
     lidarPos position;
     //clock_t begin= clock();
     ///  Create a communication channel instance
@@ -367,7 +473,8 @@ int main(int argc, const char * argv[]){
 			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
 			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
                 //fprintf(stderr,"Check 3\n");
-			if(distance_in_meters<=3.6 && distance_in_meters!=0.0){
+            float limit_of_detection = 3.6;
+			if(distance_in_meters<=limit_of_detection && distance_in_meters!=0.0){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;
 			    counter+=1;
@@ -397,16 +504,18 @@ int main(int argc, const char * argv[]){
 	    //fin de la bouboucle
 	    //std::cout<<"fin de programme, arrête toi sale bête";
         //fprintf(stderr,"Check 6\n");
-        int write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
+        if(argc >1){
         //fprintf(stderr,"Check 6,5\n");
-        //fprintf(stderr,"position x = %f \n",position.x);
-        //fprintf(stderr,"position y = %f \n",position.y);
-        //fprintf(stderr,"position theta = %f \n",position.theta);
+        
         std::vector<float> numbers = {position.x,position.y,position.theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
         //fprintf(stderr,"Check 7\n");
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
+        }
+        fprintf(stderr,"position x = %f \n",position.x);
+        fprintf(stderr,"position y = %f \n",position.y);
+        fprintf(stderr,"position theta = %f \n",position.theta);
         //fprintf(stderr,"Check 8\n");
-        sleep(1);
+        sleep(5);
 
         }
 	//sleep(1);
