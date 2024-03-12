@@ -426,6 +426,13 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
             //DEBUT TEST AUGUSTIN 2
         triangulationPierlot( &myX,  &myY, (360-beaconTab[0].angle)*DEG2RAD,  (360-beaconTab[1].angle)*DEG2RAD,  (360-beaconTab[2].angle)*DEG2RAD, 0,  0, 1, 3, 2, 0);
         printf("myX2 = %f myY2 = %f \n",myX,myY);
+
+        //Calcul angle augustin
+        float alpha, alpha1, alpha3;
+        alpha3 = atan(x/y);
+        alpha1 = 360-beaconTab[0].angle;
+        alpha = 180-alpha1-alpha3;
+        fprintf(stderr,"angle = %f \n",alpha);
 		    
 		    //now nex modified coordinates
 		    float x1n = x1-x2;
