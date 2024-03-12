@@ -11,6 +11,14 @@
 #include <rplidar.h>
 #include <iostream>
 #include <fstream>
+#include <lapacke.h>
+#define adjust_value_to_bounds( value , max )  ( ( value > max ) ? max : ( ( value < -max ) ? -max : value ) )  
+#define PI          3.141592654
+#define cot(x)      ( 1 / tan(x) )
+#define RAD2DEG     (180/PI)
+#define DEG2RAD     (PI/180)
+#define COT_MAX     100000000
+#define Cot(x)  cot(x)
 
 //#include "matplotlibcpp.h"
 using namespace sl;
@@ -30,6 +38,14 @@ typedef struct {
     double distance;
     float angle;
 } Beacon;
+
+
+float perimetre = 8.4;
+float limit_of_detection = 3.6;
+double objectMaxStep = 0.09;
+double max_object_width = 0.2;
+uint16_t angleTolerance = 2;
+
 
 int w_plot(float x[], float y[], float angle[], float distance[], int length) {//x c'est angle
 
@@ -142,6 +158,43 @@ float angleDiff(float a1, float a2) {
     return diff;
 }
 
+
+
+float triangulationPierlot(float *x, float *y,
+						float alpha1, float alpha2, float alpha3,
+						float x1, float y1, float x2, float y2, float x3, float y3)
+{
+	float cot_12 = Cot( alpha2 - alpha1 ) ;
+	float cot_23 = Cot( alpha3 - alpha2 ) ;
+	cot_12 = adjust_value_to_bounds( cot_12 , COT_MAX ) ;
+	cot_23 = adjust_value_to_bounds( cot_23 , COT_MAX ) ;
+	float cot_31 = ( 1.0 - cot_12 * cot_23 ) / ( cot_12 + cot_23 ) ;
+	cot_31 = adjust_value_to_bounds( cot_31 , COT_MAX ) ;
+	
+	float x1_ = x1 - x2 , y1_ = y1 - y2 , x3_ = x3 - x2 , y3_ = y3 - y2 ;
+
+	float c12x = x1_ + cot_12 * y1_ ;
+	float c12y = y1_ - cot_12 * x1_ ;
+
+	float c23x = x3_ - cot_23 * y3_ ;
+	float c23y = y3_ + cot_23 * x3_ ;
+
+	float c31x = (x3_ + x1_) + cot_31 * (y3_ - y1_) ;
+	float c31y = (y3_ + y1_) - cot_31 * (x3_ - x1_) ;
+	float k31 = (x3_ * x1_) + (y3_ * y1_) + cot_31 * ( (y3_ * x1_) - (x3_ * y1_) ) ;
+  
+  float D = (c12x - c23x) * (c23y - c31y) - (c23x - c31x) * (c12y - c23y) ;
+  float invD = 1.0 / D ;
+  float K = k31 * invD ;
+  
+	*x = K * (c12y - c23y) + x2 ;
+	*y = K * (c23x - c12x) + y2 ;
+	
+	return invD ; /* return 1/D */
+}
+
+
+
 lidarPos beacon_data(float a[] ,float d[],int counter){
     for(int i = 0; i<counter; i++){
         fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
@@ -155,6 +208,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     int obj_counter=0;
     std::vector<float> newa;
     std::vector<float> newd;
+    std::vector<float> newWidth;
     //float newa[167]={};
     //float newd[167]={};
     float refd=d[0];
@@ -164,17 +218,15 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
     int obj_iter=0;
     int moy_count=1;
     double actualDistance;
-    double objectMinWidth = 0.09;
+    
     Beacon myBeacon;
     Beacon* beaconTab = (Beacon*) malloc(3*sizeof(Beacon));
     double object_width = 0;
+    uint8_t already_added = 0;
     for (int i=1; i<counter;++i){
-	//printf("dist: %f, angle %f \n", d[i],a[i]);
-	//printf("dist: %f", distance(refa, a[i],refd, d[i]));
     actualDistance = distance(refa, a[i],refd, d[i]);
-    //fprintf(stderr,"test distance %lf ", distance(1,180,1,1));
-    //fprintf(stderr,"Distance between point (%f,%f) and (%f,%f) is %lf\n",refa,refd,a[i],d[i],actualDistance);
-	if(actualDistance <= objectMinWidth){
+
+	if(actualDistance <= objectMaxStep){ //Si c'est le même objet on fait une moyenne
 	//if(d[i]-refd <=0.13){
 	    //printf("a[i] %f \n", a[i]);
 	    moyd+=d[i];
@@ -187,11 +239,12 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 	    refd=d[i];
 
 	}
-	else{
-        
-        if(object_width < 0.3){
+	else{ //l'objet est fini, on l'ajoute a la liste si il n'est pas trop grand
+
+        if(object_width < max_object_width && object_width != 0){
             newa.push_back(moya/float(moy_count));
             newd.push_back(moyd/float(moy_count));
+            newWidth.push_back(object_width);
             fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
             obj_iter+=1;
         }
@@ -207,10 +260,33 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 
 	}
     if(i == counter-1 && object_width < 0.3){
+        /*if(((moya/moy_count)*(moyd/moy_count) + object_width/2) > 360-angleTolerance ){
+            fprintf(stderr,"Object fusion engaged \n");
+            for(int i = 0; i < newa.size(); i++){
+                if((newa[i]-newWidth[i]) < angleTolerance && distance(newa[i],moya/moy_count,newd[i],moyd/moy_count) < objectMaxStep){ //Gerer le cas 359° et 1°, si un objet a 358 degrés, fusionner avec objet à 1°
+                    fprintf(stderr,"distance for fusion is %f \n"distance(newa[i],moya/moy_count,newd[i],moyd/moy_count));
+                    newa[i] = (newa[i]*newWidth[i]+(moya/moy_count -360) *object_width)/(object_width+newWidth[i]);
+                    //newd[i] = (newd[i]*newWidth[i]+(moyd/moy_count) *object_width)/(object_width+newWidth[i]);
+                    newWidth[i] = newWidth[i] + object_width;
+                    already_added = 1;
+                    break;
+                }
+            }
+        }*/
+        if(distance(newa[0],moya/moy_count,newd[0],moyd/moy_count)){
+            fprintf(stderr,"Object fusion engaged \n");
+            fprintf(stderr,"distance for fusion is %f \n",distance(newa[0],moya/moy_count,newd[0],moyd/moy_count));
+                    newa[i] = (newa[0]*newWidth[i]+(moya/moy_count -360) *object_width)/(object_width+newWidth[0]);
+                    //newd[i] = (newd[i]*newWidth[i]+(moyd/moy_count) *object_width)/(object_width+newWidth[i]);
+                    newWidth[0] = newWidth[0] + object_width;
+                    already_added = 1;
+        }
+        if(!already_added){
         fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
         newa.push_back(moya/float(moy_count));
         newd.push_back(moyd/float(moy_count));
-        
+        newWidth.push_back(object_width);
+        }
         refa=a[i];
         refd=d[i];
         moyd=refd;
@@ -218,6 +294,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
         moy_count=1;
         obj_iter+=1;
     }
+
     }
     for(int i = 0; i< newa.size();i++){
         fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
@@ -260,26 +337,17 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		
 		//if(triangle<=8 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    //Ici c'est là où j'ai changé
-        float perimetre = 8.2;
+        
         //SORT LES BALISES
         
         beaconTab[0].distance = d1; beaconTab[0].angle = a1;
         beaconTab[1].distance = d2; beaconTab[1].angle = a2;
         beaconTab[2].distance = d3; beaconTab[2].angle = a3;
         int n = 3;
-        /*
-        for (int i = 0; i < n-1; i++) {
-            for (int j = 0; j < n-i-1; j++) {
-                if (distance(beaconTab[j].angle, beaconTab[j+1].angle,beaconTab[j].distance, beaconTab[j+1].distance) > distance(beaconTab[j+1].angle, beaconTab[j+2].angle,beaconTab[j+1].distance, beaconTab[j+2].distance) || 
-                    (distance(beaconTab[j].angle, beaconTab[j+1].angle,beaconTab[j].distance, beaconTab[j+1].distance) == distance(beaconTab[j+1].angle, beaconTab[j+2].angle,beaconTab[j+1].distance, beaconTab[j+2].distance) && 
-                    angleDiff(beaconTab[j].angle, beaconTab[j+1].angle) > angleDiff(beaconTab[j+1].angle, beaconTab[j+2].angle))) {
-                    Beacon temp = beaconTab[j];
-                    beaconTab[j] = beaconTab[j+1];
-                    beaconTab[j+1] = temp;
-            }
-        }
-    }*/
+        
     Beacon tempoBeacon;
+
+    //VRAI TRI SA MERE POUR REMETTRE BALISES DANS LORDRE
     while(distance(beaconTab[0].angle, beaconTab[1].angle,beaconTab[0].distance, beaconTab[1].distance) < distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance) || distance(beaconTab[1].angle, beaconTab[2].angle,beaconTab[1].distance, beaconTab[2].distance)<distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance)){
         tempoBeacon = beaconTab[1];
         beaconTab[1] = beaconTab[0];
@@ -293,7 +361,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
         
 
         uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.2+isoceleTolerance && dij>=3.2-isoceleTolerance && djk<=3.2+isoceleTolerance && djk<=3.2+isoceleTolerance && dik>=2-isoceleTolerance && dik<=2+isoceleTolerance;
-        fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+        //fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
         ///fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
 		if(condition){//faudrait rajouter une condition brrr genre sur les anngles
         
@@ -303,89 +371,61 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		    coord[2]=k;
                     //std::cout<<"il trouve qqch";
 		    
-		    balises[0][0]=newa[coord[0]];
-		    balises[0][1]=newd[coord[0]];
-		    balises[1][0]=newa[coord[1]];
-		    balises[1][1]=newd[coord[1]];
-		    balises[2][0]=newa[coord[2]];
-		    balises[2][1]=newd[coord[2]];
+		    balises[0][0]=beaconTab[0].angle;
+		    balises[0][1]=beaconTab[0].distance;
+		    balises[1][0]=beaconTab[1].angle;
+		    balises[1][1]=beaconTab[1].distance;
+		    balises[2][0]=beaconTab[2].angle;
+		    balises[2][1]=beaconTab[2].distance;
 		    
-		    //printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",newa[coord[0]],newd[coord[0]], newa[coord[1]], newd[coord[1]], newa[coord[2]], newd[coord[2]] );
+		    printf("Balises: (%f,%f), (%f, %f), (%f, %f) \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[1].angle,beaconTab[1].distance,beaconTab[2].angle,beaconTab[2].distance );
 		    printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
 		    float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
 		    float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
 		    float d12=distance(newa[coord[2]],newa[coord[1]], newd[coord[2]],newd[coord[1]]);
-		    
+		     fprintf(stderr,"wtfq2\n");
 		    float x3=2.0;
 		    float y3= 0.0;
 		    float x2=1.0;
 		    float y2=3.0;
 		    float x1=0.0;
 		    float y1=0.0;
-
+             fprintf(stderr,"wtfq3\n");
             //TEST AUGUSTIN CALCUL BALISES
-
-                for (int i = 0; i < 3; i++) {
-                    balises[i][0] = balises[i][0] * M_PI / 180.0;
-                }
+             fprintf(stderr,"wtfq4\n");
+                /*for (int j = 0; j < 3; i++) {
+                    balises[j][0] = balises[j][0] * M_PI / 180.0;
+                }*/
+                 fprintf(stderr,"wtf5\n");
 		//ici j'ai juste rajouté ces conditions là
                 // Les coordonnées des balises
                 double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
-		    x3=2.0;
-		    y3=0.0;
-		    x2=1.0;
-		    y2=3.0;
-		    x1=0.0;
-		    y1=0.0;
-		
-		if(d01 <=2.2 && d01>=1.7){ // Il trouve d'abord 
-		    double balise_coords[3][2] = {{2, 0}, {0, 0}, {1, 3}};
-		    x3=1.0;
-		    y3=3.0;
-		    x2=0.0;
-		    y2=0.0;
-		    x1=2.0;
-		    y1=0.0;
-		}
-		else if(d02 <=2.2 && d02>=1.7){
-		    double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
-		    x3=2.0;
-		    y3=0.0;
-		    x2=1.0;
-		    y2=3.0;
-		    x1=0.0;
-		    y1=0.0;
-		}
-		else if(d12 <=2.2 && d12>=1.7){
-		    double balise_coords[3][2] = {{1, 3}, {2, 0}, {0, 0}};
-		    x3=0.0;
-		    y3=0.0;
-		    x2=2.0;
-		    y2=0.0;
-		    x1=1.0;
-		    y1=3.0;
-		}
 		
 		
 
                 // Calculer la position du robot
-                double myX = 0, myY = 0;
-                
-		for (int i = 0; i < 3; i++) {
-                    myY += balise_coords[i][0] + balises[i][1] * cos(balises[i][0]);
-                    myX += balise_coords[i][1] + balises[i][1] * sin(balises[i][0]);
+                float myX = 0, myY = 0;
+        fprintf(stderr,"wtfq\n");
+		/*for (int j = 0; j < 3; i++) {
+                    myY += balise_coords[j][0] + balises[j][1] * cos(balises[j][0]);
+                    myX += balise_coords[j][1] + balises[j][1] * sin(balises[j][0]);
                 }
-		/*
-		myX = balise_coords[2][0] + balises[2][1] * cos(balises[2][0]);
-		myY = balise_coords[2][1] + balises[2][1] * sin(balises[2][0]);
-		* */
                 myX /= 3.0;
                 myY /= 3.0;
-                        printf("myX = %f myY = %f \n",myX,myY);
+                        fprintf(stderr,"myX = %f myY = %f \n",myX,myY);
 
-            //FIN TEST AUGUSTIN
+            //FIN TEST AUGUSTIN*/
+        fprintf(stderr,"wtfq7\n");
+
+
+
+
+
+            //DEBUT TEST AUGUSTIN 2
+        triangulationPierlot( &myX,  &myY, (360-beaconTab[0].angle)*DEG2RAD,  (360-beaconTab[1].angle)*DEG2RAD,  (360-beaconTab[2].angle)*DEG2RAD, 0,  0, 1, 3, 2, 0);
+        printf("myX2 = %f myY2 = %f \n",myX,myY);
 		    
 		    //now nex modified coordinates
 		    float x1n = x1-x2;
@@ -531,7 +571,7 @@ int main(int argc, const char * argv[]){
 			float distance_in_meters = nodes[i].dist_mm_q2 / 1000.f / (1 << 2);
 			//out << angle_in_degrees << " , " << distance_in_meters << "\n";
                 //fprintf(stderr,"Check 3\n");
-            float limit_of_detection = 3;
+            
 			if(distance_in_meters<=limit_of_detection && distance_in_meters!=0.0){
 			    angle[counter]=angle_in_degrees;
 			    distance[counter]=distance_in_meters;
