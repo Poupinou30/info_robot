@@ -12,7 +12,7 @@ forceVector myForce;
 position destination;
 
 
-int main(){
+int mainPattern(){
     gpioInitialise();
     int spi_handle_front = initializeSPI(0);
     int spi_handle_rear = initializeSPI(1);
@@ -102,7 +102,7 @@ int main(){
 
 
 
-int mainPotential(){
+int main(){
     //Initialisation GPIO et SPI
     gpioInitialise();
     int spi_handle_front = initializeSPI(0);
