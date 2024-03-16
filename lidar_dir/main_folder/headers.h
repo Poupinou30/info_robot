@@ -44,6 +44,12 @@ typdef struct {
     int counter;
 } lidar_data;
 
+typdef struct {
+    uint8_t isDetected;
+    float x;
+    float y;
+} Opponent;
+
 double distance (double a1,double a2,double d1,double d2);
 float angleDiff(float a1, float a2);
 float triangulationPierlot(float *x, float *y,

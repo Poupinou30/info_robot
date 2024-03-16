@@ -14,12 +14,16 @@ using namespace sl;
 int verbose;
 
 lidarPos myPos;
+Opponent myOpponent;
 beaconAbsolutePos *beaconRefPosition;
 float perimetre = 8.4;
 float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
+p_thread_mutex_t positionLock;
+p_thread_mutex_t isReadyLock;
+uint8_t readyToLock = 0;
 
 
 double distance (double a1,double a2,double d1,double d2){
@@ -99,70 +103,71 @@ void* beacon_data(void* argument){
     int obj_iter=0;
     int moy_count=1;
     double actualDistance;
+    std::vector<lidarPos> objects_coordinates;
     
     Beacon myBeacon;
     Beacon* beaconTab = (Beacon*) malloc(3*sizeof(Beacon));
     double object_width = 0;
     uint8_t already_added = 0;
     for (int i=1; i<counter;++i){
-    actualDistance = distance(refa, a[i],refd, d[i]);
+        actualDistance = distance(refa, a[i],refd, d[i]);
 
-	if(actualDistance <= objectMaxStep){ //Si c'est le même objet on fait une moyenne
-	//if(d[i]-refd <=0.13){
-	    //printf("a[i] %f \n", a[i]);
-	    moyd+=d[i];
-	    moya+=a[i];
-	    //printf("moya %d \n", moya);
-	    //printf("moyd %d \n", moyd);
-	    moy_count+=1;
-        object_width += distance(a[i],refa,d[i],refd);
-        refa=a[i];
-	    refd=d[i];
+        if(actualDistance <= objectMaxStep){ //Si c'est le même objet on fait une moyenne
+        //if(d[i]-refd <=0.13){
+            //printf("a[i] %f \n", a[i]);
+            moyd+=d[i];
+            moya+=a[i];
+            //printf("moya %d \n", moya);
+            //printf("moyd %d \n", moyd);
+            moy_count+=1;
+            object_width += distance(a[i],refa,d[i],refd);
+            refa=a[i];
+            refd=d[i];
 
-	}
-	else{ //l'objet est fini, on l'ajoute a la liste si il n'est pas trop grand
+        }
+        else{ //l'objet est fini, on l'ajoute a la liste si il n'est pas trop grand
 
-        if(object_width < max_object_width /*&& object_width != 0*/){
+            if(object_width < max_object_width /*&& object_width != 0*/){
+                newa.push_back(moya/float(moy_count));
+                newd.push_back(moyd/float(moy_count));
+                newWidth.push_back(object_width);
+                if(verbose) fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
+                obj_iter+=1;
+            }
+            
+            
+            refa=a[i];
+            refd=d[i];
+            moyd=refd;
+            moya=refa;
+            moy_count=1;
+            
+            object_width = 0;
+
+        }
+        if(i == counter-1 && object_width < 0.3){
+
+            if(distance(newa[0],moya/moy_count,newd[0],moyd/moy_count) < objectMaxStep){
+                if(verbose) fprintf(stderr,"Object fusion engaged \n");
+                if(verbose) fprintf(stderr,"distance for fusion is %f \n",distance(newa[0],moya/moy_count,newd[0],moyd/moy_count));
+                        newa[i] = (newa[0]*newWidth[i]+(moya/moy_count -360) *object_width)/(object_width+newWidth[0]);
+                        //newd[i] = (newd[i]*newWidth[i]+(moyd/moy_count) *object_width)/(object_width+newWidth[i]);
+                        newWidth[0] = newWidth[0] + object_width;
+                        already_added = 1;
+            }
+            if(!already_added){
+            if(verbose) fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
             newa.push_back(moya/float(moy_count));
             newd.push_back(moyd/float(moy_count));
             newWidth.push_back(object_width);
-            if(verbose) fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
+            }
+            refa=a[i];
+            refd=d[i];
+            moyd=refd;
+            moya=refa;
+            moy_count=1;
             obj_iter+=1;
         }
-        
-        
-        refa=a[i];
-        refd=d[i];
-        moyd=refd;
-        moya=refa;
-        moy_count=1;
-        
-        object_width = 0;
-
-	}
-    if(i == counter-1 && object_width < 0.3){
-
-        if(distance(newa[0],moya/moy_count,newd[0],moyd/moy_count) < objectMaxStep){
-            if(verbose) fprintf(stderr,"Object fusion engaged \n");
-            if(verbose) fprintf(stderr,"distance for fusion is %f \n",distance(newa[0],moya/moy_count,newd[0],moyd/moy_count));
-                    newa[i] = (newa[0]*newWidth[i]+(moya/moy_count -360) *object_width)/(object_width+newWidth[0]);
-                    //newd[i] = (newd[i]*newWidth[i]+(moyd/moy_count) *object_width)/(object_width+newWidth[i]);
-                    newWidth[0] = newWidth[0] + object_width;
-                    already_added = 1;
-        }
-        if(!already_added){
-        if(verbose) fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
-        newa.push_back(moya/float(moy_count));
-        newd.push_back(moyd/float(moy_count));
-        newWidth.push_back(object_width);
-        }
-        refa=a[i];
-        refd=d[i];
-        moyd=refd;
-        moya=refa;
-        moy_count=1;
-        obj_iter+=1;
-    }
 
     }
     for(int i = 0; i< newa.size();i++){
@@ -278,19 +283,31 @@ void* beacon_data(void* argument){
         //Calcul angle augustin
         float alpha = 180-(360-beaconTab[0].angle) - atan(myX/myY)*RAD2DEG;
         if(verbose) fprintf(stderr,"angle = %f \n",alpha);
-		    myPos.x = myX;
-		    myPos.y = myY;
-		    //if(verbose) fprintf(stderr,"beacon data\n");
-		    myPos.theta = alpha;
-		    return myPos;
-		    
-		    
-		    //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
-		    //detect_obstacle(newa, newd, obj_iter);
-		    //return balises;
-		    //break;//ici voir comment en sortir totalement
-		    
-                }
+        myPos.x = myX;
+        myPos.y = myY;
+        //if(verbose) fprintf(stderr,"beacon data\n");
+        myPos.theta = alpha;
+        lidarPos object;
+        for (int k = 0,k<newa.size()){
+            object.x = myPos.x + newd[i] * cos((myPos.theta-newa[i])*DEG2RAD);
+            object.y = myPos.y + newd[i] * sin((myPos.theta-newa[i])*DEG2RAD);
+            objects_coordinates.push_back(object)
+            if(object.x < 2 && object.x > 0 && object.y < 3 && object.y > 0){
+                myOpponent.x = object.x;
+                myOpponent.y = object.y;
+                myOpponent.isDetected = 1;
+            }
+
+        }
+        
+        
+        
+        //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
+        //detect_obstacle(newa, newd, obj_iter);
+        //return balises;
+        //break;//ici voir comment en sortir totalement
+        
+            }
             }
             
         }
@@ -314,6 +331,7 @@ int main(int argc, const char * argv[]){
     beaconRefPosition[2].x = 1.95;
     beaconRefPosition[2].y = -0.08;
     verbose =1;
+    myOpponent.isDetected = 0;
     if(verbose) fprintf(stderr,"Argc  = %d\n",argc);
     int write_fd;
     if(argc > 1) write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
