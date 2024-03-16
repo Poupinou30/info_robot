@@ -466,13 +466,13 @@ int main(int argc, const char * argv[]){
     
     }
     sleep(10);
-    else{
+    /*else{
         pthread_mutex_lock(&printLock);
         //if(verbose) fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
         pthread_mutex_unlock(&printLock);
     
         //ici faut recup les donner de res scan
-    }
+    }*/
     
    
     if(argc >1){
