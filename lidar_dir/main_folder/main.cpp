@@ -21,10 +21,10 @@ float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
-pthread_mutex_t positionLock;
-pthread_mutex_t isReadyLock;
-pthread_mutex_t lidarDataLock;
-pthread_mutex_t printLock;
+pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t lidarDataLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t printLock = PTHREAD_MUTEX_INITIALIZER;
 uint8_t readyToSend = 0;
 uint8_t lidarDataCopied = 0;
 
@@ -74,7 +74,7 @@ float triangulationPierlot(float *x, float *y,
 	*x = K * (c12y - c23y) + x2 ;
 	*y = K * (c23x - c12x) + y2 ;
     pthread_mutex_unlock(&positionLock);
-    fprintf(stderr,"pos pierlot x = %fand y = %f \n",*x,*y);
+    //fprintf(stderr,"pos pierlot x = %fand y = %f \n",*x,*y);
 	
 	return NULL ; /* return 1/D */
 }
@@ -86,7 +86,7 @@ void* beacon_data(void* argument){
         if(verbose) fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
     }*/
-    fprintf(stderr,"entre dans beaco_data \n");
+    //fprintf(stderr,"entre dans beaco_data \n");
 
     pthread_mutex_lock(&lidarDataLock);
     lidar_data *myData = (lidar_data*) argument;
@@ -100,17 +100,17 @@ void* beacon_data(void* argument){
 
     int counter = myData->counter;
     pthread_mutex_lock(&printLock);
-    fprintf(stderr,"counter = %d in beacondata \n",counter);
+    //fprintf(stderr,"counter = %d in beacondata \n",counter);
     pthread_mutex_unlock(&printLock);
     lidarDataCopied = 1;
     pthread_mutex_unlock(&lidarDataLock);
     pthread_mutex_lock(&printLock);
     for(int i = 0; i <counter; i++) {
-        /*if(a[i]>360)*/ printf("angle dans beacon = %f \n",a[i]);
+        /*if(a[i]>360)*/// printf("angle dans beacon = %f \n",a[i]);
     }
     pthread_mutex_unlock(&printLock);
 
-    if(verbose) fprintf(stderr,"We detected %d points",counter);
+    if(verbose) fprintf(stderr,"We detected %d points \n",counter);
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
     //std::cout<<"c'est beacons qui marche pas?";
@@ -131,7 +131,7 @@ void* beacon_data(void* argument){
     std::vector<lidarPos> objects_coordinates;
     
     Beacon myBeacon;
-    Beacon* beaconTab = (Beacon*) malloc(3*sizeof(Beacon));
+    Beacon beaconTab[3];
     double object_width = 0;
     uint8_t already_added = 0;
     for (int i=1; i<counter;++i){
@@ -273,8 +273,8 @@ void* beacon_data(void* argument){
 		    balises[1][1]=beaconTab[1].distance;
 		    balises[2][0]=beaconTab[2].angle;
 		    balises[2][1]=beaconTab[2].distance;
-		    //if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
-		    //if(verbose) printf("triangle: %f \n", triangle);
+		    if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
+		    if(verbose) printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
 		    float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
@@ -301,7 +301,7 @@ void* beacon_data(void* argument){
         float* myY = (float*) malloc(sizeof(float));
         *myX = 0; *myY = 0;
         pthread_mutex_unlock(&positionLock);
-        //triangulationPierlot( myX,  myY, (360-beaconTab[0].angle)*DEG2RAD,  (360-beaconTab[1].angle)*DEG2RAD,  (360-beaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
+        triangulationPierlot( myX,  myY, (360-beaconTab[0].angle)*DEG2RAD,  (360-beaconTab[1].angle)*DEG2RAD,  (360-beaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
         //fprintf(stderr,"myX = %f and myY = %d \n", myX,myY);
         //Calcul angle augustin
         float alpha = 180-(360-beaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
@@ -321,6 +321,7 @@ void* beacon_data(void* argument){
             object.y = myPos.y + newd[i] * sin((myPos.theta-newa[i])*DEG2RAD);
             objects_coordinates.push_back(object);
             if(object.x < 2 && object.x > 0 && object.y < 3 && object.y > 0){
+                if(verbose) fprintf(stderr, "opponent added \n");
                 myOpponent.x = object.x;
                 myOpponent.y = object.y;
                 myOpponent.isDetected = 1;
@@ -334,6 +335,7 @@ void* beacon_data(void* argument){
         //detect_obstacle(newa, newd, obj_iter);
         //return balises;
         //break;//ici voir comment en sortir totalement
+        //fprintf(stderr,"fin de beacon_data  \n");
         return NULL;
             }
             }
@@ -341,7 +343,7 @@ void* beacon_data(void* argument){
         }
 	
     }
-    fprintf(stderr,"Après giga boucle beacon_data  \n");
+    //fprintf(stderr,"Après giga boucle beacon_data  \n");
     /*pthread_mutex_lock(&positionLock);
     myPos.x = 0.0;
     myPos.y = 0.0;
@@ -350,7 +352,7 @@ void* beacon_data(void* argument){
     //pthread_mutex_lock(&isReadyLock);
     //readyToSend = 1;
     //pthread_mutex_unlock(&isReadyLock);
-    fprintf(stderr,"fin de beacon_data  \n");
+    sleep(1);
     return NULL;
 }
 
@@ -394,7 +396,7 @@ int main(int argc, const char * argv[]){
 		//lidar->setMotorSpeed(0); ça change rien c'est bizarreee
 		std::vector<LidarScanMode> scanModes;  // ça c'est si on veut choisir le mode de scan
 		lidar->getAllSupportedScanModes(scanModes);
-		lidar->startScanExpress(false, scanModes[0].id);
+		//lidar->startScanExpress(false, scanModes[0].id);
 		//lidar->setMotorSpeed(0);
 
 		LidarScanMode scanMode;//on utilise le mode standard de scan(on peut aussi choisir)
@@ -405,24 +407,35 @@ int main(int argc, const char * argv[]){
         pthread_t computationThread;
         lidar_data myLidarData;
         int thread_launched = 0;
+        sl_result res_gscan;
+        		    float angle[8192];
+            //if(verbose) fprintf(stderr,"Check 1\n");
+		    float distance[8192];
         while(1){
-		sl_result res_gscan = lidar->grabScanDataHq(nodes, nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
-		//res_gscan_int= lidar->grabScanDataWithInterval(nodes, nodeCount);//faudrait checker la diff avec le continu
+        res_gscan = lidar->grabScanDataHq(nodes, nodeCount);//on remplit avec le grab data (ici hq pas nécéssaire, <16m)
+        //res_gscan= lidar->getScanDataWithIntervalHq(nodes, nodeCount);//faudrait checker la diff avec le continu
+        
+		
 		if (IS_OK(res_gscan)){
+            
 		    //if(verbose) fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
 		    lidar->ascendScanData(nodes, nodeCount);
+            
 		    //std::ofstream out("lidar_bord_g_vers2.txt");
-            if(thread_launched) {if(pthread_join(computationThread, NULL) != 0) fprintf(stderr,"error while joining thread \n"); //Attends que le dernier calcul soit fini avant d'en lancer un nouveau
-                thread_launched = 0;
+            /*if(thread_launched){
+            while(1){
+        ;
+    }}*/
+            if(thread_launched) {
+                if(pthread_join(computationThread, NULL) != 0){ fprintf(stderr,"error while joining thread \n");} //Attends que le dernier calcul soit fini avant d'en lancer un nouveau
+                //thread_launched = 0;
                 readyToSend = 1;
-                fprintf(stderr,"thread joined \n");
+                //fprintf(stderr,"thread joined \n");
             }
 
             
             pthread_mutex_lock(&lidarDataLock);
-		    float angle[nodeCount];
-            //if(verbose) fprintf(stderr,"Check 1\n");
-		    float distance[nodeCount];
+
 		    int counter=0;
             
 		    for(int i=0;i<(int)nodeCount;i++){
@@ -447,32 +460,35 @@ int main(int argc, const char * argv[]){
             myLidarData.distance = distance;
             myLidarData.angle = angle;
             myLidarData.counter = counter;
-            fprintf(stderr,"counter in main = %d \n",myLidarData.counter);
-            for(int l = 0; l < counter; l++) if(myLidarData.angle[l]>360) fprintf(stderr,"dans main angle = %f \n",myLidarData.angle[l]);
+            //fprintf(stderr,"counter in main = %d \n",myLidarData.counter);
+            //for(int l = 0; l < counter; l++) if(myLidarData.angle[l]>360) //fprintf(stderr,"dans main angle = %f \n",myLidarData.angle[l]);
             
-            
-            if (pthread_create(&computationThread, NULL, beacon_data, (void*) &myLidarData) != 0) {
-        fprintf(stderr, "Erreur lors de la création du thread.\n");
-        return EXIT_FAILURE;
-    }
+            int thread_execut = pthread_create(&computationThread, NULL, beacon_data, (void*) &myLidarData);
+            //fprintf(stderr,"passe après le thread thread code = %d\n",thread_execut);
+            if (thread_execut != 0) {
+                //fprintf(stderr, "Erreur lors de la création du thread.\n");
+                return EXIT_FAILURE;
+            }
     
-    else thread_launched = 1;
-    pthread_mutex_unlock(&lidarDataLock);
+            thread_launched = 1;
+
+
+    
     
     pthread_mutex_lock(&printLock);
-    //fprintf(stderr,"passe après le thread\n");
+    
+    pthread_mutex_unlock(&lidarDataLock);
     pthread_mutex_unlock(&printLock);
-    //sleep(10);
-    
     }
-    sleep(10);
-    /*else{
+else{
         pthread_mutex_lock(&printLock);
-        //if(verbose) fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
+        if(verbose) fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
         pthread_mutex_unlock(&printLock);
-    
+        //return -1;
         //ici faut recup les donner de res scan
-    }*/
+    }
+    
+    
     
    
     if(argc >1){
@@ -489,21 +505,31 @@ int main(int argc, const char * argv[]){
     
     
     }
+    
     pthread_mutex_lock(&positionLock);
     pthread_mutex_lock(&printLock);
-    if(verbose) fprintf(stderr,"position x = %f \n",position->x);
-    if(verbose) fprintf(stderr,"position y = %f \n",position->y);
-    if(verbose) fprintf(stderr,"position theta = %f \n",position->theta);
+    if(verbose){
+     fprintf(stderr,"position x = %f \n",position->x);
+     fprintf(stderr,"position y = %f \n",position->y);
+     fprintf(stderr,"position theta = %f \n",position->theta);
+    fprintf(stderr,"position x opponent = %f \n",myOpponent.x);
+     fprintf(stderr,"position y opponent = %f \n",myOpponent.y);
+    }
     pthread_mutex_unlock(&printLock);
     pthread_mutex_unlock(&positionLock);
+    
     //if(verbose) fprintf(stderr,"Check 8\n");
     
     if(verbose) sleep(2);
+
+
+    
+    
     }
         
 	//sleep(1);
     }else{
-        if(verbose) fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
+        //if(verbose) fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
     }
 
 
@@ -511,10 +537,11 @@ int main(int argc, const char * argv[]){
     //lidar->setMotorSpeed(1);
 
 }else{
-    if(verbose) fprintf(stderr, "OSKUR poupon, Failed to connect to LIDAR %08x\r\n", res);
+    //if(verbose) fprintf(stderr, "OSKUR poupon, Failed to connect to LIDAR %08x\r\n", res);
 }
     //clock_t end= clock();
     //double time_spent= (double)(end-begin)/CLOCKS_PER_SEC;
     //printf("execution time: %f \n", time_spent);
     //close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
+    free(beaconRefPosition);
 }

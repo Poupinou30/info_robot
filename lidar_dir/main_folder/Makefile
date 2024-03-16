@@ -26,6 +26,8 @@ include $(HOME_TREE)/mak_def.inc
 CXXSRC += lidar.cpp main.cpp
 C_INCLUDES += -I$(CURDIR)/../sdk/include -I$(CURDIR)/../sdk/src 
 
+
+
 EXTRA_OBJ :=
 LD_LIBS += -lstdc++ -lpthread -lm -llapack -llapacke
 
