@@ -55,6 +55,8 @@ float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
+float triangleErrorTolerance = 0.;//il est à 0.15 par défaut
+float isoceleTolerance = 0.07;
 
 
 int w_plot(float x[], float y[], float angle[], float distance[], int length) {//x c'est angle
@@ -339,9 +341,7 @@ lidarPos beacon_data(float a[] ,float d[],int counter){
 		float dij=distance(newa[i],newa[j],newd[i],newd[j]);
 		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
 		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
-		float triangleErrorTolerance = 0.1;//il est à 0.15 par défaut
 		
-		float isoceleTolerance = 0.1;
 		
 		//if(triangle<=8 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    //Ici c'est là où j'ai changé
@@ -539,8 +539,11 @@ int main(int argc, const char * argv[]){
     verbose =1;
     if(verbose) fprintf(stderr,"Argc  = %d\n",argc);
     int write_fd;
-    if(argc > 1) write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
-    verbose = 0;
+    if(argc > 1){
+       write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande 
+       verbose = 0;
+    } 
+    
     lidarPos position;
     //clock_t begin= clock();
     ///  Create a communication channel instance
