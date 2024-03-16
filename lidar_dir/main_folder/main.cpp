@@ -21,9 +21,12 @@ float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
-p_thread_mutex_t positionLock;
-p_thread_mutex_t isReadyLock;
-uint8_t readyToLock = 0;
+pthread_mutex_t positionLock;
+pthread_mutex_t isReadyLock;
+pthread_mutex_t lidarDataLock;
+pthread_mutex_t printLock;
+uint8_t readyToSend = 0;
+uint8_t lidarDataCopied = 0;
 
 
 double distance (double a1,double a2,double d1,double d2){
@@ -67,11 +70,13 @@ float triangulationPierlot(float *x, float *y,
   float D = (c12x - c23x) * (c23y - c31y) - (c23x - c31x) * (c12y - c23y) ;
   float invD = 1.0 / D ;
   float K = k31 * invD ;
-  
+    pthread_mutex_lock(&positionLock);
 	*x = K * (c12y - c23y) + x2 ;
 	*y = K * (c23x - c12x) + y2 ;
+    pthread_mutex_unlock(&positionLock);
+    fprintf(stderr,"pos pierlot x = %fand y = %f \n",*x,*y);
 	
-	return invD ; /* return 1/D */
+	return NULL ; /* return 1/D */
 }
 
 
@@ -81,10 +86,30 @@ void* beacon_data(void* argument){
         if(verbose) fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
     }*/
+    fprintf(stderr,"entre dans beaco_data \n");
+
+    pthread_mutex_lock(&lidarDataLock);
     lidar_data *myData = (lidar_data*) argument;
-    float *a = myData->angle;
-    float *d = myData->distance;
+    float a[myData->counter];
+    float d[myData->counter];
+    // Copier les valeurs du tableau original dans le tableau copie
+    for(int i = 0; i < myData->counter; i++) {
+        a[i] = myData->angle[i];
+        d[i] = myData->distance[i];
+    }
+
     int counter = myData->counter;
+    pthread_mutex_lock(&printLock);
+    fprintf(stderr,"counter = %d in beacondata \n",counter);
+    pthread_mutex_unlock(&printLock);
+    lidarDataCopied = 1;
+    pthread_mutex_unlock(&lidarDataLock);
+    pthread_mutex_lock(&printLock);
+    for(int i = 0; i <counter; i++) {
+        /*if(a[i]>360)*/ printf("angle dans beacon = %f \n",a[i]);
+    }
+    pthread_mutex_unlock(&printLock);
+
     if(verbose) fprintf(stderr,"We detected %d points",counter);
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
@@ -131,7 +156,7 @@ void* beacon_data(void* argument){
                 newa.push_back(moya/float(moy_count));
                 newd.push_back(moyd/float(moy_count));
                 newWidth.push_back(object_width);
-                if(verbose) fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
+                //if(verbose) fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
                 obj_iter+=1;
             }
             
@@ -171,7 +196,7 @@ void* beacon_data(void* argument){
 
     }
     for(int i = 0; i< newa.size();i++){
-        if(verbose) fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
+        //if(verbose) fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
     }
     
 
@@ -232,7 +257,7 @@ void* beacon_data(void* argument){
         
 
         uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.25+isoceleTolerance && dij>=3.25-isoceleTolerance && djk<=3.25+isoceleTolerance && djk<=3.25+isoceleTolerance && dik>=1.9-isoceleTolerance && dik<=1.9+isoceleTolerance;
-        if(triangle < 8.6 && triangle > 8)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+        //if(triangle < 8.6 && triangle > 8)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
         ///if(verbose) fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
 		if(condition){//faudrait rajouter une condition brrr genre sur les anngles
         
@@ -248,27 +273,22 @@ void* beacon_data(void* argument){
 		    balises[1][1]=beaconTab[1].distance;
 		    balises[2][0]=beaconTab[2].angle;
 		    balises[2][1]=beaconTab[2].distance;
-		    if(verbose) printf("\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
-		    if(verbose) printf("triangle: %f \n", triangle);
+		    //if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
+		    //if(verbose) printf("triangle: %f \n", triangle);
 		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
 		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
 		    float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
 		    float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
 		    float d12=distance(newa[coord[2]],newa[coord[1]], newd[coord[2]],newd[coord[1]]);
-		     if(verbose) fprintf(stderr,"wtfq2\n");
+
 		    float x3=2.0;
 		    float y3= 0.0;
 		    float x2=1.0;
 		    float y2=3.0;
 		    float x1=0.0;
 		    float y1=0.0;
-             if(verbose) fprintf(stderr,"wtfq3\n");
-            //TEST AUGUSTIN CALCUL BALISES
-             if(verbose) fprintf(stderr,"wtfq4\n");
-                /*for (int j = 0; j < 3; i++) {
-                    balises[j][0] = balises[j][0] * M_PI / 180.0;
-                }*/
-                 if(verbose) fprintf(stderr,"wtf5\n");
+
+
 		//ici j'ai juste rajouté ces conditions là
                 // Les coordonnées des balises
                 double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
@@ -276,22 +296,30 @@ void* beacon_data(void* argument){
 		
 
                 // Calculer la position du robot
-                float myX = 0, myY = 0;
-
-        triangulationPierlot( &myX,  &myY, (360-beaconTab[0].angle)*DEG2RAD,  (360-beaconTab[1].angle)*DEG2RAD,  (360-beaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
-
+        pthread_mutex_lock(&positionLock);
+        float* myX = (float*) malloc(sizeof(float));
+        float* myY = (float*) malloc(sizeof(float));
+        *myX = 0; *myY = 0;
+        pthread_mutex_unlock(&positionLock);
+        //triangulationPierlot( myX,  myY, (360-beaconTab[0].angle)*DEG2RAD,  (360-beaconTab[1].angle)*DEG2RAD,  (360-beaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
+        //fprintf(stderr,"myX = %f and myY = %d \n", myX,myY);
         //Calcul angle augustin
-        float alpha = 180-(360-beaconTab[0].angle) - atan(myX/myY)*RAD2DEG;
-        if(verbose) fprintf(stderr,"angle = %f \n",alpha);
-        myPos.x = myX;
-        myPos.y = myY;
+        float alpha = 180-(360-beaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
+        //if(verbose) fprintf(stderr,"angle = %f \n",alpha);
+        
+        pthread_mutex_lock(&positionLock);
+        //fprintf(stderr,"myX = %f and myY = %d \n", *myX,*myY);
+        myPos.x = *myX;
+        myPos.y = *myY;
+        free(myX); free(myY);
         //if(verbose) fprintf(stderr,"beacon data\n");
         myPos.theta = alpha;
+        pthread_mutex_unlock(&positionLock);
         lidarPos object;
-        for (int k = 0,k<newa.size()){
+        for (int k = 0;k<newa.size();k++){
             object.x = myPos.x + newd[i] * cos((myPos.theta-newa[i])*DEG2RAD);
             object.y = myPos.y + newd[i] * sin((myPos.theta-newa[i])*DEG2RAD);
-            objects_coordinates.push_back(object)
+            objects_coordinates.push_back(object);
             if(object.x < 2 && object.x > 0 && object.y < 3 && object.y > 0){
                 myOpponent.x = object.x;
                 myOpponent.y = object.y;
@@ -306,18 +334,24 @@ void* beacon_data(void* argument){
         //detect_obstacle(newa, newd, obj_iter);
         //return balises;
         //break;//ici voir comment en sortir totalement
-        
+        return NULL;
             }
             }
             
         }
 	
     }
-
+    fprintf(stderr,"Après giga boucle beacon_data  \n");
+    /*pthread_mutex_lock(&positionLock);
     myPos.x = 0.0;
     myPos.y = 0.0;
+    pthread_mutex_unlock(&positionLock);*/
     //if(verbose) fprintf(stderr,"beacon data\n");
-    return myPos;
+    //pthread_mutex_lock(&isReadyLock);
+    //readyToSend = 1;
+    //pthread_mutex_unlock(&isReadyLock);
+    fprintf(stderr,"fin de beacon_data  \n");
+    return NULL;
 }
 
 
@@ -334,9 +368,10 @@ int main(int argc, const char * argv[]){
     myOpponent.isDetected = 0;
     if(verbose) fprintf(stderr,"Argc  = %d\n",argc);
     int write_fd;
-    if(argc > 1) write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
-    verbose = 0;
-    lidarPos position = myPos;
+    if(argc > 1){ 
+        write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
+        verbose = 0;}
+    lidarPos *position = &myPos;
     //clock_t begin= clock();
     ///  Create a communication channel instance
     IChannel* _channel;//oskur il connait pas ça
@@ -377,10 +412,19 @@ int main(int argc, const char * argv[]){
 		    //if(verbose) fprintf(stderr, "Hey mais... le grabscan marche");//erreur si je sais pas grab les data
 		    lidar->ascendScanData(nodes, nodeCount);
 		    //std::ofstream out("lidar_bord_g_vers2.txt");
-		    float angle[nodeCount]={};
+            if(thread_launched) {if(pthread_join(computationThread, NULL) != 0) fprintf(stderr,"error while joining thread \n"); //Attends que le dernier calcul soit fini avant d'en lancer un nouveau
+                thread_launched = 0;
+                readyToSend = 1;
+                fprintf(stderr,"thread joined \n");
+            }
+
+            
+            pthread_mutex_lock(&lidarDataLock);
+		    float angle[nodeCount];
             //if(verbose) fprintf(stderr,"Check 1\n");
-		    float distance[nodeCount]={};
+		    float distance[nodeCount];
 		    int counter=0;
+            
 		    for(int i=0;i<(int)nodeCount;i++){
                 //if(verbose) fprintf(stderr,"Check 2\n");
 			float angle_in_degrees = nodes[i].angle_z_q14 * 90.f / (1 << 14);
@@ -398,61 +442,77 @@ int main(int argc, const char * argv[]){
 			
 		    }
             //if(verbose) fprintf(stderr,"Check 4\n");
+            
+            lidarDataCopied = 0;
             myLidarData.distance = distance;
             myLidarData.angle = angle;
             myLidarData.counter = counter;
-            if(thread_launched) pthread_join(thread_id, NULL); //Attends que le dernier calcul soit fini avant d'en lancer un nouveau
-            thread_launched = 0;
+            fprintf(stderr,"counter in main = %d \n",myLidarData.counter);
+            for(int l = 0; l < counter; l++) if(myLidarData.angle[l]>360) fprintf(stderr,"dans main angle = %f \n",myLidarData.angle[l]);
+            
+            
             if (pthread_create(&computationThread, NULL, beacon_data, (void*) &myLidarData) != 0) {
         fprintf(stderr, "Erreur lors de la création du thread.\n");
         return EXIT_FAILURE;
     }
-    thread_launched = 1;
-            //if(verbose) fprintf(stderr,"Check 5\n");
-		    //std::vector<std::vector<float>> balises= beacon_data(angle, distance, counter);
-		    //angle_robot(balises);
-		    //out << balises[0][0] << "," << balises[0][1] << "||" << balises[1][0] << "," << balises[1][1] << "||" <<balises[2][0]<< "," << balises[2][1]<<"\n";
-		    //printf("les balises sont en: b1(%f, %f), b2(%f, %f), b3(%f,%f)", balises[0][0], balises[0][1], balises[1][0], balises[1][1], balises[2][0], balises[2][1]);
-		    
-		    //out.close();
-		    //std::cout<<"alors tu arrives jusqu'ici ou pas?";
-		    //plot_histogram(nodes, nodeCount);
-		}
-		else{
-			if(verbose) fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
-		
-		    //ici faut recup les donner de res scan
-		}
-	    
-	    //fin de la bouboucle
-	    //std::cout<<"fin de programme, arrête toi sale bête";
-        //if(verbose) fprintf(stderr,"Check 6\n");
-        if(argc >1){
-        //if(verbose) fprintf(stderr,"Check 6,5\n");
-        
-        std::vector<float> numbers = {position.x,position.y,position.theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+    
+    else thread_launched = 1;
+    pthread_mutex_unlock(&lidarDataLock);
+    
+    pthread_mutex_lock(&printLock);
+    //fprintf(stderr,"passe après le thread\n");
+    pthread_mutex_unlock(&printLock);
+    //sleep(10);
+    
+    }
+    sleep(10);
+    else{
+        pthread_mutex_lock(&printLock);
+        //if(verbose) fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
+        pthread_mutex_unlock(&printLock);
+    
+        //ici faut recup les donner de res scan
+    }
+    
+   
+    if(argc >1){
+    //if(verbose) fprintf(stderr,"Check 6,5\n");
+    pthread_mutex_lock(&isReadyLock);
+    if(readyToSend){
+        pthread_mutex_lock(&positionLock);
+        std::vector<float> numbers = {position->x,position->y,position->theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+        pthread_mutex_unlock(&positionLock);
         //if(verbose) fprintf(stderr,"Check 7\n");
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
-        }
-        if(verbose) fprintf(stderr,"position x = %f \n",position.x);
-        if(verbose) fprintf(stderr,"position y = %f \n",position.y);
-        if(verbose) fprintf(stderr,"position theta = %f \n",position.theta);
-        //if(verbose) fprintf(stderr,"Check 8\n");
-        if(verbose) sleep(2);
-
-        }
-	//sleep(1);
-        }else{
-            if(verbose) fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
-        }
-	
-    
-	    //sleep(5);
-	    //lidar->setMotorSpeed(1);
-    
-    }else{
-        if(verbose) fprintf(stderr, "OSKUR poupon, Failed to connect to LIDAR %08x\r\n", res);
     }
+    pthread_mutex_unlock(&isReadyLock);
+    
+    
+    }
+    pthread_mutex_lock(&positionLock);
+    pthread_mutex_lock(&printLock);
+    if(verbose) fprintf(stderr,"position x = %f \n",position->x);
+    if(verbose) fprintf(stderr,"position y = %f \n",position->y);
+    if(verbose) fprintf(stderr,"position theta = %f \n",position->theta);
+    pthread_mutex_unlock(&printLock);
+    pthread_mutex_unlock(&positionLock);
+    //if(verbose) fprintf(stderr,"Check 8\n");
+    
+    if(verbose) sleep(2);
+    }
+        
+	//sleep(1);
+    }else{
+        if(verbose) fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
+    }
+
+
+    //sleep(5);
+    //lidar->setMotorSpeed(1);
+
+}else{
+    if(verbose) fprintf(stderr, "OSKUR poupon, Failed to connect to LIDAR %08x\r\n", res);
+}
     //clock_t end= clock();
     //double time_spent= (double)(end-begin)/CLOCKS_PER_SEC;
     //printf("execution time: %f \n", time_spent);

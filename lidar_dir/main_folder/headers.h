@@ -38,13 +38,13 @@ typedef struct {
     float width;
 } Beacon;
 
-typdef struct {
+typedef struct {
     float *distance;
     float *angle;
     int counter;
 } lidar_data;
 
-typdef struct {
+typedef struct {
     uint8_t isDetected;
     float x;
     float y;
