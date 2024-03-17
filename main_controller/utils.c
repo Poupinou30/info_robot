@@ -159,7 +159,7 @@ void* receptionPipe(void* pipefdvoid){
             // Des données sont disponibles, lire les données
             
             read(pipefd[0], buffer, 3*sizeof(buffer));
-            if(buffer[0] > 0 && buffer[1] > 0 && ((computeEuclidianDistance(*myPos.x,*myPos.y,buffer[0],buffer[1]) < 30)||first) ){
+            if(buffer[0] > 0 && buffer[1] > 0 && ((computeEuclidianDistance(*myPos.x,*myPos.y,buffer[0],buffer[1]) < 0.30)||first) ){
             first = 0;
             pthread_mutex_lock(&lockPosition);
             *myPos.x = buffer[0];

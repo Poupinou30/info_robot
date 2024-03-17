@@ -25,6 +25,7 @@ pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lidarDataLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t printLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t lockOpponentPosition = PTHREAD_MUTEX_INITIALIZER;
 uint8_t readyToSend = 0;
 uint8_t lidarDataCopied = 0;
 
@@ -322,9 +323,12 @@ void* beacon_data(void* argument){
             objects_coordinates.push_back(object);
             if(object.x < 2 && object.x > 0 && object.y < 3 && object.y > 0){
                 if(verbose) fprintf(stderr, "opponent added \n");
+                pthread_mutex_lock(&lockOpponentPosition);
                 myOpponent.x = object.x;
                 myOpponent.y = object.y;
-                myOpponent.isDetected = 1;
+                myOpponent.isDetected = 1
+                pthread_mutex_unlock(&lockOpponentPosition);
+
             }
 
         }
@@ -508,6 +512,7 @@ else{
     
     pthread_mutex_lock(&positionLock);
     pthread_mutex_lock(&printLock);
+    pthread_mutex_lock(&lockOpponentPosition);
     if(verbose){
      fprintf(stderr,"position x = %f \n",position->x);
      fprintf(stderr,"position y = %f \n",position->y);
@@ -517,6 +522,7 @@ else{
     }
     pthread_mutex_unlock(&printLock);
     pthread_mutex_unlock(&positionLock);
+    pthread_mutex_unlock(&lockOpponentPosition);
     
     //if(verbose) fprintf(stderr,"Check 8\n");
     
