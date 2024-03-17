@@ -15,25 +15,39 @@ int verbose;
 
 lidarPos myPos;
 Opponent myOpponent;
-beaconAbsolutePos *beaconRefPosition;
+
+beaconAbsolutePos beaconRefPosition[3];
+lidarPos calibPos;
+
+
 float perimetre = 8.4;
 float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
+float triangleErrorTolerance = 0.1;//il est à 0.15 par défaut
+float isoceleTolerance = 0.1;
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lidarDataLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t printLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lockOpponentPosition = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t lockMyState = PTHREAD_MUTEX_INITIALIZER;
 uint8_t readyToSend = 0;
 uint8_t lidarDataCopied = 0;
+typedef enum{CALIB_MODE, LOCALIZE_MODE} PROGRAM_STATE;
+PROGRAM_STATE myState;
+
 
 
 double distance (double a1,double a2,double d1,double d2){
     double dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
     //if(verbose) fprintf(stderr,"distance is %lf",dist);
     return dist;
+}
+
+double beaconDistance(beaconAbsolutePos beacon1, beaconAbsolutePos beacon2){
+    return pow((pow(beacon1.x,2),pow(beacon1.y,2),pow(beacon2.x,2),pow(beacon2.y,2)),0.5);
 }
 
 float angleDiff(float a1, float a2) {
@@ -199,8 +213,30 @@ void* beacon_data(void* argument){
     for(int i = 0; i< newa.size();i++){
         //if(verbose) fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
     }
-    
-
+    pthread_mutex_lock(&lockMyState);
+    if(myState == CALIB_MODE){
+        for(int h = 0; h< newa.size();h++){
+            if(newd[h] > 0.20-isoceleTolerance && newd[h] < 0.2+isoceleTolerance && newa[h] < 180+22+4 && newa[h] > 180+22-4){
+                beaconRefPosition[0].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
+                beaconRefPosition[0].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
+            }
+            if(newd[h] > 3.15-isoceleTolerance && newd[h] < 3.15+isoceleTolerance && newa[h] < 15.85+4 && newa[h] > 15.85-4){
+                beaconRefPosition[1].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
+                beaconRefPosition[1].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
+            }
+            if(newd[h] > 1.85-isoceleTolerance && newd[h] < 1.85+isoceleTolerance && newa[h] < 96.3+4 && newa[h] > 96.3-4){
+                beaconRefPosition[2].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
+                beaconRefPosition[2].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
+            }
+            perimetre = beaconDistance(beaconRefPosition[0],beaconRefPosition[1]) + beaconDistance(beaconRefPosition[1],beaconRefPosition[2])+ beaconDistance(beaconRefPosition[2],beaconRefPosition[0]);
+            fprintf(stderr,"perimetre = %f \n",perimetre);
+            
+            
+        }
+        fprintf(stderr,"Position des balises calibrée: x1 = %f y1 = %f x2 = %f y2 = %f x3 = %f y3 = %f",beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y);
+        myState = LOCALIZE_MODE;
+    }
+    pthread_mutex_unlock(&lockMyState);
     
     //(float[2]) coord[3]={};
     int coord[3]={};
@@ -228,9 +264,9 @@ void* beacon_data(void* argument){
 		float dij=distance(newa[i],newa[j],newd[i],newd[j]);
 		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
 		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
-		float triangleErrorTolerance = 0.1;//il est à 0.15 par défaut
 		
-		float isoceleTolerance = 0.1;
+		
+		
 		
 		//if(triangle<=8 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
 		    //Ici c'est là où j'ai changé
@@ -306,6 +342,7 @@ void* beacon_data(void* argument){
         //fprintf(stderr,"myX = %f and myY = %d \n", myX,myY);
         //Calcul angle augustin
         float alpha = 180-(360-beaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
+        if(alpha<0) alpha = alpha+360;
         //if(verbose) fprintf(stderr,"angle = %f \n",alpha);
         
         pthread_mutex_lock(&positionLock);
@@ -318,15 +355,18 @@ void* beacon_data(void* argument){
         pthread_mutex_unlock(&positionLock);
         lidarPos object;
         for (int k = 0;k<newa.size();k++){
-            object.x = myPos.x + newd[i] * cos((myPos.theta-newa[i])*DEG2RAD);
-            object.y = myPos.y + newd[i] * sin((myPos.theta-newa[i])*DEG2RAD);
+            object.x = myPos.x + newd[k] * cos((myPos.theta - newa[k] + 90)*DEG2RAD);
+            object.y = myPos.y + newd[k] * sin((myPos.theta - newa[k] + 90)*DEG2RAD);
+
+
             objects_coordinates.push_back(object);
-            if(object.x < 2 && object.x > 0 && object.y < 3 && object.y > 0){
+            //fprintf(stderr,"object position: x = %f and y = %f angle = %f\n",object.x,object.y,newa[k]);
+            if(object.x < 1.99 && object.x > 0.01 && object.y < 2.99 && object.y > 0.01){
                 if(verbose) fprintf(stderr, "opponent added \n");
                 pthread_mutex_lock(&lockOpponentPosition);
                 myOpponent.x = object.x;
                 myOpponent.y = object.y;
-                myOpponent.isDetected = 1
+                myOpponent.isDetected = 1;
                 pthread_mutex_unlock(&lockOpponentPosition);
 
             }
@@ -363,15 +403,23 @@ void* beacon_data(void* argument){
 
 
 int main(int argc, const char * argv[]){
-    beaconRefPosition = (beaconAbsolutePos *) malloc(3*sizeof(beaconAbsolutePos));
+    pthread_mutex_lock(&lockMyState);
     beaconRefPosition[0].x = 0.05;
     beaconRefPosition[0].y = -0.08;
     beaconRefPosition[1].x = 1;
     beaconRefPosition[1].y= 3.08;
     beaconRefPosition[2].x = 1.95;
     beaconRefPosition[2].y = -0.08;
+
+    calibPos.x = 0.13;
+    calibPos.y = 0.125;
+    calibPos.theta = 0;
+    
+
+    myState = CALIB_MODE;
     verbose =1;
     myOpponent.isDetected = 0;
+    pthread_mutex_unlock(&lockMyState);
     if(verbose) fprintf(stderr,"Argc  = %d\n",argc);
     int write_fd;
     if(argc > 1){ 
