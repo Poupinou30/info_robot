@@ -85,6 +85,7 @@ void printObstacleLists();
 void removeMovingObstacles();
 void computeForceVector();
 void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear);
+void* updateKalman(void* args)
 
 extern position myPos;
 extern field myField;

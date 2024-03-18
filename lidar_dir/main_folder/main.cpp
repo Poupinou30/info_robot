@@ -47,7 +47,7 @@ double distance (double a1,double a2,double d1,double d2){
 }
 
 double beaconDistance(beaconAbsolutePos beacon1, beaconAbsolutePos beacon2){
-    return pow((pow(beacon1.x,2),pow(beacon1.y,2),pow(beacon2.x,2),pow(beacon2.y,2)),0.5);
+    return pow(pow(beacon1.x - beacon2.x,2)+pow(beacon1.y - beacon2.y,2),0.5);
 }
 
 float angleDiff(float a1, float a2) {
