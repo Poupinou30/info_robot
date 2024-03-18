@@ -271,7 +271,7 @@ void printObstacleLists(){
 void computeForceVector(){
     float k_att_xy = 1;
     float k_att_theta;
-    float k_repul = 1;
+    float k_repul = -1;
     double f_att_x = -k_att_xy * (*myPos.x- *destination.x);
     double f_att_y = -k_att_xy * (*myPos.y - *destination.y);
     double f_att_theta = k_att_theta * (*myPos.theta-*destination.theta);
