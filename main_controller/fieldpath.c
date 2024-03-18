@@ -20,7 +20,6 @@ position closestPoint(position rect[2], position pos) {
     position closest;
     closest.x = (float*) malloc(sizeof(float));
     closest.y = (float*) malloc(sizeof(float));
-    fprintf(stderr, "Entre dans distance \n");
     *closest.x = (*pos.x < *(rect[0].x)) ? *(rect[0].x) : (*pos.x > *(rect[1].x)) ? *(rect[1].x) : *pos.x;
     *closest.y = (*pos.y < *(rect[0].y)) ? *(rect[0].y) : (*pos.y > *(rect[1].y)) ? *(rect[1].y) : *pos.y;
     return closest;
@@ -291,23 +290,17 @@ void computeForceVector(){
 
     obstacle *tempoObstacle;
     //Calcul de la force de répulsion totale
-    fprintf(stderr,"Calcul de la force de répulsion totale avant boucle \n");
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
-        fprintf(stderr,"Avant assignation pointeur \n");
         tempoObstacle = &myForce.obstacleList[i];
-        fprintf(stderr,"Après assignation pointeur \n");
         if(tempoObstacle->isRectangle){
             *tempoPoint1.x = tempoObstacle->x1;
             *tempoPoint1.y = tempoObstacle->y1;
             *tempoPoint2.x = tempoObstacle->x2;
             *tempoPoint2.y = tempoObstacle->y2;
-            fprintf(stderr,"Après assignation pointeur 2\n");
             tempoRectangle[0] = tempoPoint1;
             tempoRectangle[1] = tempoPoint2;
             myClosestPoint = closestPoint(tempoRectangle,myPos);
-            fprintf(stderr,"Avant calcul distance \n");
             distance = computeEuclidianDistance(*myPos.x, *myPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
-            fprintf(stderr,"Après calcul distance \n");
             tempoX = *myClosestPoint.x; //Calcule la position en x
             tempoY = *myClosestPoint.y; //Calcule la position en y
             free(myClosestPoint.x);
