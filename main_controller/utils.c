@@ -175,7 +175,7 @@ void* receptionPipe(void* pipefdvoid){
             readyToGo = 1;
             pthread_mutex_unlock(&lockRefreshCounter);
             if(kalmanLaunched){
-                pthread_join(updateKalman);
+                pthread_join(updateKalman,NULL);
                 kalmanLaunched = 0;
             }
             pthread_create(&updateKalman,NULL,NULL,NULL);

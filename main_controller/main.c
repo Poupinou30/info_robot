@@ -10,6 +10,9 @@ pthread_mutex_t lockRefreshCounter;
 field myField;
 forceVector myForce;
 position destination;
+position myPos;
+position myFilteredPos;
+position myOpponent;
 
 
 int mainPattern(){

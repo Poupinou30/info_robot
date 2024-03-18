@@ -30,7 +30,7 @@ void* updateKalman(void* args){
 
     // Mise à jour
     for(int j=0; j<3; j++) {
-        double y = measurements[i][j] - (H[0]*x_pred[0] + H[1]*x_pred[1] + H[2]*x_pred[2]); // Innovation
+        double y = measurements[j] - (H[0]*x_pred[0] + H[1]*x_pred[1] + H[2]*x_pred[2]); // Innovation
         double S = H[j]*H[j]*P[j][j] + R[j]; // Innovation covariance
         double K[3] = {P[0][j]*H[j]/S, P[1][j]*H[j]/S, P[2][j]*H[j]/S}; // Gain de Kalman
 
@@ -43,8 +43,8 @@ void* updateKalman(void* args){
     fprintf(stderr,"resultat du filtre de kalman x = %lf y = %lf theta = %lf \n",x[0],x[1],
     x[2]);
     pthread_mutex_lock(&lockFilteredPosition);
-     *(myFilteredPos->x) = measurements[0];
-     *(myFilteredPos->y) = measurements[1];
-     *(myFilteredPos->theta) = measurements[2];
+     *(myFilteredPos.x) = measurements[0];
+     *(myFilteredPos.y) = measurements[1];
+     *(myFilteredPos.theta) = measurements[2];
     pthread_mutex_unlock(&lockFilteredPosition);
 }

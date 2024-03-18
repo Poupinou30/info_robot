@@ -85,11 +85,13 @@ void printObstacleLists();
 void removeMovingObstacles();
 void computeForceVector();
 void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear);
-void* updateKalman(void* args)
+void* updateKalman(void* args);
 
 extern position myPos;
 extern field myField;
 extern pid_t child_pid;
+extern position myFilteredPos;
+extern position myOpponent;
 extern int sizeX;
 extern int sizeY;
 extern forceVector myForce;
@@ -104,6 +106,3 @@ pthread_t computeKalman;
 pthread_mutex_t lockFilteredPosition;
 pthread_mutex_t lockPosition;
 pthread_mutex_t lockOpponentPosition;
-position myPos;
-position myFilteredPos;
-position myOpponent;

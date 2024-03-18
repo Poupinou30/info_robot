@@ -215,26 +215,31 @@ void* beacon_data(void* argument){
     }
     pthread_mutex_lock(&lockMyState);
     if(myState == CALIB_MODE){
+        
         for(int h = 0; h< newa.size();h++){
-            if(newd[h] > 0.20-isoceleTolerance && newd[h] < 0.2+isoceleTolerance && newa[h] < 180+22+4 && newa[h] > 180+22-4){
-                beaconRefPosition[0].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
-                beaconRefPosition[0].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
-            }
             if(newd[h] > 3.15-isoceleTolerance && newd[h] < 3.15+isoceleTolerance && newa[h] < 15.85+4 && newa[h] > 15.85-4){
+                myPos.theta = atan((beaconRefPosition[1].x-calibPos.x)/(beaconRefPosition[1].y-calibPos.y));
                 beaconRefPosition[1].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
                 beaconRefPosition[1].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
-            }
-            if(newd[h] > 1.85-isoceleTolerance && newd[h] < 1.85+isoceleTolerance && newa[h] < 96.3+4 && newa[h] > 96.3-4){
-                beaconRefPosition[2].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
-                beaconRefPosition[2].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
+            }}
+            for(int h = 0; h< newa.size();h++){
+                if(newd[h] > 0.20-isoceleTolerance && newd[h] < 0.2+isoceleTolerance && newa[h] < 180+22+4 && newa[h] > 180+22-4){
+                    beaconRefPosition[0].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
+                    beaconRefPosition[0].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
+                }
+                
+                if(newd[h] > 1.85-isoceleTolerance && newd[h] < 1.85+isoceleTolerance && newa[h] < 96.3+4 && newa[h] > 96.3-4){
+                    beaconRefPosition[2].x = calibPos.x + newd[h] * cos((myPos.theta - newa[h] + 90)*DEG2RAD);
+                    beaconRefPosition[2].y = calibPos.y + newd[h] * sin((myPos.theta - newa[h] + 90)*DEG2RAD);
+                }
+                
+                
+                
             }
             perimetre = beaconDistance(beaconRefPosition[0],beaconRefPosition[1]) + beaconDistance(beaconRefPosition[1],beaconRefPosition[2])+ beaconDistance(beaconRefPosition[2],beaconRefPosition[0]);
-            fprintf(stderr,"perimetre = %f \n",perimetre);
-            
-            
-        }
-        fprintf(stderr,"Position des balises calibrée: x1 = %f y1 = %f x2 = %f y2 = %f x3 = %f y3 = %f",beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y);
-        myState = LOCALIZE_MODE;
+                fprintf(stderr,"perimetre = %f \n",perimetre);
+            fprintf(stderr,"Position des balises calibrée: x1 = %f y1 = %f x2 = %f y2 = %f x3 = %f y3 = %f",beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y);
+            myState = LOCALIZE_MODE;
     }
     pthread_mutex_unlock(&lockMyState);
     
@@ -415,8 +420,8 @@ int main(int argc, const char * argv[]){
     calibPos.y = 0.125;
     calibPos.theta = 0;
     
-
-    myState = CALIB_MODE;
+    myState = LOCALIZE_MODE;
+    //myState = CALIB_MODE;
     verbose =1;
     myOpponent.isDetected = 0;
     pthread_mutex_unlock(&lockMyState);
