@@ -7,8 +7,8 @@ cap= cv2.VideoCapture(0)
 
 aruco_dict= cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
 parameters = cv2.aruco.DetectorParameters_create()
-fx=1000
-fy=1000
+fx=500
+fy=500
 cx=320
 cy=240
 mtx = np.array([[fx, 0, cx], [0, fx, cy], [0,0,1]])
