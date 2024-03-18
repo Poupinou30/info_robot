@@ -18,6 +18,8 @@ float computeRectangleDistance(double x1, double y1, double x2, double y2, doubl
 
 position closestPoint(position rect[2], position pos) {
     position closest;
+    closest.x = (float*) malloc(sizeof(float));
+    closest.y = (float*) malloc(sizeof(float));
     fprintf(stderr, "Entre dans distance \n");
     *closest.x = (*pos.x < *(rect[0].x)) ? *(rect[0].x) : (*pos.x > *(rect[1].x)) ? *(rect[1].x) : *pos.x;
     *closest.y = (*pos.y < *(rect[0].y)) ? *(rect[0].y) : (*pos.y > *(rect[1].y)) ? *(rect[1].y) : *pos.y;
@@ -281,7 +283,12 @@ void computeForceVector(){
     double distance;
     position tempoRectangle[2];
     position tempoPoint1, tempoPoint2;
+    tempoPoint1.x = (float*) malloc(sizeof(float)*1);
+    tempoPoint1.y = (float*) malloc(sizeof(float)*1);
+    tempoPoint2.x = (float*) malloc(sizeof(float)*1);
+    tempoPoint2.y = (float*) malloc(sizeof(float)*1);
     position myClosestPoint;
+
     obstacle *tempoObstacle;
     //Calcul de la force de répulsion totale
     fprintf(stderr,"Calcul de la force de répulsion totale avant boucle \n");
@@ -303,6 +310,8 @@ void computeForceVector(){
             fprintf(stderr,"Après calcul distance \n");
             tempoX = *myClosestPoint.x; //Calcule la position en x
             tempoY = *myClosestPoint.y; //Calcule la position en y
+            free(myClosestPoint.x);
+            free(myClosestPoint.y);
         }
         else{
             tempoX = tempoObstacle->posX; //Calcule la position en x
@@ -315,6 +324,10 @@ void computeForceVector(){
 
         }
     }
+    free(tempoPoint1.x);
+    free(tempoPoint1.y);
+    free(tempoPoint2.x);
+    free(tempoPoint2.y);
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
     fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
