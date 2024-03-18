@@ -283,6 +283,7 @@ void computeForceVector(){
     position myClosestPoint;
     obstacle *tempoObstacle;
     //Calcul de la force de répulsion totale
+    fprintf(stderr,"Calcul de la force de répulsion totale avant boucle \n");
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
         tempoObstacle = &myForce.obstacleList[i];
         
