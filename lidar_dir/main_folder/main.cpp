@@ -548,7 +548,7 @@ else{
     pthread_mutex_lock(&isReadyLock);
     if(readyToSend){
         pthread_mutex_lock(&positionLock);
-        std::vector<float> numbers = {position->x,position->y,position->theta}; // Déclaration du tableau de nombres à virgule flottante à envoyer
+        std::vector<float> numbers = {position->x,position->y,position->theta,myOpponent.x,myOpponent.y}; // Déclaration du tableau de nombres à virgule flottante à envoyer
         pthread_mutex_unlock(&positionLock);
         //if(verbose) fprintf(stderr,"Check 7\n");
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe

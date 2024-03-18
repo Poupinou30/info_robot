@@ -134,7 +134,7 @@ uint8_t kalmanLaunched = 0;
 
 
 void* receptionPipe(void* pipefdvoid){
-    float *buffer = (float*) malloc(3*sizeof(float));
+    float *buffer = (float*) malloc(5*sizeof(float));
     uint8_t first = 1;
     fprintf(stderr,"waiting for reading \n");
     //float *buffer = positionReceived; //Position stored in positionRecevived and buffer
@@ -162,10 +162,14 @@ void* receptionPipe(void* pipefdvoid){
             if(buffer[0] > 0 && buffer[1] > 0 && ((computeEuclidianDistance(*myPos.x,*myPos.y,buffer[0],buffer[1]) < 0.30)||first) ){
             first = 0;
             pthread_mutex_lock(&lockPosition);
+            pthread_mutex_lock(&lockOpponentPosition);
             *myPos.x = buffer[0];
             *myPos.y = buffer[1];
             *myPos.theta = buffer[2];
+            *myOpponent.x = buffer[3];
+            *myOpponent.y = buffer[4];
             pthread_mutex_unlock(&lockPosition);
+            pthread_mutex_unlock(&lockOpponentPosition);
             pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter ++;
             readyToGo = 1;

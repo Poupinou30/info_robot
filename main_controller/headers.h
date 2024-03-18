@@ -103,5 +103,7 @@ extern double f_theta;
 pthread_t computeKalman;
 pthread_mutex_t lockFilteredPosition;
 pthread_mutex_t lockPosition;
+pthread_mutex_t lockOpponentPosition;
 position myPos;
 position myFilteredPos;
+position myOpponent;
