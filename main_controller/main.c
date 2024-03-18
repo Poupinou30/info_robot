@@ -141,8 +141,16 @@ int main(){
     *destination.x = 1.00;
     *destination.y = 2.00;
     *myPos.x = 0;
-    *myPos.y = 2;
+    *myPos.y = 0;
     *myPos.theta = 0;
+
+
+//TEST
+    //addObstacle(0,0.10,0.01,0);
+    computeForceVector();
+    fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
+    fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+//FIN TEST
 
 
     //Pipe et thread
@@ -161,10 +169,7 @@ int main(){
         sleep(1);
     }
     fprintf(stderr,"Position acquired \n");
-    //addObstacle(0,0.10,0.01,0);
-    computeForceVector();
-    fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
-    fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+    /
 
     gettimeofday(&end, NULL);
     gettimeofday(&endPrint, NULL);

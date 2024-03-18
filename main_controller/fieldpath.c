@@ -15,6 +15,26 @@ float computeRectangleDistance(double x1, double y1, double x2, double y2, doubl
     return sqrt(dx*dx + dy*dy);
 }
 
+
+position closestPoint(position rect[2], position pos) {
+    position closest;
+    *closest.x = (*pos.x < *rect[0].x) ? *rect[0].x : (*pos.x > *rect[1].x) ? *rect[1].x : *pos.x;
+    *closest.y = (*pos.y < *rect[0].y) ? *rect[0].y : (*pos.y > *rect[1].y) ? *rect[1].y : *pos.y;
+    return closest;
+}
+
+int main() {
+    Point rect[2] = {{1.0, 1.0}, {4.0, 5.0}};
+    Point pos = {0.0, 0.0};
+    Point closest = closestPoint(rect, pos);
+    printf("Le point le plus proche est (%f, %f)\n", closest.x, closest.y);
+    return 0;
+}
+
+
+
+
+
 void computeAttractiveField(position destination){ //position convertie en cm
     fprintf(stderr,"Entered in computeAttractiveField \n");
     //Cette fonction calcule le champ d'attraction pour le potential field path planning
@@ -155,11 +175,50 @@ void makeHeatmap(){
 
 }
 
-void addObstacle(double posX, double posY, double size, uint8_t moving){
+void addRoundObstacle(double posX, double posY, double size, uint8_t moving){
     obstacle myObstacle;
     myObstacle.posX = posX;
     myObstacle.posY = posY;
     myObstacle.size = size;
+    myObstacle.isRectangle = 0;
+    myObstacle.moving = moving;
+    if(myForce.obstacleNumber == 0){
+        myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
+        myForce.obstacleList[0] = myObstacle;
+        myForce.obstacleNumber ++;
+        fprintf(stderr,"Obstacle added, size of list was 0 and is 1 now\n");
+    }
+    else{
+        //fprintf(stderr,"Realloc problem 1 with obstacle number = %d \n",myForce.obstacleNumber);
+        myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber+1));
+        myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
+        myForce.obstacleNumber ++;
+    }
+    if(moving){
+        if(myForce.movingNumber == 0){
+            myForce.movingIndexes = (int*) malloc(sizeof(int)*1);
+            myForce.movingIndexes[myForce.movingNumber] = myForce.obstacleNumber-1;
+            myForce.movingNumber ++;
+        }
+        else{
+            //fprintf(stderr,"Realloc problem 2 \n");
+            myForce.movingIndexes = (int*) realloc(myForce.movingIndexes,sizeof(int)*(myForce.movingNumber+1));
+            myForce.movingIndexes[myForce.movingNumber] = myForce.obstacleNumber-1;
+            myForce.movingNumber ++;
+        }
+
+
+    }
+}
+
+void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving){
+    obstacle myObstacle;
+    myObstacle.isRectangle = 1;
+    myObstacle.x1 = x1;
+    myObstacle.y1 = y1;
+    myObstacle.x2 = x2;
+    myObstacle.y2 = y2;
+    myObstacle.isRectangle = 1;
     myObstacle.moving = moving;
     if(myForce.obstacleNumber == 0){
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
@@ -229,11 +288,30 @@ void computeForceVector(){
     double tempoX;
     double tempoY;
     double distance;
+    position[2] tempoRectangle;
+    position tempoPoint1, tempoPoint2;
+    position closestPoint;
+    obstacle *tempoObstacle;
     //Calcul de la force de répulsion totale
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
-        tempoX = myForce.obstacleList[i].posX;
-        tempoY = myForce.obstacleList[i].posY;
-        distance = computeEuclidianDistance(tempoX,tempoY,*myPos.x,*myPos.y)-myForce.obstacleList[i].size;
+        tempoObstacle = &myForce.obstacleList[i];
+        
+        if(tempoObstacle.isRectangle){
+            *tempoPoint1.x = tempoObstacle->x1;
+            *tempoPoint1.y = tempoObstacle->y1;
+            *tempoPoint2.x = tempoObstacle->x2;
+            *tempoPoint2.y = tempoObstacle->y2;
+            tempoRectangle = {tempoPoint1,tempoPoint2};
+            closestPoint = closestPoint(tempoRectangle);
+            distance = computeEuclidianDistance(myPos.x, myPos.y, closestPoint.x, closestPoint.y); //Calcul la distance
+            tempoX = closestPoint.x; //Calcule la position en x
+            tempoY = closestPoint.y; //Calcule la position en y
+        }
+        else{
+            tempoX = tempoObstacle->posX; //Calcule la position en x
+            tempoY = tempoObstacle->posY; //Calcule la position en y
+            distance = computeEuclidianDistance(tempoX,tempoY,*myPos.x,*myPos.y)-myForce.obstacleList[i].size; //Calcule la distance
+        }
         if(distance < actionDistance){
             f_repul_x = f_repul_x + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoX - *myPos.x);
             f_repul_y = f_repul_y + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoY - *myPos.y);

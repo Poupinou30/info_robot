@@ -33,6 +33,8 @@ typedef struct obstacle{
     double posY;
     double size;
     uint8_t moving;
+    uint8_t isRectangle;
+    float x1,x2,y1,y2;
 } obstacle;
 
 
@@ -80,12 +82,14 @@ void resetRepulsiveField(int x1,int y1, int x2, int y2);
 void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
 void print2DArray(int m, int n, double** arr);
 void makeHeatmap();
-void addObstacle(double posX, double posY, double size, uint8_t moving);
+void addRoundObstacle(double posX, double posY, double size, uint8_t moving);
 void printObstacleLists();
 void removeMovingObstacles();
 void computeForceVector();
 void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear);
 void* updateKalman(void* args);
+position closestPoint(position rect[2], position pos);
+void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving)
 
 extern position myPos;
 extern field myField;
