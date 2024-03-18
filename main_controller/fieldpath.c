@@ -285,7 +285,7 @@ void computeForceVector(){
     }
 
     // Calcul de la sortie du contrôleur
-    double f_att_theta = kp * error;
+    double f_att_theta = k_att_theta * error;
     double f_repul_x = 0;
     double f_repul_y = 0;
     double tempoX;
