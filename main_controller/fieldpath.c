@@ -23,16 +23,6 @@ position closestPoint(position rect[2], position pos) {
     return closest;
 }
 
-int main() {
-    Point rect[2] = {{1.0, 1.0}, {4.0, 5.0}};
-    Point pos = {0.0, 0.0};
-    Point closest = myClosestPoint(rect, pos);
-    printf("Le point le plus proche est (%f, %f)\n", closest.x, closest.y);
-    return 0;
-}
-
-
-
 
 
 void computeAttractiveField(position destination){ //position convertie en cm
