@@ -99,3 +99,9 @@ extern double f_tot_y;
 extern int refreshCounter;
 extern uint8_t readyToGo;
 extern double f_theta;
+
+pthread_t computeKalman;
+pthread_mutex_t lockFilteredPosition;
+pthread_mutex_t lockPosition;
+position myPos;
+position myFilteredPos;

@@ -4,9 +4,9 @@
 #endif
 
 float* positionReceived;
-pthread_mutex_t lockPosition;
+
 pthread_mutex_t lockRefreshCounter;
-position myPos;
+
 field myField;
 forceVector myForce;
 position destination;
@@ -140,6 +140,7 @@ int main(){
     int pipefd[2];
     pipe(pipefd);
     pthread_t lidarExecuteThread;
+    
     pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipefd[1]); // Passage de l'adresse de pipefd[1] à pthread_create
     fprintf(stderr,"Thread for execution launched \n");
     //initialisation thread qui récupère les données du pipe provenant du programme lidar

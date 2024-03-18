@@ -130,7 +130,7 @@ void* executeProgram(void* arg){
     return NULL;
 }
 
-
+uint8_t kalmanLaunched = 0;
 
 
 void* receptionPipe(void* pipefdvoid){
@@ -168,14 +168,23 @@ void* receptionPipe(void* pipefdvoid){
             pthread_mutex_unlock(&lockPosition);
             pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter ++;
-            readyToGo = 1;}
+            readyToGo = 1;
             pthread_mutex_unlock(&lockRefreshCounter);
-            if(VERBOSE){
+            if(kalmanLaunched){
+                pthread_join(updateKalman);
+                kalmanLaunched = 0;
+            }
+            pthread_create(&updateKalman,NULL,NULL,NULL);
+            kalmanLaunched = 1;
+
+            }
+            
+            /*if(VERBOSE){
                 fprintf(stderr,"X = %f \n",*(myPos.x));
                 fprintf(stderr,"Y = %f \n",*(myPos.y));
                 fprintf(stderr,"Theta = %f \n",*(myPos.theta));
 
-            }
+            }*/
 
     }
     }
