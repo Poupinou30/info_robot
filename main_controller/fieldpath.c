@@ -26,7 +26,7 @@ position closestPoint(position rect[2], position pos) {
 int main() {
     Point rect[2] = {{1.0, 1.0}, {4.0, 5.0}};
     Point pos = {0.0, 0.0};
-    Point closest = closestPoint(rect, pos);
+    Point closest = myClosestPoint(rect, pos);
     printf("Le point le plus proche est (%f, %f)\n", closest.x, closest.y);
     return 0;
 }
@@ -290,7 +290,7 @@ void computeForceVector(){
     double distance;
     position tempoRectangle[2];
     position tempoPoint1, tempoPoint2;
-    position closestPoint;
+    position myClosestPoint;
     obstacle *tempoObstacle;
     //Calcul de la force de répulsion totale
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
@@ -302,10 +302,10 @@ void computeForceVector(){
             *tempoPoint2.x = tempoObstacle->x2;
             *tempoPoint2.y = tempoObstacle->y2;
             tempoRectangle = {tempoPoint1,tempoPoint2};
-            closestPoint = closestPoint(tempoRectangle);
-            distance = computeEuclidianDistance(*myPos.x, *myPos.y, *closestPoint.x, *closestPoint.y); //Calcul la distance
-            tempoX = *closestPoint.x; //Calcule la position en x
-            tempoY = *closestPoint.y; //Calcule la position en y
+            myClosestPoint = myClosestPoint(tempoRectangle);
+            distance = computeEuclidianDistance(*myPos.x, *myPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
+            tempoX = *myClosestPoint.x; //Calcule la position en x
+            tempoY = *myClosestPoint.y; //Calcule la position en y
         }
         else{
             tempoX = tempoObstacle->posX; //Calcule la position en x
