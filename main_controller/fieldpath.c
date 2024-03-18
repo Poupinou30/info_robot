@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-float actionDistance = 20; //en cm
+float actionDistance = 0.20; //en cm
 
 float computeEuclidianDistance(double x1, double y1, double x2, double y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
@@ -269,9 +269,9 @@ void printObstacleLists(){
 }
 
 void computeForceVector(){
-    float k_att_xy = 1;
+    float k_att_xy = 0.1;
     float k_att_theta;
-    float k_repul = -1;
+    float k_repul = -0.001;
     double f_att_x = -k_att_xy * (*myPos.x- *destination.x);
     double f_att_y = -k_att_xy * (*myPos.y - *destination.y);
     double f_att_theta = k_att_theta * (*myPos.theta-*destination.theta);
