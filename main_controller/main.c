@@ -147,12 +147,20 @@ int main(){
 
 //TEST
     //addObstacle(0,0.10,0.01,0);
-    computeForceVector();
-    fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
-    fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+    addRectangleObstacle(0,0,2,0,0); //Mur du bas
+    addRectangleObstacle(0,0,0,3,0); //Mur de gauche
+    addRectangleObstacle(2,0,2,3,0); //Mur de droite
+    addRectangleObstacle(0,3,2,3,0); //Mur du haut
+    while(1){
+        fprintf(stderr,"Entrer la position du robot: ")
+        scanf("%f %f", *myPos.x, *myPos.y);
+        computeForceVector();
+        fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
+        fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+    }
+    
 //FIN TEST
-
-
+/*
     //Pipe et thread
     int pipefd[2];
     pipe(pipefd);
@@ -208,7 +216,7 @@ int main(){
     close(pipefd[0]);
     close(pipefd[1]);
 
-
+*/
 }
 
 int mainField(){
