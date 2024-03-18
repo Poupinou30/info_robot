@@ -169,7 +169,7 @@ int main(){
         sleep(1);
     }
     fprintf(stderr,"Position acquired \n");
-    /
+    
 
     gettimeofday(&end, NULL);
     gettimeofday(&endPrint, NULL);
