@@ -154,7 +154,7 @@ int main(){
     addRectangleObstacle(0,3,2,3,0); //Mur du haut
     while(1){
         fprintf(stderr,"Entrer la position du robot: ");
-        scanf("%f %f", myPos.x, myPos.y);
+        scanf("%f %f %f", myPos.x, myPos.y,myPos.theta);
         computeForceVector();
         fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
         fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
