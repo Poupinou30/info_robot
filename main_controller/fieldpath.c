@@ -286,13 +286,15 @@ void computeForceVector(){
     //Calcul de la force de répulsion totale
     fprintf(stderr,"Calcul de la force de répulsion totale avant boucle \n");
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
+        fprintf(stderr,"Avant assignation pointeur \n");
         tempoObstacle = &myForce.obstacleList[i];
-        
+        fprintf(stderr,"Après assignation pointeur \n");
         if(tempoObstacle->isRectangle){
             *tempoPoint1.x = tempoObstacle->x1;
             *tempoPoint1.y = tempoObstacle->y1;
             *tempoPoint2.x = tempoObstacle->x2;
             *tempoPoint2.y = tempoObstacle->y2;
+            fprintf(stderr,"Après assignation pointeur 2\n");
             tempoRectangle[0] = tempoPoint1;
             tempoRectangle[1] = tempoPoint2;
             myClosestPoint = closestPoint(tempoRectangle,myPos);
