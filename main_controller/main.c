@@ -155,8 +155,8 @@ int main(){
         fprintf(stderr,"Entrer la position du robot: ");
         scanf("%f %f", *myPos.x, *myPos.y);
         //computeForceVector();
-        fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
-        fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+        //fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
+        //fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
     }
     
 //FIN TEST
