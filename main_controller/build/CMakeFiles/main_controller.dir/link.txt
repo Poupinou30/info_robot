@@ -1,1 +1,0 @@
-/usr/bin/cc    CMakeFiles/main_controller.dir/main.c.o CMakeFiles/main_controller.dir/spi_com.c.o CMakeFiles/main_controller.dir/utils.c.o CMakeFiles/main_controller.dir/controller.c.o  -o main_controller  /usr/lib/libpigpio.so -lm 
