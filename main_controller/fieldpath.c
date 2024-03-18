@@ -18,8 +18,9 @@ float computeRectangleDistance(double x1, double y1, double x2, double y2, doubl
 
 position closestPoint(position rect[2], position pos) {
     position closest;
-    *closest.x = (*pos.x < *rect[0].x) ? *rect[0].x : (*pos.x > *rect[1].x) ? *rect[1].x : *pos.x;
-    *closest.y = (*pos.y < *rect[0].y) ? *rect[0].y : (*pos.y > *rect[1].y) ? *rect[1].y : *pos.y;
+    fprintf(stderr, "Entre dans distance \n");
+    *closest.x = (*pos.x < *(rect[0].x)) ? *(rect[0].x) : (*pos.x > *(rect[1].x)) ? *(rect[1].x) : *pos.x;
+    *closest.y = (*pos.y < *(rect[0].y)) ? *(rect[0].y) : (*pos.y > *(rect[1].y)) ? *(rect[1].y) : *pos.y;
     return closest;
 }
 
