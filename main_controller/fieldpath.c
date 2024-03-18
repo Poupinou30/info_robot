@@ -295,7 +295,9 @@ void computeForceVector(){
             tempoRectangle[0] = tempoPoint1;
             tempoRectangle[1] = tempoPoint2;
             myClosestPoint = closestPoint(tempoRectangle,myPos);
+            fprintf(stderr,"Avant calcul distance \n");
             distance = computeEuclidianDistance(*myPos.x, *myPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
+            fprintf(stderr,"Après calcul distance \n");
             tempoX = *myClosestPoint.x; //Calcule la position en x
             tempoY = *myClosestPoint.y; //Calcule la position en y
         }
