@@ -96,32 +96,38 @@ void* executeProgram(void* arg){
 
     fprintf(stderr,"Lidar program correctly launched \n");
     return NULL;*/
+void handle_sigsegv(int sig) {
+    fprintf(stderr, "Erreur de segmentation capturée, terminaison du programme.\n");
+    if (child_pid > 0) {
+        killpg(getpgid(child_pid), SIGINT);
+    }
+    exit(1);
+}
 
 void handle_sigint(int sig) {
-    fprintf(stderr,"signit handeled \n");
-    killpg(getpgid(child_pid), SIGINT);
+    fprintf(stderr,"SIGINT handled \n");
+    if (child_pid > 0) {
+        killpg(getpgid(child_pid), SIGINT);
+    }
     signal(SIGINT, SIG_DFL);  // Restaure le comportement par défaut du signal SIGINT
     raise(SIGINT);  // Envoie un signal SIGINT au processus parent
 }
 
-
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg);
     char cmd[256];
-    //sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/sender_test/build/sender_test %d", pipefd);
-    //sprintf(cmd,"/home/pi/Documents/bumblebot/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
     sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
 
     child_pid = fork();
-    signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
     if (child_pid == 0) {
-
         setpgid(0, 0);
         execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
         _exit(EXIT_FAILURE);
     } else if (child_pid < 0) {
         fprintf(stderr,"Error occured \n");
     } else {
+        signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
+        signal(SIGSEGV, handle_sigsegv);  // Ajoutez cette ligne pour gérer SIGSEGV
         int status;
         waitpid(child_pid, &status, 0);
     }
@@ -154,11 +160,11 @@ void* receptionPipe(void* pipefdvoid){
             perror("select");
             exit(EXIT_FAILURE);
         } else if (ret == 0) {
-            printf("No data within one seconds.\n");
+            //printf("No data within one seconds.\n");
         } else {
             // Des données sont disponibles, lire les données
             
-            read(pipefd[0], buffer, 3*sizeof(buffer));
+            read(pipefd[0], buffer, 5*sizeof(float));
             if(buffer[0] > 0 && buffer[1] > 0 && ((computeEuclidianDistance(*myPos.x,*myPos.y,buffer[0],buffer[1]) < 0.30)||first) ){
             first = 0;
             pthread_mutex_lock(&lockPosition);
@@ -174,18 +180,21 @@ void* receptionPipe(void* pipefdvoid){
             refreshCounter ++;
             readyToGo = 1;
             pthread_mutex_unlock(&lockRefreshCounter);
+            
             if(kalmanLaunched){
-                pthread_join(updateKalman,NULL);
+                pthread_join(computeKalmanThread,NULL);
                 kalmanLaunched = 0;
             }
-            pthread_create(&updateKalman,NULL,NULL,NULL);
+            pthread_create(&computeKalmanThread,NULL,updateKalman,NULL);
             kalmanLaunched = 1;
-
-            }
             
-            /*if(VERBOSE){
+            }
+            /*
+            if(VERBOSE){
                 fprintf(stderr,"X = %f \n",*(myPos.x));
                 fprintf(stderr,"Y = %f \n",*(myPos.y));
+                fprintf(stderr,"OPPX = %f \n",buffer[3]);
+                fprintf(stderr,"OPPY = %f \n",buffer[4]);
                 fprintf(stderr,"Theta = %f \n",*(myPos.theta));
 
             }*/

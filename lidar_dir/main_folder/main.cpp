@@ -125,7 +125,7 @@ void* beacon_data(void* argument){
     }
     pthread_mutex_unlock(&printLock);
 
-    if(verbose) fprintf(stderr,"We detected %d points \n",counter);
+    if(verbose) fprintf(stderr,"We detected %d points in beacon_data \n",counter);
     //std::ifstream file;
     //file.open("lidar_2112_v2.txt");
     //std::cout<<"c'est beacons qui marche pas?";
@@ -366,7 +366,7 @@ void* beacon_data(void* argument){
 
             objects_coordinates.push_back(object);
             //fprintf(stderr,"object position: x = %f and y = %f angle = %f\n",object.x,object.y,newa[k]);
-            if(object.x < 1.99 && object.x > 0.01 && object.y < 2.99 && object.y > 0.01){
+            if(object.x < 1.95 && object.x > 0.05 && object.y < 2.95 && object.y > 0.05){
                 if(verbose) fprintf(stderr, "opponent added \n");
                 pthread_mutex_lock(&lockOpponentPosition);
                 myOpponent.x = object.x;
@@ -429,7 +429,8 @@ int main(int argc, const char * argv[]){
     int write_fd;
     if(argc > 1){ 
         write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
-        verbose = 0;}
+        verbose = 0;
+        }
     lidarPos *position = &myPos;
     //clock_t begin= clock();
     ///  Create a communication channel instance
@@ -454,7 +455,7 @@ int main(int argc, const char * argv[]){
 		std::vector<LidarScanMode> scanModes;  // ça c'est si on veut choisir le mode de scan
 		lidar->getAllSupportedScanModes(scanModes);
 		//lidar->startScanExpress(false, scanModes[0].id);
-		//lidar->setMotorSpeed(0);
+		//lidar->setMotorSpeed(1);
 
 		LidarScanMode scanMode;//on utilise le mode standard de scan(on peut aussi choisir)
 		lidar->startScan(false, true, 0, &scanMode);
@@ -517,7 +518,7 @@ int main(int argc, const char * argv[]){
             myLidarData.distance = distance;
             myLidarData.angle = angle;
             myLidarData.counter = counter;
-            //fprintf(stderr,"counter in main = %d \n",myLidarData.counter);
+            if(verbose) fprintf(stderr,"counter in main = %d \n",myLidarData.counter);
             //for(int l = 0; l < counter; l++) if(myLidarData.angle[l]>360) //fprintf(stderr,"dans main angle = %f \n",myLidarData.angle[l]);
             
             int thread_execut = pthread_create(&computationThread, NULL, beacon_data, (void*) &myLidarData);
@@ -546,7 +547,7 @@ else{
     }
     
     
-    
+
    
     if(argc >1){
     //if(verbose) fprintf(stderr,"Check 6,5\n");
@@ -579,7 +580,7 @@ else{
     
     //if(verbose) fprintf(stderr,"Check 8\n");
     
-    if(verbose) sleep(2);
+    //if(verbose) sleep(2);
 
 
     
@@ -588,7 +589,7 @@ else{
         
 	//sleep(1);
     }else{
-        //if(verbose) fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
+        if(verbose) fprintf(stderr, "OSKUR poupon, failed to get device information from LIDAR %08x\r\n", res);
     }
 
 
@@ -596,11 +597,10 @@ else{
     //lidar->setMotorSpeed(1);
 
 }else{
-    //if(verbose) fprintf(stderr, "OSKUR poupon, Failed to connect to LIDAR %08x\r\n", res);
+    if(verbose) fprintf(stderr, "OSKUR poupon, Failed to connect to LIDAR %08x\r\n", res);
 }
     //clock_t end= clock();
     //double time_spent= (double)(end-begin)/CLOCKS_PER_SEC;
     //printf("execution time: %f \n", time_spent);
     //close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
-    free(beaconRefPosition);
 }

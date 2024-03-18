@@ -120,9 +120,15 @@ int main(){
     myPos.x = (float*)malloc(sizeof(float));
     myPos.y = (float*)malloc(sizeof(float));
     myPos.theta = (float*)malloc(sizeof(float));
+    myFilteredPos.x = (float*)malloc(sizeof(float));
+    myFilteredPos.y = (float*)malloc(sizeof(float));
+    myFilteredPos.theta = (float*)malloc(sizeof(float));
+    myPos.theta = (float*)malloc(sizeof(float));
     myPos.x = &positionReceived[0];
     myPos.y = &positionReceived[1];
     myPos.theta = &positionReceived[2];
+    myOpponent.x = (float*)malloc(sizeof(float));
+    myOpponent.y = (float*)malloc(sizeof(float));
     double* outputSpeed = malloc(sizeof(double)*4);
     uint8_t *dataFront = (uint8_t*) malloc(sizeof(uint8_t)*4);
     uint8_t *dataRear = (uint8_t*) malloc(sizeof(uint8_t)*4);
@@ -167,11 +173,16 @@ int main(){
     while(1){
         gettimeofday(&now,NULL);
         nowValue = now.tv_sec*1000+now.tv_usec/1000;
-        if(nowValue - endValuePrint > 5000){
+        if(nowValue - endValuePrint > 100){
             fprintf(stderr,"X = %f \n",*(myPos.x));
             fprintf(stderr,"Y = %f \n",*(myPos.y));
             fprintf(stderr,"Theta = %f \n",*(myPos.theta));
-            fprintf(stderr,"refreshed %d times \n",refreshCounter);
+            fprintf(stderr,"filtered X = %f \n",*(myFilteredPos.x));
+            fprintf(stderr,"filtered Y = %f \n",*(myFilteredPos.y));
+            fprintf(stderr,"filtered Theta = %f \n",*(myFilteredPos.theta));
+            fprintf(stderr,"X opponent = %f \n",*(myOpponent.x));
+            fprintf(stderr,"Y opponent= %f \n",*(myOpponent.y));
+            //fprintf(stderr,"refreshed %d times \n",refreshCounter);
 
             pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter = 0;
@@ -180,7 +191,7 @@ int main(){
             endValuePrint = endPrint.tv_sec*1000+endPrint.tv_usec/1000;
         }
         if(nowValue - endValue > 50){
-            myPotentialFieldController(outputSpeed,dataFront,dataRear,spi_handle_front,spi_handle_rear);
+            //myPotentialFieldController(outputSpeed,dataFront,dataRear,spi_handle_front,spi_handle_rear);
             gettimeofday(&end,NULL);
             endValue = end.tv_sec*1000+end.tv_usec/1000;
         }
