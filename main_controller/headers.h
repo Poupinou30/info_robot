@@ -89,7 +89,7 @@ void computeForceVector();
 void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear);
 void* updateKalman(void* args);
 position closestPoint(position rect[2], position pos);
-void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving)
+void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving);
 
 extern position myPos;
 extern field myField;
