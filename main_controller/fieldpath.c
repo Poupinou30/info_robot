@@ -288,7 +288,7 @@ void computeForceVector(){
     double tempoX;
     double tempoY;
     double distance;
-    position[2] tempoRectangle;
+    position tempoRectangle[2];
     position tempoPoint1, tempoPoint2;
     position closestPoint;
     obstacle *tempoObstacle;
@@ -296,7 +296,7 @@ void computeForceVector(){
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
         tempoObstacle = &myForce.obstacleList[i];
         
-        if(tempoObstacle.isRectangle){
+        if(tempoObstacle->isRectangle){
             *tempoPoint1.x = tempoObstacle->x1;
             *tempoPoint1.y = tempoObstacle->y1;
             *tempoPoint2.x = tempoObstacle->x2;
