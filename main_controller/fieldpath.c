@@ -270,11 +270,22 @@ void printObstacleLists(){
 
 void computeForceVector(){
     float k_att_xy = 0.5;
-    float k_att_theta;
+    float k_att_theta = 1;
     float k_repul = -0.00005;
     double f_att_x = -k_att_xy * (*myPos.x- *destination.x);
     double f_att_y = -k_att_xy * (*myPos.y - *destination.y);
-    double f_att_theta = k_att_theta * (*myPos.theta-*destination.theta);
+
+    double error = *myPos.theta-*destination.theta;
+
+    // Ajustement de l'erreur pour tenir compte de la nature circulaire des angles
+    if (error > 180) {
+        error -= 360;
+    } else if (error < -180) {
+        error += 360;
+    }
+
+    // Calcul de la sortie du contrôleur
+    double f_att_theta = kp * error;
     double f_repul_x = 0;
     double f_repul_y = 0;
     double tempoX;
@@ -323,6 +334,7 @@ void computeForceVector(){
     free(tempoPoint2.y);
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
+    f_theta = f_att_theta;
     fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
     //Calcul de la force de attraction totale
 }

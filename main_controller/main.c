@@ -140,6 +140,7 @@ int main(){
     double endValuePrint = 0;
     *destination.x = 1.00;
     *destination.y = 2.00;
+    *destination.theta = 18;
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 0;
@@ -157,6 +158,7 @@ int main(){
         computeForceVector();
         fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
         fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+        fprintf(stderr,"Initial force Theta  = %lf \n",f_theta);
     }
     
 //FIN TEST
