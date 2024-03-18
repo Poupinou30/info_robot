@@ -303,7 +303,7 @@ void computeForceVector(){
             *tempoPoint2.y = tempoObstacle->y2;
             tempoRectangle = {tempoPoint1,tempoPoint2};
             closestPoint = closestPoint(tempoRectangle);
-            distance = computeEuclidianDistance(myPos.x, myPos.y, closestPoint.x, closestPoint.y); //Calcul la distance
+            distance = computeEuclidianDistance(*myPos.x, *myPos.y, *closestPoint.x, *closestPoint.y); //Calcul la distance
             tempoX = closestPoint.x; //Calcule la position en x
             tempoY = closestPoint.y; //Calcule la position en y
         }
