@@ -16,13 +16,36 @@ double degToRad(double deg) {
 }
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
+    float propotion;
+    if(v_x > 0){
+        propotion = v_x / 0.5;
+        v_x = fmax(v_x, 0.5);
+        v_y = v_y/propotion;
+    } 
+    else{
+        propotion = -v_x / 0.5;
+        v_x = fmin(v_x, -0.5);
+        v_y = v_y/propotion;
+    }
+    if(v_y > 0){
+        propotion = v_y / 0.5;
+        v_y = fmax(v_y, 0.5);
+        v_x = v_x/propotion;
+    }
+    else{
+        propotion = -v_y / 0.5;
+        v_y = fmin(v_y, -0.5);
+        v_x = v_x/propotion;
+    }
+    if(omega > 0) omega = fmax(omega, 10);
+    else omega = fmin(omega, -10);
     double radius = 0.029;
     double l_x = 0.175;
     double l_y = 0.21;
-    double omega_fl = 1.0/radius *(v_x-v_y-(l_x+l_y)*omega); //front left
-    double omega_fr = 1.0/radius *(v_x+v_y+(l_x+l_y)*omega); //front right
-    double omega_rl = 1.0/radius *(v_x+v_y-(l_x+l_y)*omega); //rear left
-    double omega_rr = 1.0/radius *(v_x-v_y+(l_x+l_y)*omega); //rear right
+    double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
+    double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
+    double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
+    double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
     output_speed[0] = omega_fl;
     output_speed[1] = omega_fr;
     output_speed[2] = omega_rl;
