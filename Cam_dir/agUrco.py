@@ -40,7 +40,7 @@ while True:
 				markerSizeInM=0.02
 				rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
 				print("Solar Panel coordinates (x,y,z):"+ str(tvec[0][0]) + " and rotation: " + str(rvec) +"\n") #
-
+			
 	cv2.imshow('Aruco Detection', frame)
 	
 	if cv2.waitKey(1) & 0xFF == ord('q'):
