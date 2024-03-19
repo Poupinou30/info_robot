@@ -138,9 +138,12 @@ int main(){
     double endValue = 0;
     double nowValue = 0;
     double endValuePrint = 0;
+    pthread_mutex_lock(&lockDestination);
     *destination.x = 1.00;
     *destination.y = 2.00;
     *destination.theta = 18;
+    destination_set = 0;
+    pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 0;
@@ -152,17 +155,19 @@ int main(){
     addRectangleObstacle(0,0,0,3,0); //Mur de gauche
     addRectangleObstacle(2,0,2,3,0); //Mur de droite
     addRectangleObstacle(0,3,2,3,0); //Mur du haut
-    while(1){
+    addRectangleObstacle(0,1.05,0.145,3-1.05,0); //jardinières gauche
+    addRectangleObstacle(2,1.05,2-0.145,3-1.05,0); //jardinières droite
+    /*while(1){
         fprintf(stderr,"Entrer la position du robot: ");
         scanf("%f %f %f", myPos.x, myPos.y,myPos.theta);
         computeForceVector();
         fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
         fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
         fprintf(stderr,"Initial force Theta  = %lf \n",f_theta);
-    }
+    }*/
     
 //FIN TEST
-/*
+
     //Pipe et thread
     int pipefd[2];
     pipe(pipefd);
@@ -197,6 +202,10 @@ int main(){
             fprintf(stderr,"filtered Theta = %f \n",*(myFilteredPos.theta));
             fprintf(stderr,"X opponent = %f \n",*(myOpponent.x));
             fprintf(stderr,"Y opponent= %f \n",*(myOpponent.y));
+            computeForceVector();
+            fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
+        fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
+        fprintf(stderr,"Initial force Theta  = %lf \n",f_theta);
             //fprintf(stderr,"refreshed %d times \n",refreshCounter);
 
             pthread_mutex_lock(&lockRefreshCounter);
@@ -218,7 +227,7 @@ int main(){
     close(pipefd[0]);
     close(pipefd[1]);
 
-*/
+
 }
 
 int mainField(){

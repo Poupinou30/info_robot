@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-float actionDistance = 0.20; //en cm
+float actionDistance = 0.30; //en cm
 
 float computeEuclidianDistance(double x1, double y1, double x2, double y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
@@ -271,11 +271,15 @@ void printObstacleLists(){
 void computeForceVector(){
     float k_att_xy = 0.5;
     float k_att_theta = -1;
-    float k_repul = -0.00005;
-    double f_att_x = -k_att_xy * (*myPos.x- *destination.x);
-    double f_att_y = -k_att_xy * (*myPos.y - *destination.y);
+    float k_repul = -0.005;
+    pthread_mutex_lock(&lockDestination);
+    double f_att_x = -destination_set*k_att_xy * (*myPos.x- *destination.x);
+    double f_att_y = -destination_set*k_att_xy * (*myPos.y - *destination.y);
+    
 
     double error = *myPos.theta-*destination.theta;
+    double f_att_theta = destination_set*k_att_theta * error;
+    pthread_mutex_unlock(&lockDestination);
 
     // Ajustement de l'erreur pour tenir compte de la nature circulaire des angles
     if (error > 180) {
@@ -285,7 +289,7 @@ void computeForceVector(){
     }
 
     // Calcul de la sortie du contrôleur
-    double f_att_theta = k_att_theta * error;
+    
     double f_repul_x = 0;
     double f_repul_y = 0;
     double tempoX;
@@ -310,8 +314,10 @@ void computeForceVector(){
             *tempoPoint2.y = tempoObstacle->y2;
             tempoRectangle[0] = tempoPoint1;
             tempoRectangle[1] = tempoPoint2;
-            myClosestPoint = closestPoint(tempoRectangle,myPos);
-            distance = computeEuclidianDistance(*myPos.x, *myPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
+            pthread_mutex_lock(&lockFilteredPosition);
+            myClosestPoint = closestPoint(tempoRectangle,myFilteredPos);
+            distance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
+            pthread_mutex_unlock(&lockFilteredPosition);
             tempoX = *myClosestPoint.x; //Calcule la position en x
             tempoY = *myClosestPoint.y; //Calcule la position en y
             free(myClosestPoint.x);
@@ -320,11 +326,15 @@ void computeForceVector(){
         else{
             tempoX = tempoObstacle->posX; //Calcule la position en x
             tempoY = tempoObstacle->posY; //Calcule la position en y
-            distance = computeEuclidianDistance(tempoX,tempoY,*myPos.x,*myPos.y)-myForce.obstacleList[i].size; //Calcule la distance
+            pthread_mutex_lock(&lockFilteredPosition);
+            distance = computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size; //Calcule la distance
+            pthread_mutex_unlock(&lockFilteredPosition);
         }
         if(distance < actionDistance){
-            f_repul_x = f_repul_x + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoX - *myPos.x);
-            f_repul_y = f_repul_y + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoY - *myPos.y);
+            pthread_mutex_lock(&lockFilteredPosition);
+            f_repul_x = f_repul_x + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoX - *myFilteredPos.x);
+            f_repul_y = f_repul_y + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoY - *myFilteredPos.y);
+            pthread_mutex_unlock(&lockFilteredPosition);
 
         }
     }

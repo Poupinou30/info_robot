@@ -106,7 +106,10 @@ extern int refreshCounter;
 extern uint8_t readyToGo;
 extern double f_theta;
 
-pthread_t computeKalmanThread;
-pthread_mutex_t lockFilteredPosition;
-pthread_mutex_t lockPosition;
-pthread_mutex_t lockOpponentPosition;
+extern pthread_t computeKalmanThread;
+extern pthread_mutex_t lockFilteredPosition;
+extern pthread_mutex_t lockPosition;
+extern pthread_mutex_t lockOpponentPosition;
+extern pthread_mutex_t lockDestination;
+extern uint8_t destination_set;
+

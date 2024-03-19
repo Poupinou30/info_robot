@@ -10,7 +10,6 @@
 #include <rplidar.h>
 #include <iostream>
 #include <fstream>
-#include <lapacke.h>
 #define adjust_value_to_bounds( value , max )  ( ( value > max ) ? max : ( ( value < -max ) ? -max : value ) )  
 #define PI          3.141592654
 #define cot(x)      ( 1 / tan(x) )
