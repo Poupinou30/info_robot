@@ -29,7 +29,7 @@ C_INCLUDES += -I$(CURDIR)/../sdk/include -I$(CURDIR)/../sdk/src
 
 
 EXTRA_OBJ :=
-LD_LIBS += -lstdc++ -lpthread -lm -llapack -llapacke
+LD_LIBS += -lstdc++ -lpthread -lm
 
 all: build_app
 

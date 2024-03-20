@@ -10,8 +10,8 @@ double P[3][3] = {{0.01, 0, 0}, {0, 0.01, 0}, {0, 0, 0.01}}; // Covariance initi
 // Matrices constantes pour le filtre de Kalman
 double F[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice de transition d'état
 double H[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice d'observation
-double Q[3][3] = {{0.005, 0, 0}, {0, 0.005, 0}, {0, 0, 0.01}}; // Bruit de processus
-double R[3] = {0.15, 0.15, 1}; // Bruit de mesure pour chaque variable d'état
+double Q[3][3] = {{0.005, 0, 0}, {0, 0.005, 0}, {0, 0, 0.001}}; // Bruit de processus
+double R[3] = {0.4, 0.4, 0.001}; // Bruit de mesure pour chaque variable d'état
 
 // Fonction de mise à jour du filtre de Kalman
 void* updateKalman(void* args) {

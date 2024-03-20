@@ -151,12 +151,14 @@ int main(){
 
 //TEST
     //addObstacle(0,0.10,0.01,0);
+    
     addRectangleObstacle(0,0,2,0,0); //Mur du bas
     addRectangleObstacle(0,0,0,3,0); //Mur de gauche
     addRectangleObstacle(2,0,2,3,0); //Mur de droite
     addRectangleObstacle(0,3,2,3,0); //Mur du haut
     addRectangleObstacle(0,1.05,0.145,3-1.05,0); //jardinières gauche
     addRectangleObstacle(2,1.05,2-0.145,3-1.05,0); //jardinières droite
+    
     /*while(1){
         fprintf(stderr,"Entrer la position du robot: ");
         scanf("%f %f %f", myPos.x, myPos.y,myPos.theta);
@@ -194,6 +196,10 @@ int main(){
         gettimeofday(&now,NULL);
         nowValue = now.tv_sec*1000+now.tv_usec/1000;
         if(nowValue - endValuePrint > 100){
+            if(VERBOSE) fprintf(stderr,"début while\n");
+            pthread_mutex_lock(&lockPosition);
+            pthread_mutex_lock(&lockFilteredPosition);
+            pthread_mutex_lock(&lockOpponentPosition);
             fprintf(stderr,"X = %f \n",*(myPos.x));
             fprintf(stderr,"Y = %f \n",*(myPos.y));
             fprintf(stderr,"Theta = %f \n",*(myPos.theta));
@@ -202,6 +208,10 @@ int main(){
             fprintf(stderr,"filtered Theta = %f \n",*(myFilteredPos.theta));
             fprintf(stderr,"X opponent = %f \n",*(myOpponent.x));
             fprintf(stderr,"Y opponent= %f \n",*(myOpponent.y));
+            pthread_mutex_unlock(&lockPosition);
+            pthread_mutex_unlock(&lockFilteredPosition);
+            pthread_mutex_unlock(&lockOpponentPosition);
+            if(VERBOSE) fprintf(stderr,"Avant force vector\n");
             computeForceVector();
             fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
         fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
@@ -211,14 +221,17 @@ int main(){
             pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter = 0;
             pthread_mutex_unlock(&lockRefreshCounter);
+            if(VERBOSE) fprintf(stderr,"Après lockrefresh\n");
             gettimeofday(&endPrint, NULL);
             endValuePrint = endPrint.tv_sec*1000+endPrint.tv_usec/1000;
+            if(VERBOSE) fprintf(stderr,"fin while\n");
         }
         if(nowValue - endValue > 50){
             //myPotentialFieldController(outputSpeed,dataFront,dataRear,spi_handle_front,spi_handle_rear);
             gettimeofday(&end,NULL);
             endValue = end.tv_sec*1000+end.tv_usec/1000;
         }
+        
 
     }
 

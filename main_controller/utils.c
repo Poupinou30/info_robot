@@ -189,8 +189,9 @@ void* receptionPipe(void* pipefdvoid){
             // Des données sont disponibles, lire les données
             
             read(pipefd[0], buffer, 5*sizeof(float));
+            
             if(buffer[0] > 0 && buffer[1] > 0 && ((computeEuclidianDistance(*myPos.x,*myPos.y,buffer[0],buffer[1]) < 0.30)||first) ){
-            first = 0;
+            //first = 0;
             pthread_mutex_lock(&lockPosition);
             pthread_mutex_lock(&lockOpponentPosition);
             *myPos.x = buffer[0];
@@ -200,6 +201,8 @@ void* receptionPipe(void* pipefdvoid){
             *myOpponent.y = buffer[4];
             pthread_mutex_unlock(&lockPosition);
             pthread_mutex_unlock(&lockOpponentPosition);
+            
+            
             pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter ++;
             readyToGo = 1;
@@ -213,6 +216,7 @@ void* receptionPipe(void* pipefdvoid){
             kalmanLaunched = 1;
             
             }
+            
             /*
             if(VERBOSE){
                 fprintf(stderr,"X = %f \n",*(myPos.x));

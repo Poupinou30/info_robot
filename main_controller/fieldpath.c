@@ -276,8 +276,9 @@ void computeForceVector(){
     double f_att_x = -destination_set*k_att_xy * (*myPos.x- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (*myPos.y - *destination.y);
     
-
-    double error = *myPos.theta-*destination.theta;
+    pthread_mutex_lock(&lockFilteredPosition); 
+    double error = *myFilteredPos.theta-*destination.theta;
+    pthread_mutex_unlock(&lockFilteredPosition); 
     double f_att_theta = destination_set*k_att_theta * error;
     pthread_mutex_unlock(&lockDestination);
 
