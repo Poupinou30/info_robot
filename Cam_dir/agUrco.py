@@ -20,30 +20,51 @@ while True:
 	corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 	#ici c'est la commande pour calibrer et pouvoir compenser la distorsion etc
 	#ret, mtx, dist, rvecs, tvecs = cv/calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-	if ids is not None:
-		
+	if ids is not None :
+		print("il y a " + str(len(ids)) + " plantes")
 		cv2.aruco.drawDetectedMarkers(frame, corners, ids)
-		
-		for id_tag in ids :
+		coordinate=[]
+		markerSizeInM=0.02
+		rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
+		#print(rvec)
+		r_deg=[]
+		for i in range(3):
+			r_deg.append(rvec[0][0][i]*(180.0/np.pi))
+		print(r_deg)
+		if(r_deg[0]<=185 and r_deg[0]>=175 or r_deg[0]<=-175 and r_deg[0]>=-185):
+			print("la plante est droite")
+		if(r_deg[0]<=120 and r_deg[0]>=80 or r_deg[0]<=-80 and r_deg[0]>=-120):
+			print("la plante est de traviole attention")
+		"""
+		for i in range(len(ids)) :
+			markerSizeInM=0.02
+			rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
+			print(tvec)
+			coordinate.append(tvec[0][0])
+		print(coordinate)
+		"""
+		"""
 			if(id_tag[0]==13):
 				#print("plante mauve:")
 				markerSizeInM=0.02
 				
 				rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
-				print("Violet Plant coordinates (x,y,z):"+ str(tvec[0][0]) + " and rotation: " + str(rvec) +"\n") #
+				#print("Violet Plant coordinates (x,y,z):"+ str(tvec[0][0]) + " and rotation: " + str(rvec) +"\n") #
 				
 			if(id_tag[0]==36):
 				markerSizeInM=0.02
 				rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
-				print("White Plant coordinates (x,y,z):"+ str(tvec[0][0]) + " and rotation: " + str(rvec) +"\n") #
+				#print("White Plant coordinates (x,y,z):"+ str(tvec[0][0]) + " and rotation: " + str(rvec) +"\n") #
 			if(id_tag[0]==47):
 				markerSizeInM=0.02
 				rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
-				print("Solar Panel coordinates (x,y,z):"+ str(tvec[0][0]) + " and rotation: " + str(rvec) +"\n") #
-			
+				#print("Solar Panel coordinates (x,y,z):"+ str(tvec[0][0]) + " and rotation: " + str(rvec) +"\n") #
+		"""
 	cv2.imshow('Aruco Detection', frame)
 	
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
+
 cap.release()
 cv2.destroyAllWindows()
+
