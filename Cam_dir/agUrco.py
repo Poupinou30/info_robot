@@ -25,7 +25,7 @@ while True:
 	if ids is not None :
 		print("il y a " + str(len(ids)) + " plantes")
 		cv2.aruco.drawDetectedMarkers(frame, corners, ids)
-		coordinate=[]
+		coordinate=[]#ICI POUR LES COORDS DE TOUTES LES PLANTES
 		markerSizeInM=0.02
 		rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
 		#print(rvec)
@@ -46,11 +46,15 @@ while True:
 		#print(coordinate)
 		#print(trav)
 		#print("coordinates of the " + str(len(ids)) + " plants :"   + str(coordinate)+ " \n")
+		coord_trav=[] #ICI POUR LES COORDONNEES DES PLANTES QUI SONT DE TRAVERS
 		for k in range(len(trav)):
+			coord_trav.append(coordinate[k])
 			tag_corners=(corners[trav[k]][0])
 			cv2.polylines(mask, [np.int32(tag_corners)], isClosed=True, color=(0,0,255), thickness=4)
 			output = cv2.add(frame, mask)
-			print(tag_corners)
+			#print(tag_corners)
+		#print("les coords des pots de travers: " + str(coord_trav) + " \n")
+		print(" les tailles des listes: toutes les plantes : " + str(len(coordinate)) + " et juste les plantes de travers : " + str(len(coord_trav) )+ " \n")
 		"""
 		for i in range(len(ids)):
 			r_deg=[]
