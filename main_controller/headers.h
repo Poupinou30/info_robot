@@ -90,6 +90,7 @@ void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* d
 void* updateKalman(void* args);
 position closestPoint(position rect[2], position pos);
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving);
+void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed);
 
 extern position myPos;
 extern field myField;
@@ -112,4 +113,5 @@ extern pthread_mutex_t lockPosition;
 extern pthread_mutex_t lockOpponentPosition;
 extern pthread_mutex_t lockDestination;
 extern uint8_t destination_set;
+extern myOdometryPos;
 

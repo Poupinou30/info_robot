@@ -147,6 +147,7 @@ int main(){
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 0;
+    double speedTabRobotFrame[3] = {0,0,0};
 
 
 //TEST
@@ -216,6 +217,10 @@ int main(){
             fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
         fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
         fprintf(stderr,"Initial force Theta  = %lf \n",f_theta);
+
+        convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,speedTabRobotFrame);
+        myPotentialFieldController(outputSpeed,dataFront,dataRear,spi_handle_front,spi_handle_rear);
+
             //fprintf(stderr,"refreshed %d times \n",refreshCounter);
 
             pthread_mutex_lock(&lockRefreshCounter);

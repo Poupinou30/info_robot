@@ -230,3 +230,17 @@ void* receptionPipe(void* pipefdvoid){
     }
     }
 }
+
+void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed){
+    double theta = *myFilteredPos.theta;
+    double cos_theta = cos(theta);
+    double sin_theta = sin(theta);
+
+    double v_x_robot = v_x * cos_theta + v_y * sin_theta;
+    double v_y_robot = -v_x * sin_theta + v_y * cos_theta;
+
+    output_speed[0] = v_x_robot;
+    output_speed[1] = v_y_robot;
+    output_speed[2] = omega;
+
+}
