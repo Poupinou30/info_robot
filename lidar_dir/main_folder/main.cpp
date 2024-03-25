@@ -30,7 +30,7 @@ float isoceleTolerance = 0.08;
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lidarDataLock = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t printLock = PTHREAD_MUTEX_INITIALIZER;
+
 pthread_mutex_t lockOpponentPosition = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lockMyState = PTHREAD_MUTEX_INITIALIZER;
 uint8_t readyToSend = 0;
@@ -98,13 +98,14 @@ float triangulationPierlot(float *x, float *y,
 
 
 void* beacon_data(void* argument){
+    if(verbose) printf("rentre dans beaconData\n");
     float oldPerimetre = 0;
     float oldIsoceleCondition = 999;
     /*for(int i = 0; i<counter; i++){
         if(verbose) fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
     }*/
-    //fprintf(stderr,"entre dans beaco_data \n");
+    if(verbose) fprintf(stderr,"entre dans beaco_data \n");
 
     pthread_mutex_lock(&lidarDataLock);
     lidar_data *myData = (lidar_data*) argument;
@@ -117,16 +118,14 @@ void* beacon_data(void* argument){
     }
 
     int counter = myData->counter;
-    pthread_mutex_lock(&printLock);
+    //pthread_mutex_lock(&printLock);
     //fprintf(stderr,"counter = %d in beacondata \n",counter);
-    pthread_mutex_unlock(&printLock);
     lidarDataCopied = 1;
     pthread_mutex_unlock(&lidarDataLock);
-    pthread_mutex_lock(&printLock);
     for(int i = 0; i <counter; i++) {
         /*if(a[i]>360)*/// printf("angle dans beacon = %f \n",a[i]);
     }
-    pthread_mutex_unlock(&printLock);
+    //pthread_mutex_unlock(&printLock);
 
     if(verbose) fprintf(stderr,"We detected %d points in beacon_data \n",counter);
     //std::ifstream file;
@@ -214,9 +213,9 @@ void* beacon_data(void* argument){
         }
 
     }
-    for(int i = 0; i< newa.size();i++){
+    /*for(int i = 0; i< newa.size();i++){
         if(verbose) fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
-    }
+    }*/
     pthread_mutex_lock(&lockMyState);
     if(myState == CALIB_MODE){
         
@@ -305,7 +304,7 @@ void* beacon_data(void* argument){
 
                     uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.25+isoceleTolerance && dij>=3.25-isoceleTolerance && djk<=3.25+isoceleTolerance && djk>=3.25-isoceleTolerance && dik>=1.9-isoceleTolerance && dik<=1.9+isoceleTolerance;
                     //if(beaconTab[0].angle < 300 && beaconTab[0].angle > 250)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
-                    if(verbose && triangle >8.3 && triangle < 8.7) fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+                    //if(verbose && triangle >8.3 && triangle < 8.7) fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
                     if(condition && fabs(triangle-perimetre) < fabs(oldPerimetre-perimetre) && fabs(oldIsoceleCondition-fabs(dij-djk))){//faudrait rajouter une condition brrr genre sur les anngles
                         beaconFound = 1;
                         bestBeaconTab[0] = beaconTab[0];
@@ -504,9 +503,9 @@ int main(int argc, const char * argv[]){
             //for(int l = 0; l < counter; l++) if(myLidarData.angle[l]>360) //fprintf(stderr,"dans main angle = %f \n",myLidarData.angle[l]);
             
             int thread_execut = pthread_create(&computationThread, NULL, beacon_data, (void*) &myLidarData);
-            //fprintf(stderr,"passe après le thread thread code = %d\n",thread_execut);
+            if(verbose)fprintf(stderr,"passe après le thread thread code = %d\n",thread_execut);
             if (thread_execut != 0) {
-                //fprintf(stderr, "Erreur lors de la création du thread.\n");
+                if(verbose) fprintf(stderr, "Erreur lors de la création du thread.\n");
                 return EXIT_FAILURE;
             }
     
@@ -515,15 +514,11 @@ int main(int argc, const char * argv[]){
 
     
     
-    pthread_mutex_lock(&printLock);
     
     pthread_mutex_unlock(&lidarDataLock);
-    pthread_mutex_unlock(&printLock);
     }
 else{
-        pthread_mutex_lock(&printLock);
         if(verbose) fprintf(stderr, "OSKUR poupon, failed to grab scan the data with LIDAR %08x\r\n", res_gscan);//erreur si je sais pas grab les data
-        pthread_mutex_unlock(&printLock);
         //return -1;
         //ici faut recup les donner de res scan
     }
@@ -547,7 +542,6 @@ else{
     }
     
     pthread_mutex_lock(&positionLock);
-    pthread_mutex_lock(&printLock);
     pthread_mutex_lock(&lockOpponentPosition);
     if(verbose){
      fprintf(stderr,"position x = %f \n",position->x);
@@ -556,7 +550,7 @@ else{
     fprintf(stderr,"position x opponent = %f \n",myOpponent.x);
      fprintf(stderr,"position y opponent = %f \n",myOpponent.y);
     }
-    pthread_mutex_unlock(&printLock);
+
     pthread_mutex_unlock(&positionLock);
     pthread_mutex_unlock(&lockOpponentPosition);
     

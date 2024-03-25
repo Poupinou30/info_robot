@@ -113,5 +113,5 @@ extern pthread_mutex_t lockPosition;
 extern pthread_mutex_t lockOpponentPosition;
 extern pthread_mutex_t lockDestination;
 extern uint8_t destination_set;
-extern myOdometryPos;
+extern position myOdometryPos;
 
