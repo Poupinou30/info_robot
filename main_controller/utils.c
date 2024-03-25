@@ -3,6 +3,15 @@
 #define HEADERS
 #endif
 
+void retrieveSpeeds(uint8_t* data, int* speed1, int* speed2) {
+    int16_t num1 = (data[0] << 8) | data[1]; // Récupère le premier nombre
+    int16_t num2 = (data[2] << 8) | data[3]; // Récupère le deuxième nombre
+
+    *speed1 = num1 * 2 * M_PI * 100 / 114688;
+    *speed2 = num2 * 2 * M_PI * 100 / 114688;
+}
+
+
 
 void createArray(int16_t num1, int16_t num2, uint8_t* output) {
     output[0] = (num1 >> 8) & 0xFF; // Premier octet du premier nombre

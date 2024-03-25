@@ -13,6 +13,8 @@ position destination;
 position myPos;
 position myFilteredPos;
 position myOpponent;
+uint8_t *SPI_reception_buffer_rear;
+uint8_t *SPI_reception_buffer_front;
 
 
 int mainPattern(){
@@ -133,6 +135,8 @@ int main(){
     uint8_t *dataFront = (uint8_t*) malloc(sizeof(uint8_t)*4);
     uint8_t *dataRear = (uint8_t*) malloc(sizeof(uint8_t)*4);
     struct timeval now, end, endPrint;
+    uint8_t *SPI_reception_buffer_1 = (uint8_t*) malloc(sizeof(uint8_t)*4);
+    uint8_t *SPI_reception_buffer_2 = (uint8_t*) malloc(sizeof(uint8_t)*4);
 
     //Assignation des valeurs
     double endValue = 0;
@@ -315,8 +319,9 @@ void processInstruction(float v_x, float v_y, float omega, double* speedTab, int
     convertsVelocity(v_x,v_y,omega,speedTab);
     createArray(speedTab[0]/(2*_Pi) *114688/100,speedTab[1]/(2*_Pi) *114688/100,dataFront);
     createArray(speedTab[2]/(2*_Pi)*114688/100,speedTab[3]/(2*_Pi) *114688/100,dataRear);
-    SPI_send(dataRear,spi_handle_rear,NULL);
-    SPI_send(dataFront,spi_handle_front,NULL); //FRONT
+    SPI_send(dataRear,spi_handle_rear,SPI_reception_buffer_rear); //REAR
+    SPI_send(dataFront,spi_handle_front,SPI_reception_buffer_front); //FRONT
+    my
 }
 
 
