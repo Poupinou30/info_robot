@@ -15,6 +15,9 @@ position myFilteredPos;
 position myOpponent;
 uint8_t *SPI_reception_buffer_rear;
 uint8_t *SPI_reception_buffer_front;
+int spi_handle_front;
+int spi_handle_rear;
+int UART_handle;
 
 
 int mainPattern(){
@@ -105,13 +108,13 @@ int mainPattern(){
 
 }
 
-
-
-int main(){
-    //Initialisation GPIO et SPI
+void initializeMainController(){
+    //Initialisation GPIO et interfaces
     gpioInitialise();
-    int spi_handle_front = initializeSPI(0);
-    int spi_handle_rear = initializeSPI(1);
+    spi_handle_front = initializeSPI(0);
+    spi_handle_rear = initializeSPI(1);
+    UART_handle = initializeUART();
+
     //Initialisation variables
     positionReceived = malloc(3*sizeof(float));
     myForce.obstacleNumber = 0;
@@ -131,6 +134,11 @@ int main(){
     myPos.theta = &positionReceived[2];
     myOpponent.x = (float*)malloc(sizeof(float));
     myOpponent.y = (float*)malloc(sizeof(float));
+}
+
+int main(){
+
+    
     double* outputSpeed = malloc(sizeof(double)*4);
     uint8_t *dataFront = (uint8_t*) malloc(sizeof(uint8_t)*4);
     uint8_t *dataRear = (uint8_t*) malloc(sizeof(uint8_t)*4);

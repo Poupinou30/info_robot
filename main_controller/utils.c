@@ -3,6 +3,13 @@
 #define HEADERS
 #endif
 
+double radius = 0.029;
+double l_y = 0.175;
+double l_x = 0.21;
+
+double v_max = 0.5;
+double omega_max = 10.0;
+
 void retrieveSpeeds(uint8_t* data, int* speed1, int* speed2) {
     int16_t num1 = (data[0] << 8) | data[1]; // Récupère le premier nombre
     int16_t num2 = (data[2] << 8) | data[3]; // Récupère le deuxième nombre
@@ -10,6 +17,7 @@ void retrieveSpeeds(uint8_t* data, int* speed1, int* speed2) {
     *speed1 = num1 * 2 * M_PI * 100 / 114688;
     *speed2 = num2 * 2 * M_PI * 100 / 114688;
 }
+
 
 
 
@@ -25,41 +33,79 @@ double degToRad(double deg) {
 }
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
-    float propotion;
-    if(v_x > 0){
-        propotion = v_x / 0.5;
-        v_x = fmax(v_x, 0.5);
-        v_y = v_y/propotion;
-    } 
-    else{
-        propotion = -v_x / 0.5;
-        v_x = fmin(v_x, -0.5);
-        v_y = v_y/propotion;
+    // Calculate the magnitude of the velocity vector
+    double v_magnitude = sqrt(pow(v_x, 2) + pow(v_y, 2));
+    
+    // Check if the magnitude is greater than the max allowed speed
+    if (v_magnitude > v_max) {
+        // Calculate the scaling factor
+        double scaling_factor = v_max / v_magnitude;
+        
+        // Apply the scaling factor to limit the speeds while maintaining the direction
+        v_x *= scaling_factor;
+        v_y *= scaling_factor;
     }
-    if(v_y > 0){
-        propotion = v_y / 0.5;
-        v_y = fmax(v_y, 0.5);
-        v_x = v_x/propotion;
+
+    if (fabs(omega) > omega_max) {
+        omega = (omega > 0 ? omega_max : -omega_max);
     }
-    else{
-        propotion = -v_y / 0.5;
-        v_y = fmin(v_y, -0.5);
-        v_x = v_x/propotion;
-    }
-    if(omega > 0) omega = fmax(omega, 10);
-    else omega = fmin(omega, -10);
-    double radius = 0.029;
-    double l_x = 0.175;
-    double l_y = 0.21;
-    double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
-    double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
-    double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
-    double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
+
+    //double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
+    //double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
+    //double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
+    //double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
+
+    double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
+    double omega_fr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //front right
+    double omega_rl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //rear left
+    double omega_rr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //rear right
+
     output_speed[0] = omega_fl;
     output_speed[1] = omega_fr;
     output_speed[2] = omega_rl;
     output_speed[3] = omega_rr;
 
+}
+
+int initializeUART(){
+    //int send_PIN = 15;
+    //int receive_PIN = 16;
+    int baud_rate = 9600;
+    
+    int UART_handle = serOpen("/dev/ttyS0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
+    if (UART_handle < 0)
+    {
+        fprintf(stderr, "Erreur lors de l'ouverture de la connexion UART.\n");
+    }
+    return UART_handle;
+}
+void UART_send(int UART_handle, char* data,char* received){
+    printf("Test data %d \n",strlen(data));
+    if(serWrite(UART_handle, data, strlen(data))!=0){
+        fprintf(stderr,"Error while writing \n");
+    }
+    fprintf(stderr,"Size of received buffer : %d \n",256);
+    int bytesRead = 0;
+    for(int i = 0; i < strlen(data); i++){ //strlen(data) était un 10 avant, pas encore testé avec cela
+        bytesRead = serRead(UART_handle, received, 256);
+        if (bytesRead > 0) {
+            received[bytesRead] = '\0';
+            fprintf(stderr,"%d received bytes \n",bytesRead);
+            break;
+        }
+        //Ici j'ai enlevé un sleep
+    }
+
+
+
+
+}
+
+void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
+    
+    v_x = r / 4 * (wheel_speeds[0] - wheel_speeds[1] + wheel_speeds[2] - wheel_speeds[3]);
+    v_y = r / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
+    omega = r / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 }
 
 double randomDouble(double min, double max) {

@@ -92,6 +92,10 @@ position closestPoint(position rect[2], position pos);
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving);
 void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed);
 void retrieveSpeeds(uint8_t* data, int* speed1, int* speed2);
+void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
+void initializeMainController();
+void UART_send(int UART_handle, char* data,char* received);
+int initializeUART()
 
 extern position myPos;
 extern field myField;
