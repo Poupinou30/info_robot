@@ -4,6 +4,7 @@
 #endif
 
 double v_max = 0.5;
+double omega_max = 10.0;
 
 void createArray(int16_t num1, int16_t num2, uint8_t* output) {
     output[0] = (num1 >> 8) & 0xFF; // Premier octet du premier nombre
@@ -29,16 +30,24 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
         v_x *= scaling_factor;
         v_y *= scaling_factor;
     }
+
+    if (fabs(omega) > omega_max) {
+        omega = (omega > 0 ? omega_max : -omega_max);
     }
-    if(omega > 0) omega = fmax(omega, 10);
-    else omega = fmin(omega, -10);
+
     double radius = 0.029;
-    double l_x = 0.175;
-    double l_y = 0.21;
-    double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
-    double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
-    double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
-    double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
+    double l_y = 0.175;
+    double l_x = 0.21;
+    //double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
+    //double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
+    //double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
+    //double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
+
+    double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
+    double omega_fr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //front right
+    double omega_rl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //rear left
+    double omega_rr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //rear right
+
     output_speed[0] = omega_fl;
     output_speed[1] = omega_fr;
     output_speed[2] = omega_rl;
