@@ -17,7 +17,7 @@ uint8_t *SPI_reception_buffer_rear;
 uint8_t *SPI_reception_buffer_front;
 int spi_handle_front;
 int spi_handle_rear;
-int UART_handle;
+
 
 
 int mainPattern(){

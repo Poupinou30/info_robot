@@ -70,7 +70,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 int initializeUART(){
     //int send_PIN = 15;
     //int receive_PIN = 16;
-    int baud_rate = 9600;
+    int baud_rate = 115200;
     
     int UART_handle = serOpen("/dev/ttyS0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
     if (UART_handle < 0)

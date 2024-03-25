@@ -95,7 +95,17 @@ void retrieveSpeeds(uint8_t* data, int* speed1, int* speed2);
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
 void initializeMainController();
 void UART_send(int UART_handle, char* data,char* received);
-int initializeUART()
+int initializeUART();
+
+//FORKS - ACTUATORS
+void setLowerFork(int height);
+void setUpperFork(int height);
+void retractForks();
+void deployForks();
+void deployArm();
+void setWheelSpeed(int speed);
+//END ACTUATORS
+
 
 extern position myPos;
 extern field myField;
