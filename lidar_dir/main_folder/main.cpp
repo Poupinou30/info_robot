@@ -305,7 +305,7 @@ void* beacon_data(void* argument){
 
                     uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.25+isoceleTolerance && dij>=3.25-isoceleTolerance && djk<=3.25+isoceleTolerance && djk>=3.25-isoceleTolerance && dik>=1.9-isoceleTolerance && dik<=1.9+isoceleTolerance;
                     //if(beaconTab[0].angle < 300 && beaconTab[0].angle > 250)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
-                    ///if(verbose) fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+                    if(verbose && triangle >8.3 && triangle < 8.7) fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
                     if(condition && fabs(triangle-perimetre) < fabs(oldPerimetre-perimetre) && fabs(oldIsoceleCondition-fabs(dij-djk))){//faudrait rajouter une condition brrr genre sur les anngles
                         beaconFound = 1;
                         bestBeaconTab[0] = beaconTab[0];
@@ -317,48 +317,12 @@ void* beacon_data(void* argument){
                         if(verbose){
                             //fprintf(stderr,"Dij = %f Djk = %d Djk = %f",dij,djk,dik);
                         }
-                        //if(verbose) fprintf(stderr,"On trouve un triangle \n");
-                        /*
-                        coord[0]=i;//en théorie ce seront les bonnes
-                        coord[1]=j;
-                        coord[2]=k;*/
-                                //std::cout<<"il trouve qqch";
                         
-                        /*balises[0][0]=beaconTab[0].angle;
-                        balises[0][1]=beaconTab[0].distance;
-                        balises[1][0]=beaconTab[1].angle;
-                        balises[1][1]=beaconTab[1].distance;
-                        balises[2][0]=beaconTab[2].angle;
-                        balises[2][1]=beaconTab[2].distance;*/
+                        
 
                         if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
                         if(verbose) printf("triangle: %f \n", triangle);
-                        /*float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
-                        float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
-                        float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
-                        float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
-                        float d12=distance(newa[coord[2]],newa[coord[1]], newd[coord[2]],newd[coord[1]]);*/
-
-
-
-                        //ici j'ai juste rajouté ces conditions là
-                            // Les coordonnées des balises
-                            //double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
-                    
-                    
-
-                            // Calculer la position du robot
                         
-                        
-                    
-                    
-                    
-                    
-                        //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
-                        //detect_obstacle(newa, newd, obj_iter);
-                        //return balises;
-                        //break;//ici voir comment en sortir totalement
-                        //fprintf(stderr,"fin de beacon_data  \n");
                     
                         }
 
