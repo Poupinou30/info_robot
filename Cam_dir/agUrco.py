@@ -33,13 +33,14 @@ while True:
 		#print(tvec)
 		
 		for i in range(len(ids)):
-			angle=rvec[i][0][0]*(180.0/np.pi)
-			if(angle<=140 and angle>=60 or angle<=-60 and angle>=-140):
-				#print("la plante est de traviole attention")
-				trav.append(i)
-			coord=[]
-			coord.append(tvec[i][0].tolist())
-			coord.append(rvec[i][0].tolist())
+			if(ids[i][0]==13 or ids[i][0]==36):
+				angle=rvec[i][0][0]*(180.0/np.pi)
+				if(angle<=140 and angle>=60 or angle<=-60 and angle>=-140):
+					#print("la plante est de traviole attention")
+					trav.append(i)
+				coord=[]
+				coord.append(tvec[i][0].tolist())
+				coord.append(rvec[i][0].tolist())
 			coordinate.append(coord)
 			#print(str(coord)+" \n")
 		#print(rvec)
