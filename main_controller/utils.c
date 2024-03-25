@@ -3,6 +3,10 @@
 #define HEADERS
 #endif
 
+double radius = 0.029;
+double l_y = 0.175;
+double l_x = 0.21;
+
 double v_max = 0.5;
 double omega_max = 10.0;
 
@@ -35,9 +39,6 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
         omega = (omega > 0 ? omega_max : -omega_max);
     }
 
-    double radius = 0.029;
-    double l_y = 0.175;
-    double l_x = 0.21;
     //double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
     //double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
     //double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
@@ -53,6 +54,13 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     output_speed[2] = omega_rl;
     output_speed[3] = omega_rr;
 
+}
+
+void calculate_vx_vy_omega(double* wheel_speeds, double v_x, double v_y, double omega) {
+    
+    v_x = r / 4 * (wheel_speeds[0] - wheel_speeds[1] + wheel_speeds[2] - wheel_speeds[3]);
+    v_y = r / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
+    omega = r / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 }
 
 double randomDouble(double min, double max) {
