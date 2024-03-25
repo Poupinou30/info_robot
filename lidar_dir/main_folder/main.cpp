@@ -25,8 +25,8 @@ float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
-float triangleErrorTolerance = 0.15;//il est à 0.15 par défaut
-float isoceleTolerance = 0.15;
+float triangleErrorTolerance = 0.08;//il est à 0.15 par défaut
+float isoceleTolerance = 0.08;
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lidarDataLock = PTHREAD_MUTEX_INITIALIZER;
@@ -35,6 +35,7 @@ pthread_mutex_t lockOpponentPosition = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lockMyState = PTHREAD_MUTEX_INITIALIZER;
 uint8_t readyToSend = 0;
 uint8_t lidarDataCopied = 0;
+
 typedef enum{CALIB_MODE, LOCALIZE_MODE} PROGRAM_STATE;
 PROGRAM_STATE myState;
 
@@ -97,6 +98,9 @@ float triangulationPierlot(float *x, float *y,
 
 
 void* beacon_data(void* argument){
+
+    float actualTrianglePerimeter = 0;
+    float actualIsoceleCondition = 0;
     /*for(int i = 0; i<counter; i++){
         if(verbose) fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
@@ -211,7 +215,7 @@ void* beacon_data(void* argument){
 
     }
     for(int i = 0; i< newa.size();i++){
-        //if(verbose) fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
+        if(verbose) fprintf(stderr,"Objet trouve à angle %f et distance %f \n",newa[i],newd[i]);
     }
     pthread_mutex_lock(&lockMyState);
     if(myState == CALIB_MODE){
@@ -405,7 +409,6 @@ void* beacon_data(void* argument){
     //pthread_mutex_lock(&isReadyLock);
     //readyToSend = 1;
     //pthread_mutex_unlock(&isReadyLock);
-    sleep(1);
     return NULL;
 }
 
