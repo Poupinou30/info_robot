@@ -97,6 +97,8 @@ float triangulationPierlot(float *x, float *y,
 
 
 void* beacon_data(void* argument){
+    float oldPerimetre = 0;
+    float oldIsoceleCondition = 999;
     /*for(int i = 0; i<counter; i++){
         if(verbose) fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
@@ -144,9 +146,10 @@ void* beacon_data(void* argument){
     int moy_count=1;
     double actualDistance;
     std::vector<lidarPos> objects_coordinates;
-    
+    double beaconFound = 0;
     Beacon myBeacon;
     Beacon beaconTab[3];
+    Beacon bestBeaconTab[3];
     double object_width = 0;
     uint8_t already_added = 0;
     for (int i=1; i<counter;++i){
@@ -244,7 +247,7 @@ void* beacon_data(void* argument){
     pthread_mutex_unlock(&lockMyState);
     
     //(float[2]) coord[3]={};
-    int coord[3]={};
+    //int coord[3]={};
     std::vector<std::vector<float>> balises (3,std::vector<float>(2));
     for (int i = 0; i < obj_iter; i++) //Boucle pour trouver balises
     {
@@ -266,136 +269,146 @@ void* beacon_data(void* argument){
                 float triangle= distance(a1,a2,d1,d2)+distance(a1,a3,d1,d3)+distance(a2,a3,d2,d3); //sensé être 3+2.5+2.5 donc 8
                 //printf("triangle: %f, i: %d, j: %d, k: %d \n", triangle, i, j, k);
 		//printf("ai: %f, aj: %f, ak: %f \n", newa[i], newa[j], newa[k]);
-		float dij=distance(newa[i],newa[j],newd[i],newd[j]);
-		float djk=distance(newa[j],newa[k],newd[j],newd[k]);
-		float dik=distance(newa[i],newa[k],newd[i],newd[k]);
-		
-		
-		
-		
-		//if(triangle<=8 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
-		    //Ici c'est là où j'ai changé
-        
-        //SORT LES BALISES
-        
-        beaconTab[0].distance = d1; beaconTab[0].angle = a1; beaconTab[0].width = w1;
-        beaconTab[1].distance = d2; beaconTab[1].angle = a2; beaconTab[1].width = w2;
-        beaconTab[2].distance = d3; beaconTab[2].angle = a3; beaconTab[2].width = w3;
-        int n = 3;
-        
-    Beacon tempoBeacon;
+                float dij=distance(newa[i],newa[j],newd[i],newd[j]);
+                float djk=distance(newa[j],newa[k],newd[j],newd[k]);
+                float dik=distance(newa[i],newa[k],newd[i],newd[k]);
+                
+                
+                
+                
+                //if(triangle<=8 && triangle>=7.8 && dij<=3.3 && dij>=1.8 && djk<=3.3 && djk>=1.8 && dik<=3.3 && dik>=1.8 && (newd[i]+newd[j]<=6.6 && newd[k]+newd[j]<=6.6) && (newa[j]-newa[i])>=30.0 && (newa[k]-newa[j])>=30.0){//faudrait rajouter une condition brrr genre sur les anngles
+                    //Ici c'est là où j'ai changé
+                
+                //SORT LES BALISES
+                
+                beaconTab[0].distance = d1; beaconTab[0].angle = a1; beaconTab[0].width = w1;
+                beaconTab[1].distance = d2; beaconTab[1].angle = a2; beaconTab[1].width = w2;
+                beaconTab[2].distance = d3; beaconTab[2].angle = a3; beaconTab[2].width = w3;
+                int n = 3;
+                
+                Beacon tempoBeacon;
 
-    //VRAI TRI SA MERE POUR REMETTRE BALISES DANS LORDRE
-    while(distance(beaconTab[0].angle, beaconTab[1].angle,beaconTab[0].distance, beaconTab[1].distance) < distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance) || distance(beaconTab[1].angle, beaconTab[2].angle,beaconTab[1].distance, beaconTab[2].distance)<distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance)){
-        tempoBeacon = beaconTab[1];
-        beaconTab[1] = beaconTab[0];
-        beaconTab[0] = beaconTab[2];
-        beaconTab[2] = tempoBeacon;
-    }
-        
-        dij=distance(beaconTab[0].angle,beaconTab[1].angle,beaconTab[0].distance,beaconTab[1].distance);
-		djk=distance(beaconTab[1].angle,beaconTab[2].angle,beaconTab[1].distance,beaconTab[2].distance);
-		dik=distance(beaconTab[0].angle,beaconTab[2].angle,beaconTab[0].distance,beaconTab[2].distance);
-        //fprintf(stderr,"djk = %f\n",djk);
-        
+                //VRAI TRI SA MERE POUR REMETTRE BALISES DANS LORDRE
+                while(distance(beaconTab[0].angle, beaconTab[1].angle,beaconTab[0].distance, beaconTab[1].distance) < distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance) || distance(beaconTab[1].angle, beaconTab[2].angle,beaconTab[1].distance, beaconTab[2].distance)<distance(beaconTab[0].angle, beaconTab[2].angle,beaconTab[0].distance, beaconTab[2].distance)){
+                    tempoBeacon = beaconTab[1];
+                    beaconTab[1] = beaconTab[0];
+                    beaconTab[0] = beaconTab[2];
+                    beaconTab[2] = tempoBeacon;
+                }
+                    
+                    dij=distance(beaconTab[0].angle,beaconTab[1].angle,beaconTab[0].distance,beaconTab[1].distance);
+                    djk=distance(beaconTab[1].angle,beaconTab[2].angle,beaconTab[1].distance,beaconTab[2].distance);
+                    dik=distance(beaconTab[0].angle,beaconTab[2].angle,beaconTab[0].distance,beaconTab[2].distance);
+                    //fprintf(stderr,"djk = %f\n",djk);
+                    
 
-        uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.25+isoceleTolerance && dij>=3.25-isoceleTolerance && djk<=3.25+isoceleTolerance && djk>=3.25-isoceleTolerance && dik>=1.9-isoceleTolerance && dik<=1.9+isoceleTolerance;
-        //if(beaconTab[0].angle < 300 && beaconTab[0].angle > 250)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
-        ///if(verbose) fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
-		if(condition){//faudrait rajouter une condition brrr genre sur les anngles
-    
-            if(verbose){
-                //fprintf(stderr,"Dij = %f Djk = %d Djk = %f",dij,djk,dik);
-            }
-		    //if(verbose) fprintf(stderr,"On trouve un triangle \n");
-		    coord[0]=i;//en théorie ce seront les bonnes
-		    coord[1]=j;
-		    coord[2]=k;
-                    //std::cout<<"il trouve qqch";
-		    
-		    balises[0][0]=beaconTab[0].angle;
-		    balises[0][1]=beaconTab[0].distance;
-		    balises[1][0]=beaconTab[1].angle;
-		    balises[1][1]=beaconTab[1].distance;
-		    balises[2][0]=beaconTab[2].angle;
-		    balises[2][1]=beaconTab[2].distance;
-		    if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
-		    if(verbose) printf("triangle: %f \n", triangle);
-		    float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
-		    float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
-		    float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
-		    float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
-		    float d12=distance(newa[coord[2]],newa[coord[1]], newd[coord[2]],newd[coord[1]]);
+                    uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.25+isoceleTolerance && dij>=3.25-isoceleTolerance && djk<=3.25+isoceleTolerance && djk>=3.25-isoceleTolerance && dik>=1.9-isoceleTolerance && dik<=1.9+isoceleTolerance;
+                    //if(beaconTab[0].angle < 300 && beaconTab[0].angle > 250)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
+                    ///if(verbose) fprintf(stderr,"Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+                    if(condition && fabs(triangle-perimetre) < fabs(oldPerimetre-perimetre) && fabs(oldIsoceleCondition-fabs(dij-djk))){//faudrait rajouter une condition brrr genre sur les anngles
+                        beaconFound = 1;
+                        bestBeaconTab[0] = beaconTab[0];
+                        bestBeaconTab[1] = beaconTab[1];
+                        bestBeaconTab[2] = beaconTab[2];
 
-		    float x3=2.0;
-		    float y3= 0.0;
-		    float x2=1.0;
-		    float y2=3.0;
-		    float x1=0.0;
-		    float y1=0.0;
+                        oldPerimetre = triangle;
+                        oldIsoceleCondition = fabs(dij-djk);
+                        if(verbose){
+                            //fprintf(stderr,"Dij = %f Djk = %d Djk = %f",dij,djk,dik);
+                        }
+                        //if(verbose) fprintf(stderr,"On trouve un triangle \n");
+                        /*
+                        coord[0]=i;//en théorie ce seront les bonnes
+                        coord[1]=j;
+                        coord[2]=k;*/
+                                //std::cout<<"il trouve qqch";
+                        
+                        /*balises[0][0]=beaconTab[0].angle;
+                        balises[0][1]=beaconTab[0].distance;
+                        balises[1][0]=beaconTab[1].angle;
+                        balises[1][1]=beaconTab[1].distance;
+                        balises[2][0]=beaconTab[2].angle;
+                        balises[2][1]=beaconTab[2].distance;*/
 
-
-		//ici j'ai juste rajouté ces conditions là
-                // Les coordonnées des balises
-                double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
-		
-		
-
-                // Calculer la position du robot
-        pthread_mutex_lock(&positionLock);
-        float* myX = (float*) malloc(sizeof(float));
-        float* myY = (float*) malloc(sizeof(float));
-        *myX = 0; *myY = 0;
-        pthread_mutex_unlock(&positionLock);
-        triangulationPierlot( myX,  myY, (360-beaconTab[0].angle)*DEG2RAD,  (360-beaconTab[1].angle)*DEG2RAD,  (360-beaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
-        //fprintf(stderr,"myX = %f and myY = %d \n", myX,myY);
-        //Calcul angle augustin
-        float alpha = 180-(360-beaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
-        if(alpha<0) alpha = alpha+360;
-        //if(verbose) fprintf(stderr,"angle = %f \n",alpha);
-        
-        pthread_mutex_lock(&positionLock);
-        //fprintf(stderr,"myX = %f and myY = %d \n", *myX,*myY);
-        myPos.x = *myX;
-        myPos.y = *myY;
-        free(myX); free(myY);
-        //if(verbose) fprintf(stderr,"beacon data\n");
-        myPos.theta = alpha;
-        pthread_mutex_unlock(&positionLock);
-        lidarPos object;
-        for (int k = 0;k<newa.size();k++){
-            object.x = myPos.x + newd[k] * cos((myPos.theta - newa[k] + 90)*DEG2RAD);
-            object.y = myPos.y + newd[k] * sin((myPos.theta - newa[k] + 90)*DEG2RAD);
+                        if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
+                        if(verbose) printf("triangle: %f \n", triangle);
+                        /*float angle_b[3]={newa[coord[0]], newa[coord[1]], newa[coord[2]]};
+                        float distance_b[3]={newd[coord[0]], newd[coord[1]], newd[coord[2]]};
+                        float d01=distance(newa[coord[0]],newa[coord[1]], newd[coord[0]],newd[coord[1]]);
+                        float d02=distance(newa[coord[0]],newa[coord[2]], newd[coord[0]],newd[coord[2]]);
+                        float d12=distance(newa[coord[2]],newa[coord[1]], newd[coord[2]],newd[coord[1]]);*/
 
 
-            objects_coordinates.push_back(object);
-            //fprintf(stderr,"object position: x = %f and y = %f angle = %f\n",object.x,object.y,newa[k]);
-            if(object.x < 1.95 && object.x > 0.05 && object.y < 2.95 && object.y > 0.05){
-                //if(verbose) fprintf(stderr, "opponent added \n");
-                pthread_mutex_lock(&lockOpponentPosition);
-                myOpponent.x = object.x;
-                myOpponent.y = object.y;
-                myOpponent.isDetected = 1;
-                pthread_mutex_unlock(&lockOpponentPosition);
 
-            }
+                        //ici j'ai juste rajouté ces conditions là
+                            // Les coordonnées des balises
+                            //double balise_coords[3][2] = {{0, 0}, {1, 3}, {2, 0}};
+                    
+                    
 
-        }
-        
-        
-        
-        //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
-        //detect_obstacle(newa, newd, obj_iter);
-        //return balises;
-        //break;//ici voir comment en sortir totalement
-        //fprintf(stderr,"fin de beacon_data  \n");
-        return NULL;
-            }
-            }
+                            // Calculer la position du robot
+                        
+                        
+                    
+                    
+                    
+                    
+                        //w_plot(&newa[0], &newd[0], angle_b, distance_b, obj_iter);
+                        //detect_obstacle(newa, newd, obj_iter);
+                        //return balises;
+                        //break;//ici voir comment en sortir totalement
+                        //fprintf(stderr,"fin de beacon_data  \n");
+                    
+                        }
+
+                    }
+                    
+                }
             
-        }
-	
-    }
+            }
+            if(beaconFound){
+            pthread_mutex_lock(&positionLock);
+            float* myX = (float*) malloc(sizeof(float));
+            float* myY = (float*) malloc(sizeof(float));
+            *myX = 0; *myY = 0;
+            
+            pthread_mutex_unlock(&positionLock);
+            triangulationPierlot( myX,  myY, (360-bestBeaconTab[0].angle)*DEG2RAD,  (360-bestBeaconTab[1].angle)*DEG2RAD,  (360-bestBeaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
+            //fprintf(stderr,"myX = %f and myY = %d \n", myX,myY);
+            //Calcul angle augustin
+            float alpha = 180-(360-bestBeaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
+            if(alpha<0) alpha = alpha+360;
+            //if(verbose) fprintf(stderr,"angle = %f \n",alpha);
+            
+            pthread_mutex_lock(&positionLock);
+            //fprintf(stderr,"myX = %f and myY = %d \n", *myX,*myY);
+            myPos.x = *myX;
+            myPos.y = *myY;
+            free(myX); free(myY);
+            //if(verbose) fprintf(stderr,"beacon data\n");
+            myPos.theta = alpha;
+            pthread_mutex_unlock(&positionLock);
+            lidarPos object;
+            for (int k = 0;k<newa.size();k++){
+                    object.x = myPos.x + newd[k] * cos((myPos.theta - newa[k] + 90)*DEG2RAD);
+                    object.y = myPos.y + newd[k] * sin((myPos.theta - newa[k] + 90)*DEG2RAD);
+
+
+                    objects_coordinates.push_back(object);
+                    //fprintf(stderr,"object position: x = %f and y = %f angle = %f\n",object.x,object.y,newa[k]);
+                    if(object.x < 1.95 && object.x > 0.05 && object.y < 2.95 && object.y > 0.05){
+                        //if(verbose) fprintf(stderr, "opponent added \n");
+                        pthread_mutex_lock(&lockOpponentPosition);
+                        myOpponent.x = object.x;
+                        myOpponent.y = object.y;
+                        myOpponent.isDetected = 1;
+                        pthread_mutex_unlock(&lockOpponentPosition);
+
+                    }
+
+                }
+            }
+
     //fprintf(stderr,"Après giga boucle beacon_data  \n");
     /*pthread_mutex_lock(&positionLock);
     myPos.x = 0.0;
@@ -405,7 +418,7 @@ void* beacon_data(void* argument){
     //pthread_mutex_lock(&isReadyLock);
     //readyToSend = 1;
     //pthread_mutex_unlock(&isReadyLock);
-    sleep(1);
+    
     return NULL;
 }
 
