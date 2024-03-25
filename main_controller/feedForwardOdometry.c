@@ -2,10 +2,16 @@
 #include "headers.h"
 #define HEADERS
 #endif
+int speed_FL = 0;
+int speed_FR = 0;
+int speed_RL = 0;
+int speed_RR = 0;
 
 
 
-void myOdometry(float* speed){
+void myOdometry(uint8_t buffer_rear, uint8_t* buffer_front){
+    retrieveSpeeds(buffer_front, &speed_FL, &speed_FR);
+    retrieveSpeeds(buffer_rear, &speed_RL, &speed_RR);
     float delta_t = 0.1;
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
@@ -19,6 +25,10 @@ void myOdometry(float* speed){
     /*output[0] = x_new;
     output[1] = y_new;
     output[2] = theta_new;*/
+}
+
+void wheelSpeedToRobotSpeed(){
+    
 }
 
 void resetOdometry(){

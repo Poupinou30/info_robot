@@ -19,6 +19,8 @@ pthread_mutex_t lockOpponentPosition;
 pthread_mutex_t lockDestination;
 uint8_t destination_set =0;
 position myOdometryPos;
+
+
 /*
 *myOdometryPos.x = 0;
 *myOdometryPos.y = 0;
