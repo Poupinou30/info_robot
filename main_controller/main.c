@@ -134,6 +134,12 @@ void initializeMainController(){
     myPos.theta = &positionReceived[2];
     myOpponent.x = (float*)malloc(sizeof(float));
     myOpponent.y = (float*)malloc(sizeof(float));
+    myOdometryPos.x = (float*)malloc(sizeof(float));
+    myOdometryPos.y = (float*)malloc(sizeof(float));
+    myOdometryPos.theta = (float*)malloc(sizeof(float));
+    *myOdometryPos.x = 0;
+    *myOdometryPos.y = 0;
+    *myOdometryPos.theta = 0;
 }
 
 int main(){
@@ -199,6 +205,7 @@ int main(){
         sleep(1);
     }
     fprintf(stderr,"Position acquired \n");
+    resetOdometry();
     
 
     gettimeofday(&end, NULL);

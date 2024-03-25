@@ -22,7 +22,3 @@ int UART_handle;
 position myOdometryPos;
 
 
-/*
-*myOdometryPos.x = 0;
-*myOdometryPos.y = 0;
-*myOdometryPos.theta = 0;*/

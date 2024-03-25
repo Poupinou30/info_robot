@@ -96,6 +96,8 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
 void initializeMainController();
 void UART_send(int UART_handle, char* data,char* received);
 int initializeUART();
+void resetOdometry();
+void myOdometry(uint8_t buffer_rear, uint8_t* buffer_front);
 
 //FORKS - ACTUATORS
 void setLowerFork(int height);
