@@ -98,14 +98,8 @@ float triangulationPierlot(float *x, float *y,
 
 
 void* beacon_data(void* argument){
-<<<<<<< HEAD
     float oldPerimetre = 0;
     float oldIsoceleCondition = 999;
-=======
-
-    float actualTrianglePerimeter = 0;
-    float actualIsoceleCondition = 0;
->>>>>>> 53af9bc1cc8d25cc9dc17d89438da301f2fc62a7
     /*for(int i = 0; i<counter; i++){
         if(verbose) fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
@@ -425,10 +419,7 @@ void* beacon_data(void* argument){
     //pthread_mutex_lock(&isReadyLock);
     //readyToSend = 1;
     //pthread_mutex_unlock(&isReadyLock);
-<<<<<<< HEAD
     
-=======
->>>>>>> 53af9bc1cc8d25cc9dc17d89438da301f2fc62a7
     return NULL;
 }
 
