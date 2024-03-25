@@ -3,6 +3,7 @@
 #define HEADERS
 #endif
 
+double v_max = 0.5;
 
 void createArray(int16_t num1, int16_t num2, uint8_t* output) {
     output[0] = (num1 >> 8) & 0xFF; // Premier octet du premier nombre
@@ -16,26 +17,18 @@ double degToRad(double deg) {
 }
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
-    float propotion;
-    if(v_x > 0){
-        propotion = v_x / 0.5;
-        v_x = fmax(v_x, 0.5);
-        v_y = v_y/propotion;
-    } 
-    else{
-        propotion = -v_x / 0.5;
-        v_x = fmin(v_x, -0.5);
-        v_y = v_y/propotion;
+    // Calculate the magnitude of the velocity vector
+    double v_magnitude = sqrt(pow(v_x, 2) + pow(v_y, 2));
+    
+    // Check if the magnitude is greater than the max allowed speed
+    if (v_magnitude > v_max) {
+        // Calculate the scaling factor
+        double scaling_factor = v_max / v_magnitude;
+        
+        // Apply the scaling factor to limit the speeds while maintaining the direction
+        v_x *= scaling_factor;
+        v_y *= scaling_factor;
     }
-    if(v_y > 0){
-        propotion = v_y / 0.5;
-        v_y = fmax(v_y, 0.5);
-        v_x = v_x/propotion;
-    }
-    else{
-        propotion = -v_y / 0.5;
-        v_y = fmin(v_y, -0.5);
-        v_x = v_x/propotion;
     }
     if(omega > 0) omega = fmax(omega, 10);
     else omega = fmin(omega, -10);
