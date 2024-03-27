@@ -20,7 +20,7 @@ int spi_handle_rear;
 
 
 
-int mainPattern(){
+int main(){
     gpioInitialise();
     int spi_handle_front = initializeSPI(0);
     int spi_handle_rear = initializeSPI(1);
@@ -82,9 +82,20 @@ int mainPattern(){
 
     //Pattern DEMO
 
-    processInstruction(0.2,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
-    sleep(2);//2
-    processInstruction(0.5,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    /*processInstruction(0,0.1,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(3);//2
+    processInstruction(0.0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(0.5);
+    processInstruction(0.1,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(3);
+    
+    processInstruction(-0.1,-0.1,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(3);*/
+
+    processInstruction(-0.2,0.2,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
+    sleep(8);
+
+    /*processInstruction(0.5,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
     sleep(1);
     processInstruction(0.0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
     sleep(0.5);
@@ -99,7 +110,7 @@ int mainPattern(){
     processInstruction(0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
     sleep(0.5);
     processInstruction(0,0,1,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
-    sleep(3);
+    sleep(3);*/
     processInstruction(0,0,0.0,speedTab,spi_handle_rear,spi_handle_front,dataFront,dataRear);
 
 
@@ -142,9 +153,9 @@ void initializeMainController(){
     *myOdometryPos.theta = 0;
 }
 
-int main(){
+int mainFINAL(){
 
-    
+    initializeMainController();
     double* outputSpeed = malloc(sizeof(double)*4);
     uint8_t *dataFront = (uint8_t*) malloc(sizeof(uint8_t)*4);
     uint8_t *dataRear = (uint8_t*) malloc(sizeof(uint8_t)*4);
@@ -336,7 +347,7 @@ void processInstruction(float v_x, float v_y, float omega, double* speedTab, int
     createArray(speedTab[2]/(2*_Pi)*114688/100,speedTab[3]/(2*_Pi) *114688/100,dataRear);
     SPI_send(dataRear,spi_handle_rear,SPI_reception_buffer_rear); //REAR
     SPI_send(dataFront,spi_handle_front,SPI_reception_buffer_front); //FRONT
-    my
+    
 }
 
 

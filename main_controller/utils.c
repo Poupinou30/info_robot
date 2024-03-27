@@ -10,7 +10,7 @@ double l_x = 0.21;
 double v_max = 0.5;
 double omega_max = 10.0;
 
-void retrieveSpeeds(uint8_t* data, int* speed1, int* speed2) {
+void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2) {
     int16_t num1 = (data[0] << 8) | data[1]; // Récupère le premier nombre
     int16_t num2 = (data[2] << 8) | data[3]; // Récupère le deuxième nombre
 
@@ -37,7 +37,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     double v_magnitude = sqrt(pow(v_x, 2) + pow(v_y, 2));
     
     // Check if the magnitude is greater than the max allowed speed
-    if (v_magnitude > v_max) {
+    /*if (v_magnitude > v_max) {
         // Calculate the scaling factor
         double scaling_factor = v_max / v_magnitude;
         
@@ -48,17 +48,18 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 
     if (fabs(omega) > omega_max) {
         omega = (omega > 0 ? omega_max : -omega_max);
-    }
+    }*/
 
-    //double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
-    //double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
-    //double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
-    //double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
+    double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
+    double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
+    double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
+    double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
+    printf("Omega fl = %f omega_fr = %f omega_rl = %f omega_rr = %f \n",omega_fl,omega_fr,omega_rl,omega_rr);
 
-    double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
+    /*double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
     double omega_fr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //front right
     double omega_rl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //rear left
-    double omega_rr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //rear right
+    double omega_rr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //rear right*/
 
     output_speed[0] = omega_fl;
     output_speed[1] = omega_fr;
@@ -103,9 +104,9 @@ void UART_send(int UART_handle, char* data,char* received){
 
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
     
-    v_x = r / 4 * (wheel_speeds[0] - wheel_speeds[1] + wheel_speeds[2] - wheel_speeds[3]);
-    v_y = r / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
-    omega = r / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+    *v_x = radius / 4 * (wheel_speeds[0] - wheel_speeds[1] + wheel_speeds[2] - wheel_speeds[3]);
+    *v_y = radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
+    *omega = radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 }
 
 double randomDouble(double min, double max) {
@@ -119,7 +120,7 @@ void extractBytes(uint16_t nombre, uint8_t *octet_haut, uint8_t *octet_bas) {
     *octet_bas = nombre & 0xFF;
 }
 
-void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e){
+void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e){ //ki_m = mantissa et Ki_e = exposant
     uint8_t *PIDTab = (uint8_t*) malloc(sizeof(uint8_t)*4);
     PIDTab[3] = 254;
     extractBytes(Kp_m,&PIDTab[2],&PIDTab[1]);

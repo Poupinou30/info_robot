@@ -91,13 +91,13 @@ void* updateKalman(void* args);
 position closestPoint(position rect[2], position pos);
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving);
 void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed);
-void retrieveSpeeds(uint8_t* data, int* speed1, int* speed2);
+void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2);
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
 void initializeMainController();
 void UART_send(int UART_handle, char* data,char* received);
 int initializeUART();
 void resetOdometry();
-void myOdometry(uint8_t buffer_rear, uint8_t* buffer_front);
+void myOdometry(uint8_t* buffer_rear, uint8_t* buffer_front);
 
 //FORKS - ACTUATORS
 void setLowerFork(int height);
@@ -123,6 +123,7 @@ extern double f_tot_y;
 extern int refreshCounter;
 extern uint8_t readyToGo;
 extern double f_theta;
+extern int UART_handle;
 
 extern pthread_t computeKalmanThread;
 extern pthread_mutex_t lockFilteredPosition;
