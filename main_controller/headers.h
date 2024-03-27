@@ -100,13 +100,24 @@ void resetOdometry();
 void myOdometry(uint8_t* buffer_rear, uint8_t* buffer_front);
 
 //FORKS - ACTUATORS
+void setArmDeployedAngle(int angle);
+void setForksDeployedAngle(int angle);
+void disableStepperMotor();
+void enableStepperMotor();
 void setLowerFork(int height);
 void setUpperFork(int height);
 void retractForks();
 void deployForks();
 void deployArm();
 void setWheelSpeed(int speed);
+void setGripperPosition(int position);
 //END ACTUATORS
+
+
+//STRATEGY
+typedef enum {GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE, GRAB_PLANTS_END,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;void manageGrabbing();
+extern grabbingState myGrabState;
+//END STRATEGY
 
 
 extern position myPos;

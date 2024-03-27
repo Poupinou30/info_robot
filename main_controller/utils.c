@@ -81,21 +81,26 @@ int initializeUART(){
     return UART_handle;
 }
 void UART_send(int UART_handle, char* data,char* received){
-    printf("Test data %d \n",strlen(data));
+    if(VERBOSE) printf("Sending '%s' by UART\n",data);
     if(serWrite(UART_handle, data, strlen(data))!=0){
         fprintf(stderr,"Error while writing \n");
     }
-    fprintf(stderr,"Size of received buffer : %d \n",256);
+    else if(VERBOSE) printf("UART correctly sent\n");
+    if(received == NULL){
+        ;
+    }
+    else{
+    if(VERBOSE) fprintf(stderr,"Size of received buffer : %d \n",strlen(received));
     int bytesRead = 0;
     for(int i = 0; i < strlen(data); i++){ //strlen(data) était un 10 avant, pas encore testé avec cela
         bytesRead = serRead(UART_handle, received, 256);
-        if (bytesRead > 0) {
+        if (bytesRead > 0 && VERBOSE) {
             received[bytesRead] = '\0';
             fprintf(stderr,"%d received bytes \n",bytesRead);
             break;
         }
         //Ici j'ai enlevé un sleep
-    }
+    }}
 
 
 

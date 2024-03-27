@@ -21,6 +21,23 @@ int spi_handle_rear;
 
 
 int main(){
+    initializeMainController();
+    printf("UART handle = %d \n",UART_handle);
+    /*deployForks();
+    sleep(1);
+    setUpperFork(130);
+    sleep(1);
+    setLowerFork(10);
+    sleep(4);
+    retractForks();*/
+    myGrabState = GRAB_PLANTS_INIT;
+    while(myGrabState != FINISHED){
+        
+        manageGrabbing();
+    }
+}
+
+int mainPattern(){
     gpioInitialise();
     int spi_handle_front = initializeSPI(0);
     int spi_handle_rear = initializeSPI(1);

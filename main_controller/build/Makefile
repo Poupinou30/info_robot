@@ -312,6 +312,33 @@ spi_com.c.s:
 	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/spi_com.c.s
 .PHONY : spi_com.c.s
 
+strategy.o: strategy.c.o
+
+.PHONY : strategy.o
+
+# target to build an object file
+strategy.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/strategy.c.o
+.PHONY : strategy.c.o
+
+strategy.i: strategy.c.i
+
+.PHONY : strategy.i
+
+# target to preprocess a source file
+strategy.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/strategy.c.i
+.PHONY : strategy.c.i
+
+strategy.s: strategy.c.s
+
+.PHONY : strategy.s
+
+# target to generate assembly for a file
+strategy.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/strategy.c.s
+.PHONY : strategy.c.s
+
 utils.o: utils.c.o
 
 .PHONY : utils.o
@@ -396,6 +423,9 @@ help:
 	@echo "... spi_com.o"
 	@echo "... spi_com.i"
 	@echo "... spi_com.s"
+	@echo "... strategy.o"
+	@echo "... strategy.i"
+	@echo "... strategy.s"
 	@echo "... utils.o"
 	@echo "... utils.i"
 	@echo "... utils.s"

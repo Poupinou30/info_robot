@@ -16,6 +16,7 @@ add_executable(main_controller main.c
         kalman.c
         feedbackOdometry.c
         forkControl.c
+        strategy.c
         )
 
 target_include_directories(main_controller PRIVATE ${pigpio_INCLUDE_DIR})
