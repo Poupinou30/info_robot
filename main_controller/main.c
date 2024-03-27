@@ -20,7 +20,7 @@ int spi_handle_rear;
 
 
 
-int main(){
+int mainOLD2(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
     /*deployForks();
@@ -37,7 +37,16 @@ int main(){
     }
 }
 
-int mainPattern(){
+int main(){ // spi test
+    initializeMainController();
+    uint8_t myTab[4] = {255, 255, 1, 1};
+    uint8_t receivedTab[4];
+    SPI_send(myTab,spi_handle_rear,receivedTab);
+    for(int i = 0; i<4; i++){
+        printf("Received %d \n",receivedTab[i]);
+    }
+}
+int mainPATTERN(){
     gpioInitialise();
     int spi_handle_front = initializeSPI(0);
     int spi_handle_rear = initializeSPI(1);
