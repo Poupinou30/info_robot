@@ -20,7 +20,7 @@ int spi_handle_rear;
 
 
 
-int mainOLD2(){
+int main(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
     /*deployForks();
@@ -30,14 +30,15 @@ int mainOLD2(){
     setLowerFork(10);
     sleep(4);
     retractForks();*/
-    myGrabState = GRAB_PLANTS_INIT;
+    myGrabState = CALIB_FORK;
+    myActuatorsState = SENDING_INSTRUCTION;
     while(myGrabState != FINISHED){
         
         manageGrabbing();
     }
 }
 
-int main(){ // spi test
+int mainSPITEST(){ // spi test
     initializeMainController();
     uint8_t myTab[4] = {255, 255, 1, 1};
     uint8_t receivedTab[4];

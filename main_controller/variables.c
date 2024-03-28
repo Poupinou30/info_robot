@@ -20,5 +20,6 @@ pthread_mutex_t lockDestination;
 uint8_t destination_set =0;
 int UART_handle;
 position myOdometryPos;
+uint8_t waitingForReception = 0;
 
 

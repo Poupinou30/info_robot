@@ -94,10 +94,17 @@ void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* out
 void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2);
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
 void initializeMainController();
-void UART_send(int UART_handle, char* data,char* received);
+
 int initializeUART();
 void resetOdometry();
 void myOdometry(uint8_t* buffer_rear, uint8_t* buffer_front);
+
+//UART ET SPI
+void UART_send(int UART_handle, char* data,char* received);
+uint8_t UART_receive(int UART_handle, char* received);
+extern int UARTReception;
+extern uint8_t waitingForReception;
+//FIN COMMUNICATION
 
 //FORKS - ACTUATORS
 void setArmDeployedAngle(int angle);
@@ -111,12 +118,16 @@ void deployForks();
 void deployArm();
 void setWheelSpeed(int speed);
 void setGripperPosition(int position);
+void calibrateFork();
 //END ACTUATORS
 
 
 //STRATEGY
-typedef enum {GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE, GRAB_PLANTS_END,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;void manageGrabbing();
+typedef enum {CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE, GRAB_PLANTS_END,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
+void manageGrabbing();
 extern grabbingState myGrabState;
+typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
+extern actuationState myActuatorsState;
 //END STRATEGY
 
 

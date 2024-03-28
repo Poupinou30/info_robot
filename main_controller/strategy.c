@@ -3,67 +3,223 @@
 #define HEADERS
 #endif
 
+char empty[] = "";
+char* endMessage = "<stopped>";
+
 
 grabbingState myGrabState;
+actuationState myActuatorsState;
+uint8_t actuator_reception;
 
 void manageGrabbing(){
-
+    char receivedData[255];
     switch (myGrabState)
     {
-    case GRAB_PLANTS_INIT:
-        deployForks();
-        setLowerFork(65);
-        setUpperFork(0);
-        sleep(3);
-        myGrabState = GRAB_PLANTS_MOVE;
+    case CALIB_FORK:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            calibrateFork();
+            //sleep(5);
+            myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+                //printf("end message = %s \n",endMessage);}
+                //waitingForReception = 1;}
+            if(receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = GRAB_PLANTS_INIT;
+                
+            } 
+            break;
+        }
         break;
+    case GRAB_PLANTS_INIT:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            deployForks();
+            setLowerFork(65);
+            setUpperFork(0);
+            myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!waitingForReception){
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                waitingForReception = 1;}
+            if(actuator_reception && receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = GRAB_PLANTS_MOVE;
+                
+            } 
+            break;
+        }
+        break;
+
     case GRAB_PLANTS_MOVE:
-        //Move forward to grab the plants
+        // Move forward to grab the plants
         myGrabState = GRAB_PLANTS_END;
         break;
+
     case GRAB_PLANTS_END:
-        setGripperPosition(1);
-        setUpperFork(142);
-        sleep(3);
-        myGrabState = UNSTACK_POTS_MOVE;
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            setGripperPosition(1);
+            setUpperFork(142);
+            myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!waitingForReception){
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                waitingForReception = 1;}
+            if(actuator_reception && receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = UNSTACK_POTS_MOVE;
+                
+            } 
+            break;
+        }
+        
         break;
+
     case UNSTACK_POTS_MOVE:
+        
         myGrabState = UNSTACK_POT_TAKE;
         break;
+
+
     case UNSTACK_POT_TAKE:
-        setLowerFork(125);
-        sleep(3);
-        myGrabState = UNSTACK_POT_POSITIONING;
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            setLowerFork(125);
+            sleep(3);
+            myActuatorsState = WAITING_ACTUATORS;
+            break;
+
+        case WAITING_ACTUATORS:
+            if(!waitingForReception){
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                waitingForReception = 1;}
+            if(actuator_reception && receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = UNSTACK_POT_POSITIONING;
+                
+            } 
+            break;
+        }
         break;
+
     case UNSTACK_POT_POSITIONING:
+        
         myGrabState = UNSTACK_POT_DROP;
         break;
+
     case UNSTACK_POT_DROP:
-        setLowerFork(30);
-        sleep(3);
-        myGrabState = GRAB_POTS_MOVE;
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            setLowerFork(30);
+            sleep(3);
+            myActuatorsState = WAITING_ACTUATORS;
+            break;
+
+        case WAITING_ACTUATORS:
+            if(!waitingForReception){
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                waitingForReception = 1;}
+            if(actuator_reception && receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = GRAB_POTS_MOVE;
+                
+            } 
+            break;
+        }
         break;
+
     case GRAB_POTS_MOVE:
-        myGrabState = DROP_PLANTS;
-        sleep(3);
+
         myGrabState = LIFT_POTS;
-        break;
+
     case LIFT_POTS:
-        setLowerFork(135);
-        sleep(3);
-        myGrabState = DROP_PLANTS;
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            setLowerFork(135);
+            sleep(3);
+            myActuatorsState = WAITING_ACTUATORS;
+            break;
+
+        case WAITING_ACTUATORS:
+            if(!waitingForReception){
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                waitingForReception = 1;}
+            if(actuator_reception && receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = DROP_PLANTS;
+                
+            } 
+            break;
+        }
         break;
+
     case DROP_PLANTS:
-        setGripperPosition(0);
-        sleep(3);
-        myGrabState = DROP_ALL;
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            setGripperPosition(0);
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!waitingForReception){
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                waitingForReception = 1;}
+            if(actuator_reception && receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = DROP_ALL;
+                
+            } 
+            break;
+        }       
         break;
+
     case DROP_ALL:
-        setLowerFork(75);
-        setUpperFork(80);
-        sleep(3);
-        myGrabState = FINISHED;
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            setLowerFork(75);
+            setUpperFork(80);
+            sleep(3);
+            myActuatorsState = WAITING_ACTUATORS;
+            break;
+
+        case WAITING_ACTUATORS:
+            if(!waitingForReception){
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                waitingForReception = 1;}
+            if(actuator_reception && receivedData == endMessage){
+                if(VERBOSE) printf("End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = FINISHED;
+                
+            } 
+            break;
+        }
         break;
+
     case FINISHED:
         break;
 

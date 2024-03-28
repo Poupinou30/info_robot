@@ -81,31 +81,63 @@ int initializeUART(){
     return UART_handle;
 }
 void UART_send(int UART_handle, char* data,char* received){
+
+    char tempoChar[100] = "";
+    char tempoChar2[255] = "";
     if(VERBOSE) printf("Sending '%s' by UART\n",data);
     if(serWrite(UART_handle, data, strlen(data))!=0){
         fprintf(stderr,"Error while writing \n");
     }
     else if(VERBOSE) printf("UART correctly sent\n");
-    if(received == NULL){
+    /*if(received == NULL){
         ;
-    }
-    else{
-    if(VERBOSE) fprintf(stderr,"Size of received buffer : %d \n",strlen(received));
+    }*/
+    
+    //if(VERBOSE) fprintf(stderr,"Size of received buffer : %d \n",strlen(received));
     int bytesRead = 0;
-    for(int i = 0; i < strlen(data); i++){ //strlen(data) était un 10 avant, pas encore testé avec cela
-        bytesRead = serRead(UART_handle, received, 256);
-        if (bytesRead > 0 && VERBOSE) {
-            received[bytesRead] = '\0';
-            fprintf(stderr,"%d received bytes \n",bytesRead);
-            break;
-        }
-        //Ici j'ai enlevé un sleep
-    }}
 
+    while(1) {
+        bytesRead = serRead(UART_handle, tempoChar, 255);
+        if (bytesRead > 0) {
+        strcat(tempoChar2,tempoChar);
+        //fprintf(stderr,"%d received bytes \n",bytesRead);
+        //printf("Message received (uart send)= '%s'\n",received);
+        //if(te[bytesRead -1]== "\0") waitingForReception = 0;
 
+        //printf("bytesRead = %d lastchar = %c \n",bytesRead,(tempoChar[bytesRead-1]));
+        if(tempoChar[bytesRead-1] == '>') break;
 
+    }
+    }
+    strcpy(received,tempoChar2);
+    //printf("received %s",tempoChar2);
+    
+    //Ici j'ai enlevé un sleep
+    
 
 }
+
+uint8_t UART_receive(int UART_handle, char* received){
+    char tempoChar[100] = "";
+    char tempoChar2[255] = "";
+    
+    //if(VERBOSE) fprintf(stderr,"Size of received buffer : %d \n",strlen(received));
+    int bytesRead = 0;
+
+        bytesRead = serRead(UART_handle, tempoChar, 255);
+        if (bytesRead > 0) {
+        strcat(received,tempoChar);
+        //fprintf(stderr,"%d received bytes \n",bytesRead);
+        //printf("Message received (uart send)= '%s'\n",received);
+        //if(te[bytesRead -1]== "\0") waitingForReception = 0;
+        printf("received %s\n",received);
+        printf("bytesRead = %d lastchar = %c \n",bytesRead,(tempoChar[bytesRead-1]));
+        if(tempoChar[bytesRead-1] == '>') return 1;
+
+    }
+    
+    
+    return 0;}
 
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
     

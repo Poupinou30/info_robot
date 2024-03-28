@@ -9,7 +9,7 @@ void setArmDeployedAngle(int angle){ //Bras du panneau solaire
     char buffer[10];
     sprintf(buffer, "<A-%d>", (int)angle);
     UART_send(UART_handle, buffer,receivedData);
-    if(VERBOSE) printf("Debug from fork = %s \n",receivedData);
+    if(VERBOSE) printf(" = %s \n",receivedData);
 }
 
 void setForksDeployedAngle(int angle){ //Bras du panneau solaire
@@ -22,6 +22,13 @@ void setForksDeployedAngle(int angle){ //Bras du panneau solaire
 void disableStepperMotor(){
     char buffer[10];
     sprintf(buffer, "<D-0>");
+    UART_send(UART_handle, buffer,receivedData);
+    if(VERBOSE) printf("Debug from fork = %s \n",receivedData);
+}
+
+void calibrateFork(){
+    char buffer[10];
+    sprintf(buffer, "<H-0>");
     UART_send(UART_handle, buffer,receivedData);
     if(VERBOSE) printf("Debug from fork = %s \n",receivedData);
 }
