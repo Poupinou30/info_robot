@@ -29,7 +29,9 @@ int w_plot(float x[], float y[], int length) {//x c'est angle
   
   fprintf(gnuplot,"set xlabel 'x'\n");
   fprintf(gnuplot,"set ylabel 'y'\n");
-  
+  //fprintf(gnuplot, "set xrange [-3.5:2]\n");
+  //fprintf(gnuplot, "set yrange [-3.5:2]\n");
+  fprintf(gnuplot, "set terminal wxt size 500,500\n");
   fprintf(gnuplot, "plot '-' using 1:2 with points lc rgb 'blue', \'-' using 1:2 with points lc rgb 'red' \n");
   //fprintf(gnuplot, "plot 'balises' using 1:2 with points lc rgb 'green' \n");
   
