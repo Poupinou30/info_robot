@@ -18,7 +18,8 @@ uint8_t *SPI_reception_buffer_front;
 int spi_handle_front;
 int spi_handle_rear;
 
-int main(){
+
+int mainUART(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
     //char* myString = "test123";
@@ -41,11 +42,14 @@ int main(){
     }
 }
 
-int mainI2C(){
+int main(){
     initializeMainController();
-    int i2c_handle = I2C_initialize(0x5A);
+    processInstructionNew(0.2,0.2,0,i2c_handle_front,i2c_handle_rear);
+    /*int i2c_handle = I2C_initialize(0x5A);
     uint8_t dataToSend[4] = {0x00,0x01,0x02,0x03};
-    I2C_send(dataToSend,i2c_handle);
+    char receive[100];
+    I2C_send(dataToSend,receive,i2c_handle);*/
+
 
 
 }
@@ -75,7 +79,7 @@ int mainPATTERN(){
     int Kp = 10; //reference
     int Ki = 60; //reference
     //Tune PID
-    tunePID(spi_handle_front,spi_handle_rear,Kp,0,Ki,0);
+    tunePID(Ki,Kp,i2c_handle_front,i2c_handle_rear);
 
     createArray(0,0,dataFront);
     createArray(0,0,dataRear);
@@ -164,6 +168,8 @@ void initializeMainController(){
     spi_handle_front = initializeSPI(0);
     spi_handle_rear = initializeSPI(1);
     UART_handle = initializeUART();
+    i2c_handle_front = I2C_initialize(0x40);
+    i2c_handle_rear = I2C_initialize(0x41);
 
     //Initialisation variables
     positionReceived = malloc(3*sizeof(float));
@@ -380,7 +386,7 @@ int mainField(){
 
 }
 
-void processInstruction(float v_x, float v_y, float omega, double* speedTab, int spi_handle_rear,int spi_handle_front,uint8_t *dataFront, uint8_t *dataRear){
+void processInstruction(float v_x, float v_y, float omega, double* speedTab, int spi_handle_rear,int spi_handle_front,uint8_t *dataFront, uint8_t *dataRear){ //Fonction qui gère l'envoi au moteurs et les calculs
     convertsVelocity(v_x,v_y,omega,speedTab);
     createArray(speedTab[0]/(2*_Pi) *114688/100,speedTab[1]/(2*_Pi) *114688/100,dataFront);
     createArray(speedTab[2]/(2*_Pi)*114688/100,speedTab[3]/(2*_Pi) *114688/100,dataRear);
@@ -389,19 +395,21 @@ void processInstruction(float v_x, float v_y, float omega, double* speedTab, int
     
 }
 
+void processInstructionNew(float v_x, float v_y, float omega, int i2c_handle_front,int i2c_handle_rear){
+    double speedTab[4];
+    convertsVelocity(v_x,v_y,omega,speedTab);
+    char toSendFront[100]; char toSendRear[100]; char toReceiveFront[100]; char toReceiveRear[100];
+    sprintf(toSendFront,"<setSpeed-%d-%d>",(int) (speedTab[0]/(2*_Pi) *114688),(int) (speedTab[1]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
+    sprintf(toSendRear,"<setSpeed-%d-%d>",(int) (speedTab[2]/(2*_Pi) *114688),(int) (speedTab[3]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
+    I2C_send(toSendFront,toReceiveFront,i2c_handle_front);
+    I2C_send(toSendRear,toReceiveRear,i2c_handle_rear);
+    int tempoSpeedFL, tempoSpeedFR, tempoSpeedRL, tempoSpeedRR;
+    printf("received 1 = %s and 2 = %s", toReceiveFront,toReceiveRear);
+    sscanf(toReceiveFront, "<measuredSpeed-%d-%d>", &tempoSpeedFL, &tempoSpeedFR);
+    sscanf(toReceiveRear, "<measuredSpeed-%d-%d>", &tempoSpeedRL, &tempoSpeedRR);
+    motorSpeed_FL = tempoSpeedFL/114688 * 2*_Pi;
+    motorSpeed_FR = tempoSpeedFR/114688 * 2*_Pi;
+    motorSpeed_RL = tempoSpeedRL/114688 * 2*_Pi;
+    motorSpeed_RR = tempoSpeedRR/114688 * 2*_Pi;
 
-
-void sendInstruction(float theta,float turn, float speed){
-    float theSin = sin(degToRad(theta)- 3.14/4);
-    float theCos = cos(degToRad(theta)- 3.14/4);
-    float theMax = fmax(fabs(theSin),fabs(theCos));
-    float leftFront = speed * theCos/theMax + turn;
-    float rightFront = speed * theSin/theMax - turn;
-    float leftRear = speed * theSin/theMax + turn;
-    float rightRear = speed * theCos/theMax - turn;
-
-    if((speed + fabs(turn)) >1){
-;
-    }
 }
-

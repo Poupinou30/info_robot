@@ -68,10 +68,12 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 void myController(double* speedTab, double currentX, double currentY, double currentTheta,double* absoluteSpeedTab, double* targetPosition);
 double randomDouble(double min, double max);
 void processInstruction(float v_x, float v_y, float omega, double* speedTab, int spi_handle_rear,int spi_handle_front,uint8_t *dataFront, uint8_t *dataRear);
+void processInstructionNew(float v_x, float v_y, float omega, int i2c_handle_front,int i2c_handle_rear);
 void* executeProgram(void* arg);
 
 void extractBytes(uint16_t nombre, uint8_t *octet_haut, uint8_t *octet_bas) ;
-void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e);
+void tunePIDOLD(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e);
+void tunePID(float Ki, float Kp, int i2c_handle_front, int i2c_handle_rear);
 void* receptionPipe(void* pipefdvoid);
 float computeEuclidianDistance(double x1, double y1, double x2, double y2);
 float computeRectangleDistance(double x1, double y1, double x2, double y2, double x3, double y3);
@@ -86,7 +88,7 @@ void addRoundObstacle(double posX, double posY, double size, uint8_t moving);
 void printObstacleLists();
 void removeMovingObstacles();
 void computeForceVector();
-void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear);
+void myPotentialFieldController();
 void* updateKalman(void* args);
 position closestPoint(position rect[2], position pos);
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving);
@@ -105,7 +107,9 @@ uint8_t UART_receive(int UART_handle, char* received);
 extern int UARTReception;
 extern uint8_t waitingForReception;
 int I2C_initialize(int address);
-void I2C_send(uint8_t* data, int I2C_handle);
+void I2C_send(char* data,char* received, int I2C_handle);
+int i2c_handle_front;
+int i2c_handle_rear;
 //FIN COMMUNICATION
 
 //FORKS - ACTUATORS
@@ -158,4 +162,9 @@ extern pthread_mutex_t lockDestination;
 extern uint8_t destination_set;
 extern position myOdometryPos;
 
+//Moteurs - odometry
+extern double motorSpeed_FL;
+extern double motorSpeed_FR;
+extern double motorSpeed_RL;
+extern double motorSpeed_RR;
 

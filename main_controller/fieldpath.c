@@ -350,11 +350,9 @@ void computeForceVector(){
     //Calcul de la force de attraction totale
 }
 
-void myPotentialFieldController(double* speedTab, uint8_t* dataFront, uint8_t* dataRear, int spi_handle_front, int spi_handle_rear){
-    convertsVelocity(f_tot_x,f_tot_y,f_theta,speedTab);
-    createArray(speedTab[0]/(2*_Pi) *114688/100,speedTab[1]/(2*_Pi) *114688/100,dataFront);
-    createArray(speedTab[2]/(2*_Pi)*114688/100,speedTab[3]/(2*_Pi) *114688/100,dataRear);
-    SPI_send(dataFront,spi_handle_front,NULL); //FRONT
-    SPI_send(dataRear,spi_handle_rear,NULL);
-
+void myPotentialFieldController(){
+    double outputSpeed[3];
+    computeForceVector();
+    convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+    processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
 }

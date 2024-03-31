@@ -21,5 +21,8 @@ uint8_t destination_set =0;
 int UART_handle;
 position myOdometryPos;
 uint8_t waitingForReception = 0;
-
+double motorSpeed_FL = 0;
+double motorSpeed_FR = 0;
+double motorSpeed_RL = 0;
+double motorSpeed_RR = 0;
 

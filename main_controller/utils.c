@@ -77,13 +77,11 @@ int I2C_initialize(int address){
     }
     return I2C_handle;
 }
-void I2C_send(uint8_t* data, int I2C_handle){
-    int err_code = i2cWriteDevice(I2C_handle,data,4);
+void I2C_send(char* data,char* received, int I2C_handle){
+    int err_code = i2cWriteDevice(I2C_handle,data,strlen(data));
     if(err_code < 0){
         fprintf(stderr,"error %d while sending I2C \n",err_code);}
-        char received[100];
     int read_data = i2cReadDevice(I2C_handle,received,100);
-    fprintf(stderr,"read_data = %s \n",received);
 }
 
 int initializeUART(){
@@ -107,30 +105,6 @@ void UART_send(int UART_handle, char* data){
         fprintf(stderr,"Error while writing \n");
     }
     else if(VERBOSE) printf("UART correctly sent\n");
-    /*if(received == NULL){
-        ;
-    }*/
-    
-    //if(VERBOSE) fprintf(stderr,"Size of received buffer : %d \n",strlen(received));
-    /*int bytesRead = 0;
-
-    while(1) {
-        bytesRead = serRead(UART_handle, tempoChar, 255);
-        if (bytesRead > 0) {
-        strcat(tempoChar2,tempoChar);
-        //fprintf(stderr,"%d received bytes \n",bytesRead);
-        //printf("Message received (uart send)= '%s'\n",received);
-        //if(te[bytesRead -1]== "\0") waitingForReception = 0;
-
-        //printf("bytesRead = %d lastchar = %c \n",bytesRead,(tempoChar[bytesRead-1]));
-        if(tempoChar[bytesRead-1] == '>') break;
-
-    }
-    }
-    strcpy(received,tempoChar2);*/
-    //printf("received %s",tempoChar2);
-    
-    //Ici j'ai enlevé un sleep
     
 
 }
@@ -175,7 +149,7 @@ void extractBytes(uint16_t nombre, uint8_t *octet_haut, uint8_t *octet_bas) {
     *octet_bas = nombre & 0xFF;
 }
 
-void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e){ //ki_m = mantissa et Ki_e = exposant
+void tunePIDOLD(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e){ //ki_m = mantissa et Ki_e = exposant
     uint8_t *PIDTab = (uint8_t*) malloc(sizeof(uint8_t)*4);
     PIDTab[3] = 254;
     extractBytes(Kp_m,&PIDTab[2],&PIDTab[1]);
@@ -194,6 +168,15 @@ void tunePID(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_
     free(PIDTab);
 
 }
+
+void tunePID(float Ki, float Kp, int i2c_handle_front, int i2c_handle_rear){
+    char toSend[100]; char toReceiveFront[100]; char toReceiveRear[100];
+    sprintf(toSend,"<setCoeff-%f-%f>",Kp,Ki); //Vitesses en ticks par seconde
+    I2C_send(toSend,toReceiveFront,i2c_handle_front);
+    I2C_send(toSend,toReceiveRear,i2c_handle_rear);
+}
+
+
 pid_t child_pid = 0;
 
 /*void handle_sigint(int sig) {
