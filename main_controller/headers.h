@@ -99,26 +99,29 @@ int initializeUART();
 void resetOdometry();
 void myOdometry(uint8_t* buffer_rear, uint8_t* buffer_front);
 
-//UART ET SPI
-void UART_send(int UART_handle, char* data,char* received);
+//UART ET SPI et I2C
+void UART_send(int UART_handle, char* data);
 uint8_t UART_receive(int UART_handle, char* received);
 extern int UARTReception;
 extern uint8_t waitingForReception;
+int I2C_initialize(int address);
+void I2C_send(uint8_t* data, int I2C_handle);
 //FIN COMMUNICATION
 
 //FORKS - ACTUATORS
-void setArmDeployedAngle(int angle);
-void setForksDeployedAngle(int angle);
-void disableStepperMotor();
-void enableStepperMotor();
-void setLowerFork(int height);
-void setUpperFork(int height);
-void retractForks();
-void deployForks();
-void deployArm();
-void setWheelSpeed(int speed);
-void setGripperPosition(int position);
-void calibrateFork();
+int setArmDeployedAngle(int angle);
+int setForksDeployedAngle(int angle);
+int disableStepperMotor();
+int enableStepperMotor();
+int setLowerFork(int height);
+int setUpperFork(int height);
+int retractForks();
+int deployForks();
+int deployArm();
+int setWheelSpeed(int speed);
+int setGripperPosition(int position);
+int calibrateFork();
+int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag);
 //END ACTUATORS
 
 

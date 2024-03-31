@@ -5,11 +5,13 @@
 
 char empty[] = "";
 char* endMessage = "<stopped>";
+char confirmMessage[100] = "<Command received :";
 
 
 grabbingState myGrabState;
 actuationState myActuatorsState;
 uint8_t actuator_reception;
+int done = 0;
 
 void manageGrabbing(){
     char receivedData[255];
@@ -19,16 +21,16 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            calibrateFork();
+            done = calibrateFork();
+
             //sleep(5);
-            myActuatorsState = WAITING_ACTUATORS;
+            if(done) myActuatorsState = WAITING_ACTUATORS;
+            done = 0;
             break;
         
         case WAITING_ACTUATORS:
             if(!actuator_reception){
                 actuator_reception = UART_receive(UART_handle,receivedData);}
-                //printf("end message = %s \n",endMessage);}
-                //waitingForReception = 1;}
             if(receivedData == endMessage){
                 if(VERBOSE) printf("End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
@@ -42,9 +44,9 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            deployForks();
-            setLowerFork(65);
-            setUpperFork(0);
+            done = deployForks();
+            done = done && setLowerFork(65);
+            done = done && setUpperFork(0);
             myActuatorsState = WAITING_ACTUATORS;
             break;
         

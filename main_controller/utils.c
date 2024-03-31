@@ -68,6 +68,24 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 
 }
 
+int I2C_initialize(int address){
+
+    int bus = 1;
+    int I2C_handle = i2cOpen(bus,address,0);
+    if(I2C_handle){
+        fprintf(stderr,"");
+    }
+    return I2C_handle;
+}
+void I2C_send(uint8_t* data, int I2C_handle){
+    int err_code = i2cWriteDevice(I2C_handle,data,4);
+    if(err_code < 0){
+        fprintf(stderr,"error %d while sending I2C \n",err_code);}
+        char received[100];
+    int read_data = i2cReadDevice(I2C_handle,received,100);
+    fprintf(stderr,"read_data = %s \n",received);
+}
+
 int initializeUART(){
     //int send_PIN = 15;
     //int receive_PIN = 16;
@@ -80,7 +98,7 @@ int initializeUART(){
     }
     return UART_handle;
 }
-void UART_send(int UART_handle, char* data,char* received){
+void UART_send(int UART_handle, char* data){
 
     char tempoChar[100] = "";
     char tempoChar2[255] = "";
@@ -94,7 +112,7 @@ void UART_send(int UART_handle, char* data,char* received){
     }*/
     
     //if(VERBOSE) fprintf(stderr,"Size of received buffer : %d \n",strlen(received));
-    int bytesRead = 0;
+    /*int bytesRead = 0;
 
     while(1) {
         bytesRead = serRead(UART_handle, tempoChar, 255);
@@ -109,7 +127,7 @@ void UART_send(int UART_handle, char* data,char* received){
 
     }
     }
-    strcpy(received,tempoChar2);
+    strcpy(received,tempoChar2);*/
     //printf("received %s",tempoChar2);
     
     //Ici j'ai enlevé un sleep
@@ -130,8 +148,8 @@ uint8_t UART_receive(int UART_handle, char* received){
         //fprintf(stderr,"%d received bytes \n",bytesRead);
         //printf("Message received (uart send)= '%s'\n",received);
         //if(te[bytesRead -1]== "\0") waitingForReception = 0;
-        printf("received %s\n",received);
-        printf("bytesRead = %d lastchar = %c \n",bytesRead,(tempoChar[bytesRead-1]));
+        //printf("received '%s'\n",received);
+        //printf("bytesRead = %d lastchar = %c \n",bytesRead,(tempoChar[bytesRead-1]));
         if(tempoChar[bytesRead-1] == '>') return 1;
 
     }

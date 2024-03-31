@@ -18,11 +18,14 @@ uint8_t *SPI_reception_buffer_front;
 int spi_handle_front;
 int spi_handle_rear;
 
-
-
 int main(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
+    //char* myString = "test123";
+    //char myString[10] = {};
+    //char receivedChar[1000];
+    //UART_send(UART_handle,myString,receivedChar);
+    //printf("received char = '%s'",receivedChar);
     /*deployForks();
     sleep(1);
     setUpperFork(130);
@@ -38,9 +41,18 @@ int main(){
     }
 }
 
-int mainSPITEST(){ // spi test
+int mainI2C(){
     initializeMainController();
-    uint8_t myTab[4] = {255, 255, 1, 1};
+    int i2c_handle = I2C_initialize(0x5A);
+    uint8_t dataToSend[4] = {0x00,0x01,0x02,0x03};
+    I2C_send(dataToSend,i2c_handle);
+
+
+}
+
+int mainSPI(){ // spi test
+    initializeMainController();
+    uint8_t myTab[4] = {3};
     uint8_t receivedTab[4];
     SPI_send(myTab,spi_handle_rear,receivedTab);
     for(int i = 0; i<4; i++){
