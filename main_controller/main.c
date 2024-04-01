@@ -85,7 +85,7 @@ int main(){
     initializeMainController();
     *myPos.x = 0;
     *myPos.y = 0;
-    *myPos.theta = 0;
+    *myPos.theta = 32;
     *myOdometryPos.x = 0.72;
     *myOdometryPos.y = 1.23;
     while(1){
