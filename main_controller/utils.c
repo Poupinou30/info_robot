@@ -141,6 +141,10 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
 
     *omega = radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
+    measuredSpeedX = *v_x;
+    measuredSpeedY = *v_y;
+    measuredSpeedOmega = *omega;
+
 }
 
 

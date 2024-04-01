@@ -26,3 +26,7 @@ double motorSpeed_FR = 0;
 double motorSpeed_RL = 0;
 double motorSpeed_RR = 0;
 movingState myControllerState = STOPPED;
+
+double measuredSpeedX = 0;
+double measuredSpeedY = 0;
+double measuredSpeedOmega = 0;

@@ -133,11 +133,16 @@ int mainReal(){
             updateKalman(NULL);
 
             gettimeofday(&lastExecutionTime, NULL);
+            //ON EST ARRIVE A DESTINATION?
             if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.05){
                 myControllerState = STOPPED;
             }
             else{
                 myControllerState = MOVING;
+            }
+
+            if(measuredSpeedX < 0.1 && measuredSpeedY < 0.1 && measuredSpeedOmega < 0.1){
+                resetOdometry();
             }
         }
     }

@@ -173,5 +173,9 @@ extern double motorSpeed_FR;
 extern double motorSpeed_RL;
 extern double motorSpeed_RR;
 
+extern double measuredSpeedY;
+extern double measuredSpeedOmega;
+extern double measuredSpeedX;
+
 //STATES
 extern movingState myControllerState;
