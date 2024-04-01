@@ -91,6 +91,7 @@ int main(){
     while(1){
 
         updateKalman();
+        printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
     }
     
 }
