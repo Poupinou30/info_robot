@@ -42,7 +42,7 @@ int mainUART(){
     }
 }
 
-int mainPatternOdometry(){
+int mainPatternOdometryOld(){
     initializeMainController();
     struct timeval now, end, endInst;
     gettimeofday(&now, NULL);
@@ -90,7 +90,7 @@ int main(){
     *myOdometryPos.y = 1.23;
     while(1){
 
-        updateKalman();
+        updateKalman(NULL);
         printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
     }
     
