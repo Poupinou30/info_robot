@@ -4,7 +4,7 @@
 #endif
 
 // Déclaration initiale des variables globales
-double x[3] = {0, 0, 0}; // Vecteur d'état initial [x, y, theta]
+double x[3] = {1, 1.5, 0}; // Vecteur d'état initial [x, y, theta]
 double P[3][3] = {{0.01, 0, 0}, {0, 0.01, 0}, {0, 0, 0.01}}; // Covariance initiale de l'état
 
 // Matrices constantes pour le filtre de Kalman
