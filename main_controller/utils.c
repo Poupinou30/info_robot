@@ -316,7 +316,7 @@ void* receptionPipe(void* pipefdvoid){
             /*if(kalmanLaunched){
                 pthread_join(computeKalmanThread,NULL);
                 kalmanLaunched = 0;
-            }
+            }*/
             pthread_create(&computeKalmanThread,NULL,updateKalman,NULL);
             kalmanLaunched = 1;
             
