@@ -75,6 +75,9 @@ void extractBytes(uint16_t nombre, uint8_t *octet_haut, uint8_t *octet_bas) ;
 void tunePIDOLD(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t Kp_e,uint16_t Ki_m, int8_t Ki_e);
 void tunePID(float Ki, float Kp, int i2c_handle_front, int i2c_handle_rear);
 void* receptionPipe(void* pipefdvoid);
+
+
+//POTENTIAL FIELD
 float computeEuclidianDistance(double x1, double y1, double x2, double y2);
 float computeRectangleDistance(double x1, double y1, double x2, double y2, double x3, double y3);
 void computeAttractiveField(position destination);
@@ -95,7 +98,9 @@ void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t mo
 void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed);
 void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2);
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
+void initializeObstacles();
 void initializeMainController();
+typedef enum{MOVING,STOPPED} movingState;
 
 int initializeUART();
 void resetOdometry();
@@ -168,3 +173,5 @@ extern double motorSpeed_FR;
 extern double motorSpeed_RL;
 extern double motorSpeed_RR;
 
+//STATES
+extern movingState myControllerState;

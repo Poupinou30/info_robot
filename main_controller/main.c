@@ -81,6 +81,78 @@ int mainPatternOdometryOld(){
 
 }
 
+int mainReal(){
+
+    //initialisation
+
+    initializeMainController();
+    pthread_mutex_lock(&lockDestination);
+    *destination.x = 1.00;
+    *destination.y = 2.00;
+    *destination.theta = 18;
+    destination_set = 0;
+    pthread_mutex_unlock(&lockDestination);
+    *myPos.x = 0;
+    *myPos.y = 0;
+    *myPos.theta = 0;
+    double speedTabRobotFrame[3] = {0,0,0};
+
+
+    int pipefd[2];
+    pipe(pipefd);
+    pthread_t lidarExecuteThread;
+    
+    //Lancer la localisation lidar
+    pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipefd[1]); // Passage de l'adresse de pipefd[1] à pthread_create
+    fprintf(stderr,"Thread for execution launched \n");
+
+    //initialisation thread qui récupère les données du pipe provenant du programme lidar
+    pthread_t pipeComThread;
+    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
+    fprintf(stderr,"Thread for capture launched \n");
+    //Wait for the lidar to be ready
+    while(readyToGo != 1){
+        fprintf(stderr,"waiting for position acquisition \n");
+        sleep(1);
+    }
+    fprintf(stderr,"Position acquired \n");
+
+    struct timeval lastExecutionTime, currentTime;
+    gettimeofday(&lastExecutionTime, NULL);
+
+    while (1)
+    {
+        gettimeofday(&currentTime, NULL);
+        double elapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
+        elapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
+
+        if (elapsedTime >= 10)
+        {
+            myPotentialFieldController();
+            myOdometry();
+            updateKalman(NULL);
+
+            gettimeofday(&lastExecutionTime, NULL);
+            if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.05){
+                myControllerState = STOPPED;
+            }
+            else{
+                myControllerState = MOVING;
+            }
+        }
+    }
+
+
+
+
+    //DANS UNE LOOP---------------
+        //Lancer le controle en vitesse (envoyer des 0)
+
+        //Lancer le path planning
+        //KALMAN
+    
+}
+
 int main(){
     initializeMainController();
     *myPos.x = 0;
@@ -256,11 +328,13 @@ int mainPATTERN(){
 void initializeMainController(){
     //Initialisation GPIO et interfaces
     gpioInitialise();
+    initializeObstacles();
     spi_handle_front = initializeSPI(0);
     spi_handle_rear = initializeSPI(1);
     UART_handle = initializeUART();
     i2c_handle_front = I2C_initialize(0x40);
     i2c_handle_rear = I2C_initialize(0x41);
+
 
     //Initialisation variables
     positionReceived = malloc(3*sizeof(float));

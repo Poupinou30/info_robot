@@ -351,8 +351,22 @@ void computeForceVector(){
 }
 
 void myPotentialFieldController(){
+    if(myControllerState == MOVING){
     double outputSpeed[3];
     computeForceVector();
     convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
     processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
+    }
+    else{
+        processInstructionNew(0,0,0,0,i2c_handle_front,i2c_handle_rear);
+    }
+}
+
+void initializeObstacles(){
+    addRectangleObstacle(0,0,2,0,0); //Mur du bas
+    addRectangleObstacle(0,0,0,3,0); //Mur de gauche
+    addRectangleObstacle(2,0,2,3,0); //Mur de droite
+    addRectangleObstacle(0,3,2,3,0); //Mur du haut
+    addRectangleObstacle(0,1.05,0.145,3-1.05,0); //jardinières gauche
+    addRectangleObstacle(2,1.05,2-0.145,3-1.05,0); //jardinières droite
 }

@@ -309,14 +309,14 @@ void* receptionPipe(void* pipefdvoid){
             readyToGo = 1;
             pthread_mutex_unlock(&lockRefreshCounter);
             
-            if(kalmanLaunched){
+            /*if(kalmanLaunched){
                 pthread_join(computeKalmanThread,NULL);
                 kalmanLaunched = 0;
             }
             pthread_create(&computeKalmanThread,NULL,updateKalman,NULL);
             kalmanLaunched = 1;
             
-            }
+            }*/
             
             /*
             if(VERBOSE){

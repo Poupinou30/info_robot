@@ -25,4 +25,4 @@ double motorSpeed_FL = 0;
 double motorSpeed_FR = 0;
 double motorSpeed_RL = 0;
 double motorSpeed_RR = 0;
-
+movingState myControllerState = STOPPED;
