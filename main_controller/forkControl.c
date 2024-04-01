@@ -37,6 +37,7 @@ int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag)
     sprintf(expectedData, "<Command received : %s>", withoutCrochet);
     printf("expected data = %s and buffer = %s \n",expectedData, buffer);
     if (strcmp(expectedData, buffer) == 0) {
+        printf("buffer erased\n");
         buffer[0] = '\0'; // Erase the buffer
         *commandReceivedFlag = 1;
         return 1;

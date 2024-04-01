@@ -14,6 +14,7 @@ uint8_t actuator_reception;
 int done = 0;
 
 void manageGrabbing(){
+    //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     char receivedData[255];
     switch (myGrabState)
     {
@@ -29,10 +30,14 @@ void manageGrabbing(){
             break;
         
         case WAITING_ACTUATORS:
+            //fprintf(stderr,"actuators reception = %d\n",actuator_reception);
+            //fprintf(stderr,"received message = %s \n",receivedData);
             if(!actuator_reception){
+                //printf("dans if actuator reception\n");
                 actuator_reception = UART_receive(UART_handle,receivedData);}
-            if(receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+            if(strlen(receivedData) != 0) fprintf(stderr,"condition = %d and string1 = %s and string 2 = %s \n", (strcmp(receivedData,endMessage) == 0),receivedData,endMessage);
+            if(strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_PLANTS_INIT;
                 
@@ -51,11 +56,10 @@ void manageGrabbing(){
             break;
         
         case WAITING_ACTUATORS:
-            if(!waitingForReception){
-                actuator_reception = UART_receive(UART_handle,receivedData);
-                waitingForReception = 1;}
-            if(actuator_reception && receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_PLANTS_MOVE;
                 
@@ -79,11 +83,14 @@ void manageGrabbing(){
             break;
         
         case WAITING_ACTUATORS:
-            if(!waitingForReception){
+         
+            if(!actuator_reception){
+               
                 actuator_reception = UART_receive(UART_handle,receivedData);
-                waitingForReception = 1;}
-            if(actuator_reception && receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+                }
+            //else printf("actuators_reception = %d\n",actuator_reception);
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = UNSTACK_POTS_MOVE;
                 
@@ -109,11 +116,10 @@ void manageGrabbing(){
             break;
 
         case WAITING_ACTUATORS:
-            if(!waitingForReception){
-                actuator_reception = UART_receive(UART_handle,receivedData);
-                waitingForReception = 1;}
-            if(actuator_reception && receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = UNSTACK_POT_POSITIONING;
                 
@@ -137,11 +143,10 @@ void manageGrabbing(){
             break;
 
         case WAITING_ACTUATORS:
-            if(!waitingForReception){
-                actuator_reception = UART_receive(UART_handle,receivedData);
-                waitingForReception = 1;}
-            if(actuator_reception && receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_POTS_MOVE;
                 
@@ -164,11 +169,10 @@ void manageGrabbing(){
             break;
 
         case WAITING_ACTUATORS:
-            if(!waitingForReception){
-                actuator_reception = UART_receive(UART_handle,receivedData);
-                waitingForReception = 1;}
-            if(actuator_reception && receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = DROP_PLANTS;
                 
@@ -185,11 +189,10 @@ void manageGrabbing(){
             break;
         
         case WAITING_ACTUATORS:
-            if(!waitingForReception){
-                actuator_reception = UART_receive(UART_handle,receivedData);
-                waitingForReception = 1;}
-            if(actuator_reception && receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = DROP_ALL;
                 
@@ -209,11 +212,10 @@ void manageGrabbing(){
             break;
 
         case WAITING_ACTUATORS:
-            if(!waitingForReception){
-                actuator_reception = UART_receive(UART_handle,receivedData);
-                waitingForReception = 1;}
-            if(actuator_reception && receivedData == endMessage){
-                if(VERBOSE) printf("End message received from actuator\n");
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = FINISHED;
                 

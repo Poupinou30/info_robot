@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-double radius = 0.029;
+double radius = 0.03134;
 double l_y = 0.175;
 double l_x = 0.21;
 
@@ -50,13 +50,13 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
         omega = (omega > 0 ? omega_max : -omega_max);
     }*/
 
-    double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
+    /*double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
     double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
     double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
     double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
-    printf("Omega fl = %f omega_fr = %f omega_rl = %f omega_rr = %f \n",omega_fl,omega_fr,omega_rl,omega_rr);
+    */
 
-    /*double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
+    double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
     double omega_fr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //front right
     double omega_rl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //rear left
     double omega_rr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //rear right*/
@@ -65,6 +65,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     output_speed[1] = omega_fr;
     output_speed[2] = omega_rl;
     output_speed[3] = omega_rr;
+    //if(VERBOSE) printf("Omega fl = %f omega_fr = %f omega_rl = %f omega_rr = %f \n",omega_fl,omega_fr,omega_rl,omega_rr);
 
 }
 
@@ -110,6 +111,7 @@ void UART_send(int UART_handle, char* data){
 }
 
 uint8_t UART_receive(int UART_handle, char* received){
+    //printf("dans uart receive\n");
     char tempoChar[100] = "";
     char tempoChar2[255] = "";
     
@@ -119,7 +121,7 @@ uint8_t UART_receive(int UART_handle, char* received){
         bytesRead = serRead(UART_handle, tempoChar, 255);
         if (bytesRead > 0) {
         strcat(received,tempoChar);
-        //fprintf(stderr,"%d received bytes \n",bytesRead);
+        fprintf(stderr,"%d received bytes \n",bytesRead);
         //printf("Message received (uart send)= '%s'\n",received);
         //if(te[bytesRead -1]== "\0") waitingForReception = 0;
         //printf("received '%s'\n",received);
@@ -127,16 +129,21 @@ uint8_t UART_receive(int UART_handle, char* received){
         if(tempoChar[bytesRead-1] == '>') return 1;
 
     }
+    //printf("received: '%s' \n",received);
     
     
     return 0;}
 
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
-    
-    *v_x = radius / 4 * (wheel_speeds[0] - wheel_speeds[1] + wheel_speeds[2] - wheel_speeds[3]);
+    *v_x = radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+
     *v_y = radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
+
     *omega = radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+
 }
+
+
 
 double randomDouble(double min, double max) {
     double range = (max - min); 

@@ -99,7 +99,7 @@ void initializeMainController();
 
 int initializeUART();
 void resetOdometry();
-void myOdometry(uint8_t* buffer_rear, uint8_t* buffer_front);
+void myOdometry();
 
 //UART ET SPI et I2C
 void UART_send(int UART_handle, char* data);

@@ -42,16 +42,88 @@ int mainUART(){
     }
 }
 
+int mainPatternOdometry(){
+    initializeMainController();
+    struct timeval now, end, endInst;
+    gettimeofday(&now, NULL);
+    gettimeofday(&end,NULL);
+    gettimeofday(&endInst,NULL);
+    double nowValue = now.tv_sec*1000+now.tv_usec/1000;
+    double endValue = end.tv_sec*1000+end.tv_usec/1000;
+    double instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
+
+    while(1){
+        
+
+        gettimeofday(&now, NULL);
+        double currentTime = now.tv_sec*1000+now.tv_usec/1000;
+        if (currentTime - nowValue >= 3000) {
+            break;
+        }
+
+        gettimeofday(&endInst,NULL);
+        double elapsedTime = endInst.tv_sec*1000+endInst.tv_usec/1000 - instValue;
+        if (elapsedTime >= 500) {
+
+            processInstructionNew(-0.0,0.0,1,i2c_handle_front,i2c_handle_rear);
+            printf("speed fl = %f and speed fr = %f and speed rl = %f and speed rr = %f \n",motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR);
+            double wheelSpeed[4] = {motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR};
+            double vx,vy,omega;
+            computeSpeedFromOdometry(wheelSpeed,&vx,&vy,&omega);
+            printf("vx = %f vy = %f omega = %f \n",vx,vy,omega);
+
+            instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
+        }
+    }
+    processInstructionNew(0.0,0.0,0,i2c_handle_front,i2c_handle_rear);
+
+
+
+}
+
 int main(){
     initializeMainController();
-    processInstructionNew(0.2,0.2,0,i2c_handle_front,i2c_handle_rear);
-    /*int i2c_handle = I2C_initialize(0x5A);
-    uint8_t dataToSend[4] = {0x00,0x01,0x02,0x03};
-    char receive[100];
-    I2C_send(dataToSend,receive,i2c_handle);*/
+    struct timeval now, end, endInst, endSecond;
+    gettimeofday(&now, NULL);
+    gettimeofday(&end,NULL);
+    gettimeofday(&endInst,NULL);
+    gettimeofday(&endSecond,NULL);
+    double nowValue = now.tv_sec*1000+now.tv_usec/1000;
+    double endValue = end.tv_sec*1000+end.tv_usec/1000;
+    double instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
+    double secondValue = endSecond.tv_sec*1000+endSecond.tv_usec/1000;
+    double vx,vy,omega;
+    while(1){
+        gettimeofday(&now, NULL);
+        double currentTime = now.tv_sec*1000+now.tv_usec/1000;
+        if (currentTime - nowValue >= 100000) {
+            break;
+        }
 
+        gettimeofday(&endInst,NULL);
+        double elapsedTime = endInst.tv_sec*1000+endInst.tv_usec/1000 - instValue;
+        if (elapsedTime >= 10) {
+            processInstructionNew(0.2,0.2,0,i2c_handle_front,i2c_handle_rear);
+            double wheelSpeed[4] = {motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR};
+            
+            computeSpeedFromOdometry(wheelSpeed,&vx,&vy,&omega);
+            
+            myOdometry();
+            if(*myOdometryPos.x > 1 || *myOdometryPos.y > 1) break;
+            instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
+        }
 
-
+        gettimeofday(&endSecond,NULL);
+        double secondElapsedTime = endSecond.tv_sec*1000+endSecond.tv_usec/1000 - secondValue;
+        if (secondElapsedTime >= 1000) {
+            printf("vx = %f vy = %f omega = %f \n",vx,vy,omega);
+            printf("pos x = %f, pos y = %f, pos theta = %f",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
+            printf("Executing code every second\n");
+            secondValue = endSecond.tv_sec*1000+endSecond.tv_usec/1000;
+        }
+    }
+    processInstructionNew(0.0,0.0,0,i2c_handle_front,i2c_handle_rear);
+     printf("pos x = %f, pos y = %f, pos theta = %f",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
 }
 
 int mainSPI(){ // spi test
@@ -184,6 +256,9 @@ void initializeMainController(){
     myFilteredPos.x = (float*)malloc(sizeof(float));
     myFilteredPos.y = (float*)malloc(sizeof(float));
     myFilteredPos.theta = (float*)malloc(sizeof(float));
+    *myFilteredPos.x = 0;
+    *myFilteredPos.y = 0;
+    *myFilteredPos.theta = 0;
     myPos.theta = (float*)malloc(sizeof(float));
     myPos.x = &positionReceived[0];
     myPos.y = &positionReceived[1];
@@ -404,12 +479,15 @@ void processInstructionNew(float v_x, float v_y, float omega, int i2c_handle_fro
     I2C_send(toSendFront,toReceiveFront,i2c_handle_front);
     I2C_send(toSendRear,toReceiveRear,i2c_handle_rear);
     int tempoSpeedFL, tempoSpeedFR, tempoSpeedRL, tempoSpeedRR;
-    printf("received 1 = %s and 2 = %s", toReceiveFront,toReceiveRear);
+    //if(VERBOSE) printf("received 1 = '%s' and 2 = '%s'", toReceiveFront,toReceiveRear);
     sscanf(toReceiveFront, "<measuredSpeed-%d-%d>", &tempoSpeedFL, &tempoSpeedFR);
     sscanf(toReceiveRear, "<measuredSpeed-%d-%d>", &tempoSpeedRL, &tempoSpeedRR);
-    motorSpeed_FL = tempoSpeedFL/114688 * 2*_Pi;
-    motorSpeed_FR = tempoSpeedFR/114688 * 2*_Pi;
-    motorSpeed_RL = tempoSpeedRL/114688 * 2*_Pi;
-    motorSpeed_RR = tempoSpeedRR/114688 * 2*_Pi;
+    /*if(VERBOSE){
+        printf("tempoSpeedFL = %d FR = %d RL = %d RR = %d \n",tempoSpeedFL,tempoSpeedFR,tempoSpeedRL,tempoSpeedRR);
+    }*/
+    motorSpeed_FL = (double) tempoSpeedFL/114688.0 * 2*_Pi;
+    motorSpeed_FR = (double) tempoSpeedFR/114688.0 * 2*_Pi;
+    motorSpeed_RL = (double) tempoSpeedRL/114688.0 * 2*_Pi;
+    motorSpeed_RR = (double) tempoSpeedRR/114688.0 * 2*_Pi;
 
 }
