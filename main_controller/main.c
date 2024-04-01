@@ -94,7 +94,7 @@ int main(){
         printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
         printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
         printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
-        sleep(0.5);
+        sleep(1);
     }
     
 }
