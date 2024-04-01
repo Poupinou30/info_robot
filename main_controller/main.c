@@ -88,6 +88,7 @@ int main(){
     *myPos.theta = 32;
     *myOdometryPos.x = 0.72;
     *myOdometryPos.y = 1.23;
+    *myOdometryPos.theta = 29;
     while(1){
 
         updateKalman(NULL);
