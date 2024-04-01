@@ -83,6 +83,20 @@ int mainPatternOdometry(){
 
 int main(){
     initializeMainController();
+    *myPos.x = 0;
+    *myPos.y = 0;
+    *myPos.theta = 0;
+    *myOdometryPos.x = 0.72;
+    *myOdometryPos.y = 1.23;
+    while(1){
+
+        updateKalman();
+    }
+    
+}
+
+int mainPatternOdometry(){
+    initializeMainController();
     struct timeval now, end, endInst, endSecond;
     gettimeofday(&now, NULL);
     gettimeofday(&end,NULL);

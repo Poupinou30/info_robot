@@ -20,7 +20,7 @@ void* updateKalman(void* args) {
     pthread_mutex_unlock(&lockPosition);
 
     // Obtention des mesures du deuxième capteur (à remplacer par les vraies valeurs)
-    double secondSensorMeasurement[3] = {0, 0, 0}; // Remplacez par les vraies valeurs
+    double secondSensorMeasurement[3] = {*myOdometryPos.x, *myOdometryPos.y, *myOdometryPos.theta}; // Remplacez par les vraies valeurs
 
     // Combinaison des mesures des deux capteurs
     double measurementsCombined[6] = {measurements[0], measurements[1], measurements[2], 
