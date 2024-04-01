@@ -358,7 +358,7 @@ void myPotentialFieldController(){
     processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
     }
     else{
-        processInstructionNew(0,0,0,0,i2c_handle_front,i2c_handle_rear);
+        processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
     }
 }
 
