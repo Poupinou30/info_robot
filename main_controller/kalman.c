@@ -42,25 +42,18 @@ void* updateKalman(void* args) {
     }
 
     // Étape de mise à jour
-    double K[3][6];
-    for (int i = 0; i < 6; i++) {
-        double y = measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]); // Innovation
-        double S = H[i][0] * P_pred[0][0] * H[i][0] + H[i][1] * P_pred[1][1] * H[i][1] + H[i][2] * P_pred[2][2] * H[i][2] + R[i]; // Covariance de l'innovation
-        for (int j = 0; j < 3; j++) {
-            K[j][i] = P_pred[j][0] * H[i][0] / S; // Gain de Kalman
-        }
-    }
     for (int j = 0; j < 3; j++) {
-        x[j] = x_pred[j];
+        double innovationSum = 0;
+        double covarianceSum = 0;
         for (int i = 0; i < 6; i++) {
-            x[j] += K[j][i] * (measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2])); // Mise à jour de l'état
+            double y = measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]); // Innovation
+            double S = H[i][0] * P_pred[0][0] * H[i][0] + H[i][1] * P_pred[1][1] * H[i][1] + H[i][2] * P_pred[2][2] * H[i][2] + R[i]; // Covariance de l'innovation
+            double K = P_pred[j][j] * H[i][j] / S; // Gain de Kalman
+            innovationSum += K * y;
+            covarianceSum += K * H[i][j] * P_pred[j][j];
         }
-        for (int k = 0; k < 3; k++) {
-            P[j][k] = P_pred[j][k];
-            for (int i = 0; i < 6; i++) {
-                P[j][k] -= K[j][i] * H[i][k] * P_pred[j][k]; // Mise à jour de la covariance de l'état
-            }
-        }
+        x[j] = x_pred[j] + innovationSum; // Mise à jour de l'état
+        P[j][j] = P_pred[j][j] - covarianceSum; // Mise à jour de la covariance de l'état
     }
 
     pthread_mutex_lock(&lockFilteredPosition);
