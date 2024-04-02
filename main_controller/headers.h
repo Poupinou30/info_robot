@@ -178,6 +178,8 @@ extern double measuredSpeedOmega;
 extern double measuredSpeedX;
 struct timeval lidarAcquisitionTime;
 pthread_t lidarTimeLock;
+bool lidarAcquisitionFlag;
+pthread_mutex_t lidarFlagLock;
 
 //STATES
 extern movingState myControllerState;

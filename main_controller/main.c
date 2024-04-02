@@ -152,9 +152,17 @@ int main(){
             pthread_mutex_unlock(&lidarTimeLock);
             printf("conditions = %d %d %d %d \n",measuredSpeedX < 0.03 , measuredSpeedY < 0.03 , measuredSpeedOmega < 0.1 , lidarElapsedTime < 200);
             printf("time elapsed = %lf \n",lidarElapsedTime);
+
+            pthread_mutex_lock(&lockLidarAcquisitionFlag);
             if(measuredSpeedX < 0.03 && measuredSpeedY < 0.03 && measuredSpeedOmega < 0.1 && lidarElapsedTime < 200){
                 resetOdometry();
+                lidarAcquisitionFlag = 1;
             }
+            else{
+                lidarAcquisitionFlag = 0;
+            }
+            pthread_mutex_unlock(&lockLidarAcquisitionFlag);
+
         }
     }
 

@@ -24,9 +24,18 @@ void* updateKalman(void* args) {
     double secondSensorMeasurement[3] = {*myOdometryPos.x, *myOdometryPos.y, *myOdometryPos.theta}; // Remplacez par les vraies valeurs
 
     // Combinaison des mesures des deux capteurs
-    double measurementsCombined[6] = {measurements[0], measurements[1], measurements[2], 
+    pthread_mutex_lock(&lockLidarAcquisitionFlag);
+    if(lidarAcquisitionFlag){
+        double measurementsCombined[6] = {measurements[0], measurements[1], measurements[2], 
                                       secondSensorMeasurement[0], secondSensorMeasurement[1], secondSensorMeasurement[2]};
 
+    }
+    else{
+        double measurementsCombined[6] = {secondSensorMeasurement[0], secondSensorMeasurement[1], secondSensorMeasurement[2], 
+                                      secondSensorMeasurement[0], secondSensorMeasurement[1], secondSensorMeasurement[2]};
+    }
+    pthread_mutex_unlock(&lockLidarAcquisitionFlag);
+    
     // Étape de prédiction
     double x_pred[3];
     double P_pred[3][3];
