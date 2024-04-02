@@ -346,7 +346,7 @@ void computeForceVector(){
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
     f_theta = f_att_theta;
-    fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
+    //fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
     //Calcul de la force de attraction totale
 }
 

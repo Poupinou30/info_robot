@@ -38,7 +38,8 @@ void myOdometry(){
 
 
 void resetOdometry(){
-    myOdometryPos.x = myFilteredPos.x;
-    myOdometryPos.y = myFilteredPos.y;
-    myOdometryPos.theta = myFilteredPos.theta;
+    printf("odometry resetted \n");
+    *myOdometryPos.x = *myFilteredPos.x;
+    *myOdometryPos.y = *myFilteredPos.y;
+    *myOdometryPos.theta = *myFilteredPos.theta;
 }

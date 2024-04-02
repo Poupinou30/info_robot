@@ -299,6 +299,11 @@ void* receptionPipe(void* pipefdvoid){
             //first = 0;
             pthread_mutex_lock(&lockPosition);
             pthread_mutex_lock(&lockOpponentPosition);
+            if(*myPos.x != buffer[0] && *myPos.y != buffer[1] && *myPos.theta != buffer[2]){
+                pthread_mutex_lock(&lidarTimeLock);
+                gettimeofday(&lidarAcquisitionTime,NULL);
+                pthread_mutex_unlock(&lidarTimeLock);
+            }
             *myPos.x = buffer[0];
             *myPos.y = buffer[1];
             *myPos.theta = buffer[2];
@@ -309,8 +314,10 @@ void* receptionPipe(void* pipefdvoid){
             
             
             pthread_mutex_lock(&lockRefreshCounter);
+            
             refreshCounter ++;
             readyToGo = 1;
+
             pthread_mutex_unlock(&lockRefreshCounter);
             
             /*if(kalmanLaunched){

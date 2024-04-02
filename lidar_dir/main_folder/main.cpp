@@ -20,7 +20,7 @@ beaconAbsolutePos beaconRefPosition[3];
 lidarPos calibPos;
 
 
-float perimetre = 8.5;
+float perimetre = 8.4;
 float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;

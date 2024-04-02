@@ -81,7 +81,8 @@ int mainPatternOdometryOld(){
 
 }
 
-int mainReal(){
+int main(){
+
 
     //initialisation
 
@@ -131,6 +132,11 @@ int mainReal(){
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
+            if(VERBOSE){
+                printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
+                printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
+                printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
+            }
 
             gettimeofday(&lastExecutionTime, NULL);
             //ON EST ARRIVE A DESTINATION?
@@ -140,8 +146,13 @@ int mainReal(){
             else{
                 myControllerState = MOVING;
             }
-
-            if(measuredSpeedX < 0.1 && measuredSpeedY < 0.1 && measuredSpeedOmega < 0.1){
+            pthread_mutex_lock(&lidarTimeLock);
+            double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
+            lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
+            pthread_mutex_unlock(&lidarTimeLock);
+            printf("conditions = %d %d %d %d \n",measuredSpeedX < 0.03 , measuredSpeedY < 0.03 , measuredSpeedOmega < 0.1 , lidarElapsedTime < 200);
+            printf("time elapsed = %lf \n",lidarElapsedTime);
+            if(measuredSpeedX < 0.03 && measuredSpeedY < 0.03 && measuredSpeedOmega < 0.1 && lidarElapsedTime < 200){
                 resetOdometry();
             }
         }
@@ -158,7 +169,7 @@ int mainReal(){
     
 }
 
-int main(){
+int mainTestKalman(){
     initializeMainController();
     *myPos.x = 0;
     *myPos.y = 0;

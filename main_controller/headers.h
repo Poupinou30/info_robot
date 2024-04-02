@@ -176,6 +176,8 @@ extern double motorSpeed_RR;
 extern double measuredSpeedY;
 extern double measuredSpeedOmega;
 extern double measuredSpeedX;
+struct timeval lidarAcquisitionTime;
+pthread_t lidarTimeLock;
 
 //STATES
 extern movingState myControllerState;

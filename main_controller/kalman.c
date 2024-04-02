@@ -12,7 +12,7 @@ double F[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice de transition d'�
 double H[6][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice d'observation
 
 double Q[3][3] = {{0.005, 0, 0}, {0, 0.005, 0}, {0, 0, 0.01}}; // Bruit de processus
-double R[6] = {0.4, 0.4, 0.01, 0.4, 0.4, 0.01}; // Bruit de mesure pour chaque variable d'état
+double R[6] = {1, 1, 0.01, 0.4, 0.4, 0.01}; // Bruit de mesure pour chaque variable d'état
 
 // Fonction de mise à jour du filtre de Kalman
 void* updateKalman(void* args) {
