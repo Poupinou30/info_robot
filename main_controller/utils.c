@@ -143,7 +143,7 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
 
     measuredSpeedX = *v_x;
     measuredSpeedY = *v_y;
-    measuredSpeedOmega = *omega;
+    measuredSpeedOmega = *omega * 180 / M_PI;
 
 }
 
