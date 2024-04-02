@@ -269,8 +269,8 @@ void printObstacleLists(){
 }
 
 void computeForceVector(){
-    float k_att_xy = 0.5;
-    float k_att_theta = -1;
+    float k_att_xy = 0.2;
+    float k_att_theta = 0;
     float k_repul = -0.005;
     pthread_mutex_lock(&lockDestination);
     double f_att_x = -destination_set*k_att_xy * (*myPos.x- *destination.x);
@@ -351,13 +351,15 @@ void computeForceVector(){
 }
 
 void myPotentialFieldController(){
-    if(myControllerState == MOVING){
+    if(myControllerState == MOVING && destination_set == 1){
     double outputSpeed[3];
     computeForceVector();
     convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+    printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
     processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
     }
     else{
+        computeForceVector();
         processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
     }
 }

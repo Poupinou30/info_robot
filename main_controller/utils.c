@@ -33,6 +33,7 @@ double degToRad(double deg) {
 }
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
+    omega = omega/112.5;
     // Calculate the magnitude of the velocity vector
     double v_magnitude = sqrt(pow(v_x, 2) + pow(v_y, 2));
     
@@ -139,7 +140,7 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
 
     *v_y = radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
 
-    *omega = radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+    *omega = 112.5*radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
     measuredSpeedX = *v_x;
     measuredSpeedY = *v_y;
@@ -233,6 +234,8 @@ void handle_sigsegv(int sig) {
 }
 
 void handle_sigint(int sig) {
+    processInstructionNew(0.0,0,0,i2c_handle_front,i2c_handle_rear);
+    gpioTerminate();
     fprintf(stderr,"SIGINT handled \n");
     if (child_pid > 0) {
         killpg(getpgid(child_pid), SIGINT);
@@ -345,8 +348,8 @@ void* receptionPipe(void* pipefdvoid){
 
 void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed){
     double theta = *myFilteredPos.theta;
-    double cos_theta = cos(theta);
-    double sin_theta = sin(theta);
+    double cos_theta = cos(theta* _Pi / 180);
+    double sin_theta = sin(theta*_Pi / 180);
 
     double v_x_robot = v_x * cos_theta + v_y * sin_theta;
     double v_y_robot = -v_x * sin_theta + v_y * cos_theta;

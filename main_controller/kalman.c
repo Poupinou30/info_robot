@@ -12,29 +12,37 @@ double F[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice de transition d'�
 double H[6][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice d'observation
 
 double Q[3][3] = {{0.005, 0, 0}, {0, 0.005, 0}, {0, 0, 0.01}}; // Bruit de processus
-double R[6] = {1, 1, 0.01, 0.4, 0.4, 0.01}; // Bruit de mesure pour chaque variable d'état
+double R[6] = {1, 1, 0.01, 0.4, 0.4, 0.1}; // Bruit de mesure pour chaque variable d'état
 
 // Fonction de mise à jour du filtre de Kalman
 void* updateKalman(void* args) {
     pthread_mutex_lock(&lockPosition);
     double measurements[3] = {*(myPos.x), *(myPos.y), *(myPos.theta)}; // Obtention des mesures
     pthread_mutex_unlock(&lockPosition);
+    double measurementsCombined[6];
 
     // Obtention des mesures du deuxième capteur (à remplacer par les vraies valeurs)
     double secondSensorMeasurement[3] = {*myOdometryPos.x, *myOdometryPos.y, *myOdometryPos.theta}; // Remplacez par les vraies valeurs
 
     // Combinaison des mesures des deux capteurs
-    pthread_mutex_lock(&lockLidarAcquisitionFlag);
+    pthread_mutex_lock(&lidarFlagLock);
     if(lidarAcquisitionFlag){
-        double measurementsCombined[6] = {measurements[0], measurements[1], measurements[2], 
-                                      secondSensorMeasurement[0], secondSensorMeasurement[1], secondSensorMeasurement[2]};
-
-    }
-    else{
-        double measurementsCombined[6] = {secondSensorMeasurement[0], secondSensorMeasurement[1], secondSensorMeasurement[2], 
-                                      secondSensorMeasurement[0], secondSensorMeasurement[1], secondSensorMeasurement[2]};
-    }
-    pthread_mutex_unlock(&lockLidarAcquisitionFlag);
+    measurementsCombined[0] = measurements[0];
+    measurementsCombined[1] = measurements[1];
+    measurementsCombined[2] = measurements[2];
+    measurementsCombined[3] = secondSensorMeasurement[0];
+    measurementsCombined[4] = secondSensorMeasurement[1];
+    measurementsCombined[5] = secondSensorMeasurement[2];
+}
+else{
+    measurementsCombined[0] = secondSensorMeasurement[0];
+    measurementsCombined[1] = secondSensorMeasurement[1];
+    measurementsCombined[2] = secondSensorMeasurement[2];
+    measurementsCombined[3] = secondSensorMeasurement[0];
+    measurementsCombined[4] = secondSensorMeasurement[1];
+    measurementsCombined[5] = secondSensorMeasurement[2];
+}
+    pthread_mutex_unlock(&lidarFlagLock);
     
     // Étape de prédiction
     double x_pred[3];
