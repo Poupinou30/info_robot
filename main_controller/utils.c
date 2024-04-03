@@ -354,3 +354,19 @@ void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* out
     output_speed[2] = omega;
 
 }
+
+void generateLog(){
+    FILE *logFile;
+    int variable = 0;
+
+    fichier = fopen("logPosition.txt", "w");
+    if (fichier == NULL) {
+        printf("Erreur lors de l'ouverture du fichier\n");
+        return 1;
+    }
+    fprintf(fichier, "lidarPos ; odometryPos ; filteredPos\n");
+}
+
+void writeLog(){
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
+}

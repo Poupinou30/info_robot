@@ -16,6 +16,8 @@
 #endif //MAIN_CONTROLLER_HEADERS_H
 #define VERBOSE 1
 #define timeDelay 100 //ms
+#define makeLog 1
+
 
 
 extern float* positionReceived;
@@ -188,3 +190,8 @@ extern movingState myControllerState;
 void handle_sigint(int sig);
 
 extern double totalTime;
+extern FILE* logFile;
+
+//LOG AND OTHERS
+void generateLog();
+void writeLog();
