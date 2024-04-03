@@ -216,13 +216,14 @@ void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t mo
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
         myForce.obstacleList[0] = myObstacle;
         myForce.obstacleNumber ++;
-        fprintf(stderr,"Obstacle added, size of list was 0 and is 1 now\n");
+        fprintf(stderr,"Obstacle added, size of list was 0 and is %d now\n", myForce.obstacleNumber);
     }
     else{
         //fprintf(stderr,"Realloc problem 1 with obstacle number = %d \n",myForce.obstacleNumber);
         myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber+1));
         myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
         myForce.obstacleNumber ++;
+        fprintf(stderr,"Obstacle added, size of list was %d and is %d now\n",myForce.obstacleNumber-1, myForce.obstacleNumber);
     }
     if(moving){
         if(myForce.movingNumber == 0){
@@ -239,9 +240,11 @@ void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t mo
 
 
     }
+    fprintf(stderr,"Obstacle added, at the end, size of list is %d now\n", myForce.obstacleNumber);
 }
 
 void removeMovingObstacles(){
+    printf("remove moving obstacles \n");
     int j = 0;
     while (j < myForce.movingNumber) {
         for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
@@ -255,13 +258,15 @@ void removeMovingObstacles(){
     }
     myForce.movingNumber = 0;
     myForce.obstacleList = realloc(myForce.obstacleList, sizeof(obstacle)*myForce.obstacleNumber);
+    fprintf(stderr,"Obstacle removed, size of list is %d now\n", myForce.obstacleNumber);
 }
 
 
 void printObstacleLists(){
     fprintf(stderr,"There are %d obstacles in the list\n",myForce.obstacleNumber);
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
-        fprintf(stderr,"Obstacle %d is at x = %lf, y = %lf and has size of %lf and has moving to %d\n",i,myForce.obstacleList[i].posX,myForce.obstacleList[i].posY,myForce.obstacleList[i].size,myForce.obstacleList[i].moving);
+        if(myForce.obstacleList[i].isRectangle) fprintf(stderr,"Obstacle %d is at x1 = %lf, y1 = %lf x2 = %lf y2 = %lf and has size of %lf and has moving to %d\n",i,myForce.obstacleList[i].x1,myForce.obstacleList[i].x2,myForce.obstacleList[i].y1,myForce.obstacleList[i].y2,myForce.obstacleList[i].size,myForce.obstacleList[i].moving);
+        else fprintf(stderr,"Obstacle %d is at x = %lf, y = %lf and has size of %lf and has moving to %d\n",i,myForce.obstacleList[i].posX,myForce.obstacleList[i].posY,myForce.obstacleList[i].size,myForce.obstacleList[i].moving);
     }
     for (int i = 0; i < myForce.movingNumber; ++i) {
         fprintf(stderr,"index of moving is %d\n",myForce.movingIndexes[i]);
@@ -269,25 +274,40 @@ void printObstacleLists(){
 }
 
 void computeForceVector(){
-    float k_att_xy = 0.2;
-    float k_att_theta = 0;
-    float k_repul = -0.005;
-    pthread_mutex_lock(&lockDestination);
-    double f_att_x = -destination_set*k_att_xy * (*myPos.x- *destination.x);
-    double f_att_y = -destination_set*k_att_xy * (*myPos.y - *destination.y);
     
+    
+    float k_att_xy = /*0.2*/ 0;
+    float k_att_theta = /*0.3*/ 0;
+    float k_repul = -0.05;
+    //double theta = *myFilteredPos.theta
+    pthread_mutex_lock(&lockDestination);
     pthread_mutex_lock(&lockFilteredPosition); 
-    double error = *myFilteredPos.theta-*destination.theta;
+    double f_att_x = -destination_set*k_att_xy * (*myFilteredPos.x- *destination.x);
+    double f_att_y = -destination_set*k_att_xy * (*myFilteredPos.y - *destination.y);
+    double theta = *myFilteredPos.theta;
+    double desiredTheta = *destination.theta;
+    
+
+    if(theta > 180) theta +=-180;
+    if(desiredTheta > 180) desiredTheta+=-180;
+    
+    double error = theta-desiredTheta;
+    printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
+    
+
+    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.02 && error < 1){
+        myControllerState = STOPPED;
+    }
+    else{
+        myControllerState = MOVING;
+    }
     pthread_mutex_unlock(&lockFilteredPosition); 
-    double f_att_theta = destination_set*k_att_theta * error;
     pthread_mutex_unlock(&lockDestination);
 
     // Ajustement de l'erreur pour tenir compte de la nature circulaire des angles
-    if (error > 180) {
-        error -= 360;
-    } else if (error < -180) {
-        error += 360;
-    }
+
+
+    double f_att_theta = -destination_set*k_att_theta * error;
 
     // Calcul de la sortie du contrôleur
     

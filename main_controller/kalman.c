@@ -27,21 +27,21 @@ void* updateKalman(void* args) {
     // Combinaison des mesures des deux capteurs
     pthread_mutex_lock(&lidarFlagLock);
     if(lidarAcquisitionFlag){
-    measurementsCombined[0] = measurements[0];
-    measurementsCombined[1] = measurements[1];
-    measurementsCombined[2] = measurements[2];
-    measurementsCombined[3] = secondSensorMeasurement[0];
-    measurementsCombined[4] = secondSensorMeasurement[1];
-    measurementsCombined[5] = secondSensorMeasurement[2];
-}
-else{
-    measurementsCombined[0] = secondSensorMeasurement[0];
-    measurementsCombined[1] = secondSensorMeasurement[1];
-    measurementsCombined[2] = secondSensorMeasurement[2];
-    measurementsCombined[3] = secondSensorMeasurement[0];
-    measurementsCombined[4] = secondSensorMeasurement[1];
-    measurementsCombined[5] = secondSensorMeasurement[2];
-}
+        measurementsCombined[0] = measurements[0];
+        measurementsCombined[1] = measurements[1];
+        measurementsCombined[2] = measurements[2];
+        measurementsCombined[3] = secondSensorMeasurement[0];
+        measurementsCombined[4] = secondSensorMeasurement[1];
+        measurementsCombined[5] = secondSensorMeasurement[2];
+    }
+    else{
+        measurementsCombined[0] = secondSensorMeasurement[0];
+        measurementsCombined[1] = secondSensorMeasurement[1];
+        measurementsCombined[2] = secondSensorMeasurement[2];
+        measurementsCombined[3] = secondSensorMeasurement[0];
+        measurementsCombined[4] = secondSensorMeasurement[1];
+        measurementsCombined[5] = secondSensorMeasurement[2];
+    }
     pthread_mutex_unlock(&lidarFlagLock);
     
     // Étape de prédiction
@@ -64,8 +64,15 @@ else{
         double innovationSum = 0;
         double covarianceSum = 0;
         for (int i = 0; i < 6; i++) {
-            double y = measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]); // Innovation
+            double y;
+            if (j == 2 && x_pred[j] - x[j] < -180) {
+                // Ajustement de l'innovation pour la transition de 360 à 0 degré
+                y = measurementsCombined[i] - (H[i][0] * (x_pred[0] + 360) + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]);
+            } else {
+                y = measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]); // Innovation
+            }
             double S = H[i][0] * P_pred[0][0] * H[i][0] + H[i][1] * P_pred[1][1] * H[i][1] + H[i][2] * P_pred[2][2] * H[i][2] + R[i]; // Covariance de l'innovation
+            
             double K = P_pred[j][j] * H[i][j] / S; // Gain de Kalman
             innovationSum += K * y;
             covarianceSum += K * H[i][j] * P_pred[j][j];

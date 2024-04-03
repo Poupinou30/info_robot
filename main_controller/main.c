@@ -81,14 +81,16 @@ int mainPatternOdometryOld(){
 
 }
 
-int mainOUAISSAMERE(){
+int main(){
 
 
     //initialisation
 
     initializeMainController();
+
+    printObstacleLists();
     pthread_mutex_lock(&lockDestination);
-    *destination.x = 1.00;
+    *destination.x = 1;
     *destination.y = 1.5;
     *destination.theta = 18;
     destination_set = 1;
@@ -143,12 +145,7 @@ int mainOUAISSAMERE(){
             gettimeofday(&lastExecutionTime, NULL);
             //ON EST ARRIVE A DESTINATION?
             printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
-            if(/*computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.05*/ 0){
-                myControllerState = STOPPED;
-            }
-            else{
-                myControllerState = MOVING;
-            }
+
             pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
             lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
@@ -159,7 +156,7 @@ int mainOUAISSAMERE(){
 
 
             pthread_mutex_lock(&lidarFlagLock);
-            if(measuredSpeedX < 0.03 && measuredSpeedY < 0.03 && measuredSpeedOmega < 0.1 && lidarElapsedTime < 200){
+            if(((measuredSpeedX < 0.03 && measuredSpeedY < 0.03 && measuredSpeedOmega < 0.1) ||fabs(*myPos.theta - *myOdometryPos.theta)> 5) && lidarElapsedTime < 200 ){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -201,7 +198,7 @@ int mainTestKalman(){
     
 }
 
-int main(){
+int mainPatternOdometry(){
     initializeMainController();
     struct timeval now, end, endInst, endSecond;
     gettimeofday(&now, NULL);
@@ -214,22 +211,25 @@ int main(){
     double secondValue = endSecond.tv_sec*1000+endSecond.tv_usec/1000;
     double vx,vy,omega;
     signal(SIGINT, handle_sigint);
+    double currentTime;
+    printf("start time in main = %lf \n",nowValue);
     while(1){
         gettimeofday(&now, NULL);
-        double currentTime = now.tv_sec*1000+now.tv_usec/1000;
-        if (currentTime - nowValue >= 18000) {
+        currentTime = now.tv_sec*1000+now.tv_usec/1000;
+        if (currentTime - nowValue >= 3000 ) {
             break;
         }
 
         gettimeofday(&endInst,NULL);
         double elapsedTime = endInst.tv_sec*1000+endInst.tv_usec/1000 - instValue;
-        if (elapsedTime >= 10) {
-            processInstructionNew(0.0,0.0,30,i2c_handle_front,i2c_handle_rear);
+        if (elapsedTime >= 30) {
+            myOdometry();
+            processInstructionNew(0.0,0.3,-30,i2c_handle_front,i2c_handle_rear);
             double wheelSpeed[4] = {motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR};
             
             computeSpeedFromOdometry(wheelSpeed,&vx,&vy,&omega);
             
-            myOdometry();
+            
             //if(*myOdometryPos.x > 1 || *myOdometryPos.y > 1) break;
             instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
         }
@@ -244,7 +244,8 @@ int main(){
         }
     }
     processInstructionNew(0.0,0.0,0,i2c_handle_front,i2c_handle_rear);
-     printf("print last pos x = %f, pos y = %f, pos theta = %f",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
+    myOdometry();
+     printf("print last pos x = %f, pos y = %f, pos theta = %f total time in odometry = %lf current time in controller = %lf",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,totalTime, currentTime-nowValue);
 }
 
 int mainSPI(){ // spi test
@@ -368,8 +369,6 @@ void initializeMainController(){
 
     //Initialisation variables
     positionReceived = malloc(3*sizeof(float));
-    myForce.obstacleNumber = 0;
-    myForce.movingNumber = 0;
     destination.x = (float*)malloc(sizeof(float));
     destination.y = (float*)malloc(sizeof(float));
     destination.theta = (float*)malloc(sizeof(float));
