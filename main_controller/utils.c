@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-double radius = 0.03134;
+double radius = 0.031;
 double l_y = 0.175;
 double l_x = 0.21;
 

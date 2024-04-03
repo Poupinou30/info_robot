@@ -186,3 +186,5 @@ extern movingState myControllerState;
 
 
 void handle_sigint(int sig);
+
+extern double totalTime;
