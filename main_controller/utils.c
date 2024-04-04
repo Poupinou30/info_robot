@@ -38,7 +38,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     double v_magnitude = sqrt(pow(v_x, 2) + pow(v_y, 2));
     
     // Check if the magnitude is greater than the max allowed speed
-    /*if (v_magnitude > v_max) {
+    if (v_magnitude > v_max) {
         // Calculate the scaling factor
         double scaling_factor = v_max / v_magnitude;
         
@@ -49,14 +49,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 
     if (fabs(omega) > omega_max) {
         omega = (omega > 0 ? omega_max : -omega_max);
-    }*/
-
-    /*double omega_fl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //front left
-    double omega_fr = 1.0/radius *(v_y+v_x+(l_x+l_y)*omega); //front right
-    double omega_rl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //rear left
-    double omega_rr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //rear right
-    */
-
+    }
     double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
     double omega_fr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //front right
     double omega_rl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //rear left
@@ -67,6 +60,19 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     output_speed[2] = omega_rl;
     output_speed[3] = omega_rr;
     //if(VERBOSE) printf("Omega fl = %f omega_fr = %f omega_rl = %f omega_rr = %f \n",omega_fl,omega_fr,omega_rl,omega_rr);
+
+}
+
+void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
+    *v_x = radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+
+    *v_y = radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
+
+    *omega = 112.5*1.043*radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+
+    measuredSpeedX = *v_x;
+    measuredSpeedY = *v_y;
+    measuredSpeedOmega = *omega * 180 / M_PI;
 
 }
 
@@ -135,18 +141,7 @@ uint8_t UART_receive(int UART_handle, char* received){
     
     return 0;}
 
-void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
-    *v_x = radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
-    *v_y = radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
-
-    *omega = 112.5*radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
-
-    measuredSpeedX = *v_x;
-    measuredSpeedY = *v_y;
-    measuredSpeedOmega = *omega * 180 / M_PI;
-
-}
 
 
 
@@ -358,4 +353,20 @@ void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* out
     output_speed[1] = v_y_robot;
     output_speed[2] = omega;
 
+}
+
+void generateLog(){
+    FILE *logFile;
+    int variable = 0;
+
+    fichier = fopen("logPosition.txt", "w");
+    if (fichier == NULL) {
+        printf("Erreur lors de l'ouverture du fichier\n");
+        return 1;
+    }
+    fprintf(fichier, "lidarPos ; odometryPos ; filteredPos\n");
+}
+
+void writeLog(){
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
 }

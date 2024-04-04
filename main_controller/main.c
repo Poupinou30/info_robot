@@ -132,6 +132,7 @@ int mainDINGUERIE(){
 
         if (elapsedTime >= 50)
         {
+            if(makeLog)
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
@@ -365,6 +366,7 @@ void initializeMainController(){
     UART_handle = initializeUART();
     i2c_handle_front = I2C_initialize(0x40);
     i2c_handle_rear = I2C_initialize(0x41);
+    if(makeLog) generateLog();
 
 
     //Initialisation variables
