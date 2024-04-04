@@ -19,7 +19,7 @@ int spi_handle_front;
 int spi_handle_rear;
 
 
-int mainUART(){
+int main(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
     //char* myString = "test123";
@@ -81,7 +81,7 @@ int mainPatternOdometryOld(){
 
 }
 
-int main(){
+int mainDINGUERIE(){
 
 
     //initialisation

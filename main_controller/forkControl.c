@@ -31,6 +31,7 @@ int setWheelSpeedCommandReceivedFlag = 0;
 int setGripperPositionCommandReceivedFlag = 0;
 
 int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag) {
+    printf("Dans checkCommand et expected = %s",expected);
     char expectedData[255];
     char withoutCrochet[20];
     sscanf(expected, "<%[^>]>", withoutCrochet);
@@ -54,7 +55,11 @@ int setArmDeployedAngle(int angle) { //Bras du panneau solaire
     if (!UART_receive(UART_handle, setArmDeployedAngleBuffer) || !checkCommandReceived(dataToSend,setArmDeployedAngleBuffer, &armDeployedAngleCommandReceivedFlag)) {
         return 0;
     }
-    return armDeployedAngleCommandReceivedFlag;
+    else{
+        armDeployedAngleCommandReceivedFlag =0;
+        return 1;
+    }
+    
 }
 
 int setForksDeployedAngle(int angle) { //Bras du panneau solaire
@@ -66,129 +71,162 @@ int setForksDeployedAngle(int angle) { //Bras du panneau solaire
     if (!UART_receive(UART_handle, setForksDeployedAngleBuffer) || !checkCommandReceived(dataToSend,setForksDeployedAngleBuffer, &forksDeployedAngleCommandReceivedFlag)) {
         return 0;
     }
-    return forksDeployedAngleCommandReceivedFlag;
+    else{
+        forksDeployedAngleCommandReceivedFlag = 0;
+        return 1;
+    }
+    
 }
 
 int disableStepperMotor() {
     sprintf(dataToSend, "<D-0>");
     if (disableStepperMotorCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        disableStepperMotorCommandReceivedFlag = 1; // Set flag to 1
+        disableStepperMotorCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, disableStepperMotorBuffer) || !checkCommandReceived(dataToSend, disableStepperMotorBuffer, &disableStepperMotorCommandReceivedFlag)) {
         return 0;
     }
-    return disableStepperMotorCommandReceivedFlag;
+    else{
+        disableStepperMotorCommandReceivedFlag = 0;
+        return 1;
+    }
+
 }
 
 int calibrateFork() {
     sprintf(dataToSend, "<H-0>");
     if (calibrateForkCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        calibrateForkCommandReceivedFlag = 1; // Set flag to 1
+        calibrateForkCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, calibrateForkBuffer) || !checkCommandReceived(dataToSend, calibrateForkBuffer, &calibrateForkCommandReceivedFlag)) {
         return 0;
     }
-    return calibrateForkCommandReceivedFlag;
+    else{
+        calibrateForkCommandReceivedFlag = 0;
+        return 1;
+    }
+
 }
 
 int enableStepperMotor() {
     sprintf(dataToSend, "<E-0>");
     if (enableStepperMotorCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        enableStepperMotorCommandReceivedFlag = 1; // Set flag to 1
+        enableStepperMotorCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, enableStepperMotorBuffer) || !checkCommandReceived(dataToSend, enableStepperMotorBuffer, &enableStepperMotorCommandReceivedFlag)) {
         return 0;
     }
-    return enableStepperMotorCommandReceivedFlag;
+    else{
+        enableStepperMotorCommandReceivedFlag = 0;
+        return 1;
+    }
 }
 
 int setLowerFork(int height) {
     sprintf(dataToSend, "<F-%d>", (int)height);
     if (setLowerForkCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        setLowerForkCommandReceivedFlag = 1; // Set flag to 1
+        setLowerForkCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, setLowerForkBuffer) || !checkCommandReceived(dataToSend, setLowerForkBuffer, &setLowerForkCommandReceivedFlag)) {
         return 0;
     }
-    return setLowerForkCommandReceivedFlag;
+    else{
+        setLowerForkCommandReceivedFlag = 0;
+        return 1;
+    }
 }
 
 int setUpperFork(int height) {
     sprintf(dataToSend, "<f-%d>", (int)height);
     if (setUpperForkCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        setUpperForkCommandReceivedFlag = 1; // Set flag to 1
+        setUpperForkCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, setUpperForkBuffer) || !checkCommandReceived(dataToSend, setUpperForkBuffer, &setUpperForkCommandReceivedFlag)) {
         return 0;
     }
-    return setUpperForkCommandReceivedFlag;
+    else{
+        setUpperForkCommandReceivedFlag = 0;
+        return 1;
+    }
+    
 }
 
 int retractForks() {
     sprintf(dataToSend, "<S-0>");
     if (retractForksCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        retractForksCommandReceivedFlag = 1; // Set flag to 1
+        retractForksCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, retractForksBuffer) || !checkCommandReceived(dataToSend, retractForksBuffer, &retractForksCommandReceivedFlag)) {
         return 0;
     }
-    return retractForksCommandReceivedFlag;
+    else{
+        retractForksCommandReceivedFlag = 0;
+        return 1;
+    }
 }
 
 int deployForks() {
     sprintf(dataToSend, "<S-1>");
     if (deployForksCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        deployForksCommandReceivedFlag = 1; // Set flag to 1
+        deployForksCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, deployForksBuffer) || !checkCommandReceived(dataToSend, deployForksBuffer, &deployForksCommandReceivedFlag)) {
         return 0;
     }
-    return deployForksCommandReceivedFlag;
+    else{
+        deployForksCommandReceivedFlag = 0;
+        return 1;
+    }
 }
 
 int deployArm() {
     sprintf(dataToSend, "<S-2>");
     if (deployArmCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        deployArmCommandReceivedFlag = 1; // Set flag to 1
+        deployArmCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, deployArmBuffer) || !checkCommandReceived(dataToSend, deployArmBuffer, &deployArmCommandReceivedFlag)) {
         return 0;
     }
-    return deployArmCommandReceivedFlag;
+    else{
+        deployArmCommandReceivedFlag = 0;
+        return 1;
+    }
 }
 
 int setWheelSpeed(int speed) {
     sprintf(dataToSend, "<W-%d>", speed);
     if (setWheelSpeedCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        setWheelSpeedCommandReceivedFlag = 1; // Set flag to 1
+        setWheelSpeedCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, setWheelSpeedBuffer) || !checkCommandReceived(dataToSend, setWheelSpeedBuffer, &setWheelSpeedCommandReceivedFlag)) {
         return 0;
     }
-    return setWheelSpeedCommandReceivedFlag;
+    else{
+        setWheelSpeedCommandReceivedFlag = 0;
+        return 1;
+    }
 }
 
 int setGripperPosition(int position) {
-    /*  x = 0 : gripper open (0°)
-        x = 1 : gripper closed (180°)
-        2 <= x <= 180 : set servo angle
-    */
     sprintf(dataToSend, "<G-%d>", position);
     if (setGripperPositionCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        setGripperPositionCommandReceivedFlag = 1; // Set flag to 1
+        setGripperPositionCommandReceivedFlag = 1;
     }
     if (!UART_receive(UART_handle, setGripperPositionBuffer) || !checkCommandReceived(dataToSend, setGripperPositionBuffer, &setGripperPositionCommandReceivedFlag)) {
         return 0;
     }
-    return setGripperPositionCommandReceivedFlag;
+    else{
+        setGripperPositionCommandReceivedFlag = 0;
+        return 1;
+    }
 }

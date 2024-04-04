@@ -12,6 +12,7 @@ grabbingState myGrabState;
 actuationState myActuatorsState;
 uint8_t actuator_reception;
 int done = 0;
+uint8_t done1 = 0, done2 = 0, done3 = 0;
 
 void manageGrabbing(){
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
@@ -38,9 +39,11 @@ void manageGrabbing(){
             if(strlen(receivedData) != 0) fprintf(stderr,"condition = %d and string1 = %s and string 2 = %s \n", (strcmp(receivedData,endMessage) == 0),receivedData,endMessage);
             if(strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                actuator_reception = 0;
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_PLANTS_INIT;
-                
+                receivedData[0] = '\0';
+                sleep(3);                
             } 
             break;
         }
@@ -49,10 +52,10 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            done = deployForks();
-            done = done && setLowerFork(65);
-            done = done && setUpperFork(0);
-            myActuatorsState = WAITING_ACTUATORS;
+            if(!done1) done1 = deployForks();
+            if(!done2) done2 = done1 && setLowerFork(65);
+            if(!done3) done3 = done2 && setUpperFork(0);
+            if(done3) myActuatorsState = WAITING_ACTUATORS;
             break;
         
         case WAITING_ACTUATORS:
@@ -62,6 +65,9 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_PLANTS_MOVE;
+                done1=0; done2=0; done3 = 0;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
                 
             } 
             break;
@@ -77,13 +83,18 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            setGripperPosition(1);
-            setUpperFork(142);
-            myActuatorsState = WAITING_ACTUATORS;
+            if(!done1) done1 = setGripperPosition(1);
+            printf("done1 = %d done2 =%d \n",done1,done2);
+            if(!done2){
+                printf("rentre dans le if setUpperFork\n");
+                done2 = done1 && setUpperFork(142);
+
+            } 
+            if(done2) myActuatorsState = WAITING_ACTUATORS;
             break;
         
         case WAITING_ACTUATORS:
-         
+            printf("waiting actuators\n");
             if(!actuator_reception){
                
                 actuator_reception = UART_receive(UART_handle,receivedData);
@@ -93,6 +104,9 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = UNSTACK_POTS_MOVE;
+                done1, done2, done3 = 0;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
                 
             } 
             break;
@@ -101,7 +115,7 @@ void manageGrabbing(){
         break;
 
     case UNSTACK_POTS_MOVE:
-        
+        sleep(3);
         myGrabState = UNSTACK_POT_TAKE;
         break;
 
@@ -122,6 +136,8 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = UNSTACK_POT_POSITIONING;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
                 
             } 
             break;
@@ -149,6 +165,8 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_POTS_MOVE;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
                 
             } 
             break;
@@ -156,7 +174,7 @@ void manageGrabbing(){
         break;
 
     case GRAB_POTS_MOVE:
-
+        sleep(3);
         myGrabState = LIFT_POTS;
 
     case LIFT_POTS:
@@ -175,7 +193,8 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = DROP_PLANTS;
-                
+                receivedData[0] = '\0';
+                actuator_reception = 0;
             } 
             break;
         }
@@ -195,6 +214,8 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = DROP_ALL;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
                 
             } 
             break;
@@ -218,6 +239,8 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = FINISHED;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
                 
             } 
             break;
