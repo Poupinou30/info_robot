@@ -4,7 +4,7 @@
 #endif
 
 // Déclaration initiale des variables globales
-double x[3] = {1, 1.5, 0}; // Vecteur d'état initial [x, y, theta]
+double x[3]; // Vecteur d'état initial [x, y, theta]
 double P[3][3] = {{0.01, 0, 0}, {0, 0.01, 0}, {0, 0, 0.01}}; // Covariance initiale de l'état
 
 // Matrices constantes pour le filtre de Kalman
@@ -13,6 +13,9 @@ double H[6][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 0}, {0, 1, 0}, {0, 0, 
 
 double Q[3][3] = {{0.005, 0, 0}, {0, 0.005, 0}, {0, 0, 0.01}}; // Bruit de processus
 double R[6] = {1, 1, 0.01, 0.4, 0.4, 0.1}; // Bruit de mesure pour chaque variable d'état
+double oldTheta;
+double meanTheta = 0;
+uint8_t thetaForcedFlag = 0;
 
 // Fonction de mise à jour du filtre de Kalman
 void* updateKalman(void* args) {
@@ -42,6 +45,7 @@ void* updateKalman(void* args) {
         measurementsCombined[4] = secondSensorMeasurement[1];
         measurementsCombined[5] = secondSensorMeasurement[2];
     }
+    meanTheta = (measurementsCombined[2] + measurementsCombined[5])/2;
     pthread_mutex_unlock(&lidarFlagLock);
     
     // Étape de prédiction
@@ -60,32 +64,53 @@ void* updateKalman(void* args) {
     }
 
     // Étape de mise à jour
-    for (int j = 0; j < 3; j++) {
-        double innovationSum = 0;
-        double covarianceSum = 0;
-        for (int i = 0; i < 6; i++) {
-            double y;
-            if (j == 2 && x_pred[j] - x[j] < -180) {
-                // Ajustement de l'innovation pour la transition de 360 à 0 degré
-                y = measurementsCombined[i] - (H[i][0] * (x_pred[0] + 360) + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]);
-            } else {
-                y = measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]); // Innovation
+// Étape de mise à jour
+for (int j = 0; j < 3; j++) {
+    double innovationSum = 0;
+    double covarianceSum = 0;
+    for (int i = 0; i < 6; i++) {
+        double y;
+        if (j == 2) {
+            double diff = measurementsCombined[i] - x_pred[j];
+            // Ajustement de l'innovation pour les transitions entre 0 et 360 degrés
+            if (diff > 180) {
+                diff -= 360;
+            } else if (diff < -180) {
+                diff += 360;
             }
-            double S = H[i][0] * P_pred[0][0] * H[i][0] + H[i][1] * P_pred[1][1] * H[i][1] + H[i][2] * P_pred[2][2] * H[i][2] + R[i]; // Covariance de l'innovation
-            
-            double K = P_pred[j][j] * H[i][j] / S; // Gain de Kalman
-            innovationSum += K * y;
-            covarianceSum += K * H[i][j] * P_pred[j][j];
+            y = diff; // Innovation ajustée
+        } else {
+            y = measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]); // Innovation
         }
-        x[j] = x_pred[j] + innovationSum; // Mise à jour de l'état
-        P[j][j] = P_pred[j][j] - covarianceSum; // Mise à jour de la covariance de l'état
+        double S = H[i][0] * P_pred[0][0] * H[i][0] + H[i][1] * P_pred[1][1] * H[i][1] + H[i][2] * P_pred[2][2] * H[i][2] + R[i]; // Covariance de l'innovation
+        
+        double K = P_pred[j][j] * H[i][j] / S; // Gain de Kalman
+        innovationSum += K * y;
+        covarianceSum += K * H[i][j] * P_pred[j][j];
     }
+    x[j] = x_pred[j] + innovationSum; // Mise à jour de l'état
+    P[j][j] = P_pred[j][j] - covarianceSum; // Mise à jour de la covariance de l'état
+}
+
 
     pthread_mutex_lock(&lockFilteredPosition);
     *(myFilteredPos.x) = x[0];
     *(myFilteredPos.y) = x[1];
-    *(myFilteredPos.theta) = x[2];
+    if(x[2]> 360) *myFilteredPos.theta = x[2] - 360;
+    else *myFilteredPos.theta = x[2];
+    *(myFilteredPos.theta) = fmod(x[2],360);
     pthread_mutex_unlock(&lockFilteredPosition);
 
     return NULL;
+}
+
+void defineInitialPosition(){
+    x[0] = *myPos.x; x[1] = *myPos.y; x[2] = *myPos.theta;
+    pthread_mutex_lock(&lockFilteredPosition);
+    *(myFilteredPos.x) = x[0];
+    *(myFilteredPos.y) = x[1];
+    *(myFilteredPos.theta) = x[2];
+    oldTheta = x[2];
+    pthread_mutex_unlock(&lockFilteredPosition);
+
 }

@@ -90,9 +90,9 @@ int main(){
 
     printObstacleLists();
     pthread_mutex_lock(&lockDestination);
-    *destination.x = 1;
+    *destination.x = 0.5;
     *destination.y = 1.5;
-    *destination.theta = 18;
+    *destination.theta = 0;
     destination_set = 1;
     pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
@@ -119,6 +119,9 @@ int main(){
         sleep(1);
     }
     fprintf(stderr,"Position acquired \n");
+    //IF POSITION ACQUIRED, DEFINE ODOMETRY AND FILTER REFERENCES
+    defineInitialPosition();
+    resetOdometry();
     myControllerState = MOVING;
 
     struct timeval lastExecutionTime, currentTime;
@@ -157,7 +160,7 @@ int main(){
 
 
             pthread_mutex_lock(&lidarFlagLock);
-            if(((measuredSpeedX < 0.03 && measuredSpeedY < 0.03 && measuredSpeedOmega < 0.1) ||fabs(*myPos.theta - *myOdometryPos.theta)> 5) && lidarElapsedTime < 200 ){
+            if(((measuredSpeedX < 0.1 && measuredSpeedY < 0.1 && measuredSpeedOmega < 10) ||fabs(*myPos.theta - *myOdometryPos.theta)> 5) && lidarElapsedTime < 200 ){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }

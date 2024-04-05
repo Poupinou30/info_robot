@@ -95,6 +95,7 @@ void removeMovingObstacles();
 void computeForceVector();
 void myPotentialFieldController();
 void* updateKalman(void* args);
+void defineInitialPosition();
 position closestPoint(position rect[2], position pos);
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving);
 void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed);

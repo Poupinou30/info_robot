@@ -293,8 +293,8 @@ void* receptionPipe(void* pipefdvoid){
             
             read(pipefd[0], buffer, 5*sizeof(float));
             
-            if(buffer[0] > 0 && buffer[1] > 0 && ((computeEuclidianDistance(*myPos.x,*myPos.y,buffer[0],buffer[1]) < 0.30)||first) ){
-            //first = 0;
+            if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.20)||(first && buffer[0] > 0.01 && buffer[1] > 0.01) ){
+            first = 0;
             pthread_mutex_lock(&lockPosition);
             pthread_mutex_lock(&lockOpponentPosition);
             if(*myPos.x != buffer[0] && *myPos.y != buffer[1] && *myPos.theta != buffer[2]){
@@ -326,6 +326,7 @@ void* receptionPipe(void* pipefdvoid){
             kalmanLaunched = 1;*/
             
             }
+            else printf("Condition = %d %d %d %d %d OR %d \n",buffer[0] > 0 , buffer[1] > 0 , buffer[0] < 2 , buffer[1]< 3 , (computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.20),first);
             
             /*
             if(VERBOSE){
@@ -358,12 +359,13 @@ void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* out
 void generateLog(){
     int variable = 0;
 
-    logFile = fopen("logPosition.txt", "w");
+    logFile = fopen("../logFiles/logPosition.txt", "w");
     if (logFile == NULL) {
         printf("Erreur lors de l'ouverture du fichier\n");
         return 1;
     }
     fprintf(logFile, "lidarPos ; odometryPos ; filteredPos\n");
+    printf("File generated i guess\n");
 }
 
 void writeLog(){

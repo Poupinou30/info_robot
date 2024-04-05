@@ -47,4 +47,5 @@ for i in range(3):
     for j in range(3):
         axs[i, j].legend()
 
-plt.show()
+# Enregistrer les tracés en JPEG
+plt.savefig('plots.jpeg', format='jpeg')

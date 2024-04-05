@@ -276,8 +276,8 @@ void printObstacleLists(){
 void computeForceVector(){
     
     
-    float k_att_xy = /*0.2*/ 0;
-    float k_att_theta = /*0.3*/ 0;
+    float k_att_xy = /*0.2*/ 0.3;
+    float k_att_theta = /*0.3*/ 0.5;
     float k_repul = -0.05;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
@@ -288,14 +288,21 @@ void computeForceVector(){
     double desiredTheta = *destination.theta;
     
 
-    if(theta > 180) theta +=-180;
-    if(desiredTheta > 180) desiredTheta+=-180;
+    if(theta > 180) theta +=-360;
+    if(desiredTheta > 180) desiredTheta+=-360;
     
     double error = theta-desiredTheta;
+    if(error<-180){
+        error += 360;
+    }
+    else if(error>180){
+        error-=360;
+    }
+
     printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
     
 
-    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.02 && error < 1){
+    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.02 && fabs(error) < 1){
         myControllerState = STOPPED;
     }
     else{
