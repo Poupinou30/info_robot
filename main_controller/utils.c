@@ -128,7 +128,7 @@ uint8_t UART_receive(int UART_handle, char* received){
         bytesRead = serRead(UART_handle, tempoChar, 255);
         if (bytesRead > 0) {
         strcat(received,tempoChar);
-        fprintf(stderr,"%d received bytes \n",bytesRead);
+        fprintf(stderr,"%d received bytes : '%s' \n",bytesRead,tempoChar);
         //printf("Message received (uart send)= '%s'\n",received);
         //if(te[bytesRead -1]== "\0") waitingForReception = 0;
         //printf("received '%s'\n",received);
@@ -356,15 +356,14 @@ void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* out
 }
 
 void generateLog(){
-    FILE *logFile;
     int variable = 0;
 
-    fichier = fopen("logPosition.txt", "w");
-    if (fichier == NULL) {
+    logFile = fopen("logPosition.txt", "w");
+    if (logFile == NULL) {
         printf("Erreur lors de l'ouverture du fichier\n");
         return 1;
     }
-    fprintf(fichier, "lidarPos ; odometryPos ; filteredPos\n");
+    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos\n");
 }
 
 void writeLog(){

@@ -55,7 +55,7 @@ void manageGrabbing(){
             if(!done1) done1 = deployForks();
             if(!done2) done2 = done1 && setLowerFork(65);
             if(!done3) done3 = done2 && setUpperFork(0);
-            if(done3) myActuatorsState = WAITING_ACTUATORS;
+            if(done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
         
         case WAITING_ACTUATORS:
@@ -84,9 +84,9 @@ void manageGrabbing(){
         {
         case SENDING_INSTRUCTION:
             if(!done1) done1 = setGripperPosition(1);
-            printf("done1 = %d done2 =%d \n",done1,done2);
+            //printf("done1 = %d done2 =%d \n",done1,done2);
             if(!done2){
-                printf("rentre dans le if setUpperFork\n");
+                //printf("rentre dans le if setUpperFork\n");
                 done2 = done1 && setUpperFork(142);
 
             } 
@@ -94,7 +94,7 @@ void manageGrabbing(){
             break;
         
         case WAITING_ACTUATORS:
-            printf("waiting actuators\n");
+            //printf("waiting actuators\n");
             if(!actuator_reception){
                
                 actuator_reception = UART_receive(UART_handle,receivedData);
@@ -104,7 +104,7 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = UNSTACK_POTS_MOVE;
-                done1, done2, done3 = 0;
+                done1 = 0; done2 = 0; done3 = 0;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
                 
@@ -116,6 +116,7 @@ void manageGrabbing(){
 
     case UNSTACK_POTS_MOVE:
         sleep(3);
+        printf("dans unstack move\n");
         myGrabState = UNSTACK_POT_TAKE;
         break;
 
@@ -124,9 +125,9 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            setLowerFork(125);
-            sleep(3);
-            myActuatorsState = WAITING_ACTUATORS;
+            printf("dans unstack pots and done = %d\n",done1);
+            if(!done1) done1 = setLowerFork(125);
+            if (done1) myActuatorsState = WAITING_ACTUATORS;
             break;
 
         case WAITING_ACTUATORS:
@@ -137,7 +138,9 @@ void manageGrabbing(){
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = UNSTACK_POT_POSITIONING;
                 receivedData[0] = '\0';
+                done1 = 0; done2 = 0; done3 = 0;
                 actuator_reception = 0;
+                sleep(3);
                 
             } 
             break;
@@ -153,9 +156,8 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            setLowerFork(30);
-            sleep(3);
-            myActuatorsState = WAITING_ACTUATORS;
+            if(!done1) done1 = setLowerFork(30);
+            if(done1) myActuatorsState = WAITING_ACTUATORS;
             break;
 
         case WAITING_ACTUATORS:
@@ -167,6 +169,7 @@ void manageGrabbing(){
                 myGrabState = GRAB_POTS_MOVE;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
+                done1 = 0; done2 = 0; done3 = 0;
                 
             } 
             break;
@@ -181,9 +184,8 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            setLowerFork(135);
-            sleep(3);
-            myActuatorsState = WAITING_ACTUATORS;
+            if(!done1) done1 = setLowerFork(135);
+            if(done1) myActuatorsState = WAITING_ACTUATORS;
             break;
 
         case WAITING_ACTUATORS:
@@ -195,6 +197,7 @@ void manageGrabbing(){
                 myGrabState = DROP_PLANTS;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
+                done1 = 0; done2 = 0; done3 = 0;
             } 
             break;
         }
@@ -204,7 +207,8 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            setGripperPosition(0);
+            if(!done1) done1 = setGripperPosition(0);
+            if(done1) myActuatorsState = WAITING_ACTUATORS;
             break;
         
         case WAITING_ACTUATORS:
@@ -216,6 +220,7 @@ void manageGrabbing(){
                 myGrabState = DROP_ALL;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
+                done1 = 0; done2 = 0; done3 = 0;
                 
             } 
             break;
@@ -226,10 +231,9 @@ void manageGrabbing(){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            setLowerFork(75);
-            setUpperFork(80);
-            sleep(3);
-            myActuatorsState = WAITING_ACTUATORS;
+            if(!done1) done1 = setLowerFork(75);
+            if(!done2) done2 = done1 && setUpperFork(80);
+            if(done1 && done2) myActuatorsState = WAITING_ACTUATORS;
             break;
 
         case WAITING_ACTUATORS:

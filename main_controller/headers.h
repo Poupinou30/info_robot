@@ -190,7 +190,7 @@ extern movingState myControllerState;
 void handle_sigint(int sig);
 
 extern double totalTime;
-extern FILE* logFile;
+FILE* logFile;
 
 //LOG AND OTHERS
 void generateLog();

@@ -19,7 +19,7 @@ int spi_handle_front;
 int spi_handle_rear;
 
 
-int main(){
+int mainFORKSUART(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
     //char* myString = "test123";
@@ -81,7 +81,7 @@ int mainPatternOdometryOld(){
 
 }
 
-int mainDINGUERIE(){
+int main(){
 
 
     //initialisation
@@ -132,7 +132,7 @@ int mainDINGUERIE(){
 
         if (elapsedTime >= 50)
         {
-            if(makeLog)
+            if(makeLog) writeLog();
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
