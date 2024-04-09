@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-double radius = 0.031;
+double radius = 0.03;
 double l_y = 0.175;
 double l_x = 0.21;
 
@@ -68,7 +68,7 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
 
     *v_y = radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
 
-    *omega = 112.5*1.043*radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+    *omega = 112.5*/*1.043**/radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
     measuredSpeedX = *v_x;
     measuredSpeedY = *v_y;
@@ -242,7 +242,7 @@ void handle_sigint(int sig) {
 void* executeProgram(void* arg){
     int pipefd = *((int*)arg);
     char cmd[256];
-    sprintf(cmd,"/home/pi/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
+    sprintf(cmd,"/home/pi/Documents/lab_git_augu_new/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
     //sprintf(cmd,"/home/student/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
 
     child_pid = fork();
@@ -293,7 +293,7 @@ void* receptionPipe(void* pipefdvoid){
             
             read(pipefd[0], buffer, 5*sizeof(float));
             
-            if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.20)||(first && buffer[0] > 0.01 && buffer[1] > 0.01) ){
+            if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.50)||(first && buffer[0] > 0.01 && buffer[1] > 0.01 && buffer[0] < 2 && buffer[1]< 3) ){
             first = 0;
             pthread_mutex_lock(&lockPosition);
             pthread_mutex_lock(&lockOpponentPosition);

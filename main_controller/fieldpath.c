@@ -277,7 +277,7 @@ void computeForceVector(){
     
     
     float k_att_xy = /*0.2*/ 0.3;
-    float k_att_theta = /*0.3*/ 0.5;
+    float k_att_theta = /*0.3*/ 0.2;
     float k_repul = -0.05;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
@@ -302,7 +302,7 @@ void computeForceVector(){
     printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
     
 
-    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.02 && fabs(error) < 1){
+    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.02 && fabs(error) < 0.5){
         myControllerState = STOPPED;
     }
     else{
@@ -383,6 +383,7 @@ void myPotentialFieldController(){
     computeForceVector();
     convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
     printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
+    if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear);
     processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
     }
     else{

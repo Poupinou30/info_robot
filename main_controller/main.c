@@ -19,7 +19,7 @@ int spi_handle_front;
 int spi_handle_rear;
 
 
-int mainFORKSUART(){
+int mainFORKS(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
     //char* myString = "test123";
@@ -90,14 +90,14 @@ int main(){
 
     printObstacleLists();
     pthread_mutex_lock(&lockDestination);
-    *destination.x = 0.5;
+    *destination.x = 1.85;
     *destination.y = 1.5;
     *destination.theta = 0;
     destination_set = 1;
     pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
     *myPos.y = 0;
-    *myPos.theta = 0;
+    *myPos.theta = 180;
     double speedTabRobotFrame[3] = {0,0,0};
 
 
@@ -114,6 +114,7 @@ int main(){
     pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
     fprintf(stderr,"Thread for capture launched \n");
     //Wait for the lidar to be ready
+    //readyToGo = 1;
     while(readyToGo != 1){
         fprintf(stderr,"waiting for position acquisition \n");
         sleep(1);
@@ -129,6 +130,7 @@ int main(){
 
     while (1)
     {
+        //lidarAcquisitionFlag = 0; //A RETIRER CETAIT POUR TEST ODOMETRIE
         gettimeofday(&currentTime, NULL);
         double elapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
         elapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
@@ -160,7 +162,7 @@ int main(){
 
 
             pthread_mutex_lock(&lidarFlagLock);
-            if(((measuredSpeedX < 0.1 && measuredSpeedY < 0.1 && measuredSpeedOmega < 10) ||fabs(*myPos.theta - *myOdometryPos.theta)> 5) && lidarElapsedTime < 200 ){
+            if(((measuredSpeedX < 0.25 && measuredSpeedY < 0.25 && measuredSpeedOmega < 10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 400){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -204,6 +206,7 @@ int mainTestKalman(){
 
 int mainPatternOdometry(){
     initializeMainController();
+
     struct timeval now, end, endInst, endSecond;
     gettimeofday(&now, NULL);
     gettimeofday(&end,NULL);
@@ -220,7 +223,7 @@ int mainPatternOdometry(){
     while(1){
         gettimeofday(&now, NULL);
         currentTime = now.tv_sec*1000+now.tv_usec/1000;
-        if (currentTime - nowValue >= 3000 ) {
+        if (currentTime - nowValue >= 20000 ) {
             break;
         }
 
@@ -228,13 +231,13 @@ int mainPatternOdometry(){
         double elapsedTime = endInst.tv_sec*1000+endInst.tv_usec/1000 - instValue;
         if (elapsedTime >= 30) {
             myOdometry();
-            processInstructionNew(0.0,0.3,-30,i2c_handle_front,i2c_handle_rear);
+            processInstructionNew(0.0,0.0,30,i2c_handle_front,i2c_handle_rear);
             double wheelSpeed[4] = {motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR};
             
             computeSpeedFromOdometry(wheelSpeed,&vx,&vy,&omega);
             
             
-            //if(*myOdometryPos.x > 1 || *myOdometryPos.y > 1) break;
+            if(*myOdometryPos.theta > 359 || *myOdometryPos.y > 1) break;
             instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
         }
 
@@ -398,6 +401,9 @@ void initializeMainController(){
     *myOdometryPos.x = 0;
     *myOdometryPos.y = 0;
     *myOdometryPos.theta = 0;
+
+    //Initialisation PID
+    tunePID(30,15,i2c_handle_front,i2c_handle_rear);
 }
 
 int mainFINAL(){

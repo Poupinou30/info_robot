@@ -96,8 +96,10 @@ for (int j = 0; j < 3; j++) {
     pthread_mutex_lock(&lockFilteredPosition);
     *(myFilteredPos.x) = x[0];
     *(myFilteredPos.y) = x[1];
-    if(x[2]> 360) *myFilteredPos.theta = x[2] - 360;
-    else *myFilteredPos.theta = x[2];
+    double tempoTheta = x[2];
+    while(tempoTheta> 360) tempoTheta = x[2] - 360;
+    while (tempoTheta < 0) tempoTheta = x[2]+360;
+    *myFilteredPos.theta = tempoTheta;
     *(myFilteredPos.theta) = fmod(x[2],360);
     pthread_mutex_unlock(&lockFilteredPosition);
 

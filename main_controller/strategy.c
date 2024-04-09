@@ -76,21 +76,51 @@ void manageGrabbing(){
 
     case GRAB_PLANTS_MOVE:
         // Move forward to grab the plants
-        myGrabState = GRAB_PLANTS_END;
+        myGrabState = GRAB_PLANTS_CLOSE;
         break;
 
-    case GRAB_PLANTS_END:
+    case GRAB_PLANTS_CLOSE:
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
             if(!done1) done1 = setGripperPosition(1);
             //printf("done1 = %d done2 =%d \n",done1,done2);
-            if(!done2){
+            if(done1) myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            //printf("waiting actuators\n");
+            if(!actuator_reception){
+               
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                }
+            //else printf("actuators_reception = %d\n",actuator_reception);
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = GRAB_PLANTS_END;
+                done1 = 0; done2 = 0; done3 = 0;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
+                
+            } 
+            break;
+        }
+        
+        break;
+
+
+
+    case GRAB_PLANTS_END:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            if(!done1){
                 //printf("rentre dans le if setUpperFork\n");
-                done2 = done1 && setUpperFork(142);
+                done1 = setUpperFork(142);
 
             } 
-            if(done2) myActuatorsState = WAITING_ACTUATORS;
+            if(done1) myActuatorsState = WAITING_ACTUATORS;
             break;
         
         case WAITING_ACTUATORS:
