@@ -90,14 +90,18 @@ int main(){
 
     printObstacleLists();
     pthread_mutex_lock(&lockDestination);
-    *destination.x = 1.85;
-    *destination.y = 1.5;
+    *destination.x = 1.7;
+    *destination.y = 2;
     *destination.theta = 0;
     destination_set = 1;
     pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 180;
+    //ADDING OPPONENT OBSTACLE DONE IN INITIALIZATION
+
+
+    //
     double speedTabRobotFrame[3] = {0,0,0};
 
 
@@ -135,7 +139,7 @@ int main(){
         double elapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
         elapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
 
-        if (elapsedTime >= 50)
+        if (elapsedTime >= 30)
         {
             if(makeLog) writeLog();
             myPotentialFieldController();
@@ -144,6 +148,7 @@ int main(){
             
             if(VERBOSE){
                 printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
+                printf("opponent x = %f y = %f \n",*myOpponent.x,*myOpponent.y);
                 //printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
                 //printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
                 printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
@@ -161,9 +166,9 @@ int main(){
             //printf("time elapsed = %lf \n",lidarElapsedTime);
             printf("myControllerState = %d \n",myControllerState);
 
-
+            updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
             pthread_mutex_lock(&lidarFlagLock);
-            if(((measuredSpeedX < 0.25 && measuredSpeedY < 0.25 && measuredSpeedOmega < 10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 400){
+            if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 400){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -232,13 +237,13 @@ int mainPatternOdometry(){
         double elapsedTime = endInst.tv_sec*1000+endInst.tv_usec/1000 - instValue;
         if (elapsedTime >= 30) {
             myOdometry();
-            processInstructionNew(0.0,0.0,30,i2c_handle_front,i2c_handle_rear);
+            processInstructionNew(0.0,0.0,20,i2c_handle_front,i2c_handle_rear);
             double wheelSpeed[4] = {motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR};
             
             computeSpeedFromOdometry(wheelSpeed,&vx,&vy,&omega);
             
             
-            if(*myOdometryPos.theta > 359 || *myOdometryPos.y > 1) break;
+            if(*myOdometryPos.theta > 359) break;
             instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
         }
 
@@ -402,7 +407,7 @@ void initializeMainController(){
     *myOdometryPos.x = 0;
     *myOdometryPos.y = 0;
     *myOdometryPos.theta = 0;
-
+    addOpponentObstacle();
     //Initialisation PID
     tunePID(30,15,i2c_handle_front,i2c_handle_rear);
 }
