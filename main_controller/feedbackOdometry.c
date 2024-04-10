@@ -35,7 +35,7 @@ void myOdometry(){
     //printf("vxf = %f vyf = %f vxr = %f vyf = %f theta = %f\n",v_x_f,v_y_f,v_x_r,v_y_r,*myFilteredPos.theta);
     *myOdometryPos.x += v_x_f*timeDelta/1000000;
     *myOdometryPos.y += v_y_f*timeDelta/1000000;
-    *myOdometryPos.theta += 1.015 *omega_r*timeDelta/1000000;
+    *myOdometryPos.theta += 1.055 *omega_r*timeDelta/1000000;
     if(*myOdometryPos.theta > 360) *myOdometryPos.theta+=-360;
     if(*myOdometryPos.theta < 0) *myOdometryPos.theta+=360;
     //*myOdometryPos.theta = *myPos.theta;

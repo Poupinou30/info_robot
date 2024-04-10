@@ -203,6 +203,43 @@ void addRoundObstacle(double posX, double posY, double size, uint8_t moving){
     }
 }
 
+void addOpponentObstacle(){
+    obstacle myObstacle;
+    myObstacle.size = 0.3;
+    myObstacle.isRectangle = 0;
+    myObstacle.moving = 1;
+    if(myForce.obstacleNumber == 0){
+        myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
+        myForce.obstacleList[0] = myObstacle;
+        myForce.obstacleNumber ++;
+        fprintf(stderr,"Opponent obstacle added, size of list was 0 and is 1 now\n");
+    }
+    else{
+        //fprintf(stderr,"Realloc problem 1 with obstacle number = %d \n",myForce.obstacleNumber);
+        myForce.obstacleList = realloc(myForce.obstacleList,sizeof(obstacle)*(myForce.obstacleNumber+1));
+        myForce.obstacleList[myForce.obstacleNumber] = myObstacle;
+        myForce.obstacleNumber ++;
+    }
+    if(myForce.movingNumber == 0){
+        myForce.movingIndexes = (int*) malloc(sizeof(int)*1);
+        myForce.movingIndexes[myForce.movingNumber] = myForce.obstacleNumber-1;
+        myForce.movingNumber ++;
+    }
+    else{
+        //fprintf(stderr,"Realloc problem 2 \n");
+        myForce.movingIndexes = (int*) realloc(myForce.movingIndexes,sizeof(int)*(myForce.movingNumber+1));
+        myForce.movingIndexes[myForce.movingNumber] = myForce.obstacleNumber-1;
+        myForce.movingNumber ++;
+    }
+}
+
+void updateOpponentObstacle(){
+    pthread_mutex_lock(&lockOpponentPosition);
+    myForce.obstacleList[myForce.movingIndexes[0]].posX = *myOpponent.x;
+    myForce.obstacleList[myForce.movingIndexes[0]].posY = *myOpponent.y;
+    pthread_mutex_unlock(&lockOpponentPosition);
+}
+
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving){
     obstacle myObstacle;
     myObstacle.isRectangle = 1;
@@ -277,7 +314,7 @@ void computeForceVector(){
     
     
     float k_att_xy = /*0.2*/ 0.3;
-    float k_att_theta = /*0.3*/ 0.2;
+    float k_att_theta = /*0.3*/ 0.3;
     float k_repul = -0.05;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);

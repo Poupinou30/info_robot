@@ -7,7 +7,7 @@ double radius = 0.03;
 double l_y = 0.175;
 double l_x = 0.21;
 
-double v_max = 0.5;
+double v_max = 0.4;
 double omega_max = 10.0;
 
 void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2) {
@@ -33,6 +33,18 @@ double degToRad(double deg) {
 }
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
+    //Speed limitation
+    struct timeval currentTime;
+    gettimeofday(&currentTime,NULL);
+    pthread_mutex_lock(&lidarTimeLock);
+    double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
+    lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
+    pthread_mutex_unlock(&lidarTimeLock);
+    if(lidarElapsedTime > 500) v_max = 0.3;
+    else v_max = 0.3;
+
+
+
     omega = omega/112.5;
     // Calculate the magnitude of the velocity vector
     double v_magnitude = sqrt(pow(v_x, 2) + pow(v_y, 2));
@@ -364,10 +376,10 @@ void generateLog(){
         printf("Erreur lors de l'ouverture du fichier\n");
         return 1;
     }
-    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos\n");
+    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos\n");
     printf("File generated i guess\n");
 }
 
 void writeLog(){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y);
 }

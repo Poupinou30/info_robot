@@ -2,30 +2,33 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Ouvrir le fichier en mode lecture
-with open('logPosition.txt', 'r') as f:
+with open('../logFiles/logPosition.txt', 'r') as f:
     lines = f.readlines()
 
 # Supprimer l'en-tête
 lines = lines[1:]
 
 # Initialiser les listes pour stocker les données
-lidarPos, odometryPos, filteredPos = [], [], []
+lidarPos, odometryPos, filteredPos, opponentPos = [], [], [], []
 
 # Parcourir chaque ligne du fichier
 for line in lines:
     # Extraire les données
-    lidar, odometry, filtered = line.split(';')
+    data = line.split(';')
+    lidar, odometry, filtered, opponent = data[0], data[1], data[2], data[3]
     lidarPos.append([float(val) for val in lidar.split()])
     odometryPos.append([float(val) for val in odometry.split()])
     filteredPos.append([float(val) for val in filtered.split()])
+    opponentPos.append([float(val) for val in opponent.split()])
 
 # Convertir les listes en tableaux pour faciliter le traçage
 lidarPos = np.array(lidarPos)
 odometryPos = np.array(odometryPos)
 filteredPos = np.array(filteredPos)
+opponentPos = np.array(opponentPos)
 
 # Tracer les données
-fig, axs = plt.subplots(3, 3, figsize=(15, 15))
+fig, axs = plt.subplots(4, 3, figsize=(15, 20))
 
 # Tracer les positions x
 axs[0, 0].plot(lidarPos[:, 0], label='Lidar X Position')
@@ -42,8 +45,12 @@ axs[2, 0].plot(lidarPos[:, 2], label='Lidar Theta Position')
 axs[2, 1].plot(odometryPos[:, 2], label='Odometry Theta Position')
 axs[2, 2].plot(filteredPos[:, 2], label='Filtered Theta Position')
 
+# Tracer les positions de l'opposant
+axs[3, 0].plot(opponentPos[:, 0], label='Opponent X Position')
+axs[3, 1].plot(opponentPos[:, 1], label='Opponent Y Position')
+
 # Ajouter des légendes
-for i in range(3):
+for i in range(4):
     for j in range(3):
         axs[i, j].legend()
 

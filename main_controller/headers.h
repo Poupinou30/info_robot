@@ -103,6 +103,8 @@ void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2);
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
 void initializeObstacles();
 void initializeMainController();
+void addOpponentObstacle();
+void updateOpponentObstacle();
 typedef enum{MOVING,STOPPED} movingState;
 
 int initializeUART();
