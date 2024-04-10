@@ -120,6 +120,10 @@ int i2c_handle_front;
 int i2c_handle_rear;
 //FIN COMMUNICATION
 
+//Communication LIDAR
+void sendFilteredPos()
+//FIN LIDAR
+
 //FORKS - ACTUATORS
 int setArmDeployedAngle(int angle);
 int setForksDeployedAngle(int angle);

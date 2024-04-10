@@ -14,10 +14,13 @@ using namespace sl;
 int verbose;
 
 lidarPos myPos;
+lidarPos filteredPos;
 Opponent myOpponent;
+bool filteredPosAcquired = false;
 
 beaconAbsolutePos beaconRefPosition[3];
 lidarPos calibPos;
+pthread_mutex_t filteredPositionLock;
 
 
 float perimetre = 8.4;
@@ -352,10 +355,15 @@ void* beacon_data(void* argument){
             //if(verbose) fprintf(stderr,"beacon data\n");
             myPos.theta = alpha;
             pthread_mutex_unlock(&positionLock);
+            }
+
+            if(filteredPosAcquired){
             lidarPos object;
+            pthread_mutex_lock(&lockOpponentPosition);
+            pthread_mutex_lock(&filteredPositionLock);
             for (int k = 0;k<newa.size();k++){
-                    object.x = myPos.x + newd[k] * cos((myPos.theta - newa[k] + 90)*DEG2RAD);
-                    object.y = myPos.y + newd[k] * sin((myPos.theta - newa[k] + 90)*DEG2RAD);
+                    object.x = filteredPos.x + newd[k] * cos((filteredPos.theta - newa[k] + 90)*DEG2RAD);
+                    object.y = filteredPos.y + newd[k] * sin((filteredPos.theta - newa[k] + 90)*DEG2RAD);
 
 
                     objects_coordinates.push_back(object);
@@ -371,6 +379,8 @@ void* beacon_data(void* argument){
                     }
 
                 }
+            pthread_mutex_unlock(&filteredPositionLock);
+            pthread_mutex_unlock(&lockOpponentPosition);
             }
 
     //fprintf(stderr,"Après giga boucle beacon_data  \n");
@@ -396,6 +406,7 @@ int main(int argc, const char * argv[]){
     beaconRefPosition[1].y= 3.08;
     beaconRefPosition[2].x = 1.95;
     beaconRefPosition[2].y = -0.08;
+    
 
     calibPos.x = 0.13;
     calibPos.y = 0.125;
@@ -411,6 +422,9 @@ int main(int argc, const char * argv[]){
     if(argc > 1){ 
         write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
         verbose = 0;
+        int pipe_fd2[2];
+        pipe(pipe_fd2);
+        write(write_fd, pipe_fd2[1], sizeof(int)); // Écriture de l'adresse du pipe controlleur->lidar dans le pipe lidar->controller
         }
     lidarPos *position = &myPos;
     //clock_t begin= clock();
@@ -537,7 +551,24 @@ else{
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
     }
     pthread_mutex_unlock(&isReadyLock);
-    
+    //Reception position filtrée
+    ret = select(pipefd[0] + 1, &set, NULL, NULL, &timeout);
+    if (ret == -1) {
+            perror("select");
+            exit(EXIT_FAILURE);
+        } else if (ret == 0) {
+            //printf("No data within one seconds.\n");
+        } //DES DONNEES SONT DISPONIBLES
+        else{
+            double buffer[3];
+            read(pipefd[0], buffer, sizeof(buffer));
+            pthread_mutex_lock(&filteredPositionLock);
+            filteredPos.x = buffer[0];
+            filteredPos.y = buffer[1];
+            filteredPos.theta = buffer[2];
+            pthread_mutex_unlock(&filteredPositionLock);
+            filteredPosAcquired = true;
+        }
     
     }
     

@@ -264,6 +264,17 @@ void* executeProgram(void* arg){
 }
 
 uint8_t kalmanLaunched = 0;
+pipeCL_set = 0;
+int pipefdCL;
+
+void sendFilteredPos(){
+    float buffer[5];
+    buffer[0] = *myFilteredPos.x;
+    buffer[1] = *myFilteredPos.y;
+    buffer[2] = *myFilteredPos.theta;
+    write(pipefd,buffer,3*sizeof(float));
+}
+
 
 
 void* receptionPipe(void* pipefdvoid){
@@ -288,8 +299,12 @@ void* receptionPipe(void* pipefdvoid){
             exit(EXIT_FAILURE);
         } else if (ret == 0) {
             //printf("No data within one seconds.\n");
-        } else {
-            // Des données sont disponibles, lire les données
+        } //DES DONNEES SONT DISPONIBLES
+        else if (!pipeCL_set){
+            read(pipefd[0],&pipefdCL,sizeof(int));
+            pipeCL_set = 1;
+        }
+        else {
             
             read(pipefd[0], buffer, 5*sizeof(float));
             
