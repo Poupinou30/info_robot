@@ -54,5 +54,30 @@ for i in range(4):
     for j in range(3):
         axs[i, j].legend()
 
+# Regrouper les graphiques de odometryPos, filteredPos et lidarPos
+axs[0, 1].clear()
+axs[1, 1].clear()
+axs[2, 1].clear()
+
+# Tracer les positions x de odometryPos, filteredPos et lidarPos
+axs[0, 1].plot(lidarPos[:, 0], label='Lidar X Position', color='red')
+axs[0, 1].plot(odometryPos[:, 0], label='Odometry X Position', color='green')
+axs[0, 1].plot(filteredPos[:, 0], label='Filtered X Position', color='blue')
+
+# Tracer les positions y de odometryPos, filteredPos et lidarPos
+axs[1, 1].plot(lidarPos[:, 1], label='Lidar Y Position', color='red')
+axs[1, 1].plot(odometryPos[:, 1], label='Odometry Y Position', color='green')
+axs[1, 1].plot(filteredPos[:, 1], label='Filtered Y Position', color='blue')
+
+# Tracer les positions theta de odometryPos, filteredPos et lidarPos
+axs[2, 1].plot(lidarPos[:, 2], label='Lidar Theta Position', color='red')
+axs[2, 1].plot(odometryPos[:, 2], label='Odometry Theta Position', color='green')
+axs[2, 1].plot(filteredPos[:, 2], label='Filtered Theta Position', color='blue')
+
+# Ajouter des légendes aux nouveaux graphiques
+axs[0, 1].legend()
+axs[1, 1].legend()
+axs[2, 1].legend()
+
 # Enregistrer les tracés en JPEG
-plt.savefig('plots.jpeg', format='jpeg')
+plt.savefig('plotsMainController.jpeg', format='jpeg')

@@ -4,115 +4,167 @@
 #endif
 
 // Déclaration initiale des variables globales
-double x[3]; // Vecteur d'état initial [x, y, theta]
-double P[3][3] = {{0.01, 0, 0}, {0, 0.01, 0}, {0, 0, 0.01}}; // Covariance initiale de l'état
+double x[7]; // Vecteur d'état initial [x, y, theta, opponent_x, opponent_y, velocity_x, velocity_y]
+double P[7][7] = {
+    {0.01, 0, 0, 0, 0, 0, 0},
+    {0, 0.01, 0, 0, 0, 0, 0},
+    {0, 0, 0.01, 0, 0, 0, 0},
+    {0, 0, 0, 0.01, 0, 0, 0},
+    {0, 0, 0, 0, 0.01, 0, 0},
+    {0, 0, 0, 0, 0, 0.0001, 0},
+    {0, 0, 0, 0, 0, 0, 0.0001}
+}; // Covariance initiale de l'état
 
 // Matrices constantes pour le filtre de Kalman
-double F[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice de transition d'état
-double H[6][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; // Matrice d'observation
+double F[7][7] = {
+    {1, 0, 0, 0, 0, 0.03, 0},
+    {0, 1, 0, 0, 0, 0, 0.03},
+    {0, 0, 1, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 0, 1, 0},
+    {0, 0, 0, 0, 0, 0, 1}
+}; // Matrice de transition d'état
+double H[10][7] = {
+    {1, 0, 0, 0, 0, 0, 0}, // myPos.x from sensor 1
+    {0, 1, 0, 0, 0, 0, 0}, // myPos.y from sensor 1
+    {0, 0, 1, 0, 0, 0, 0}, // myPos.theta from sensor 1
+    {1, 0, 0, 0, 0, 0, 0}, // myPos.x from sensor 2
+    {0, 1, 0, 0, 0, 0, 0}, // myPos.y from sensor 2
+    {0, 0, 1, 0, 0, 0, 0}, // myPos.theta from sensor 2
+    {0, 0, 0, 1, 0, 0, 0}, // opponentX
+    {0, 0, 0, 0, 1, 0, 0}, // opponentY
+    {0, 0, 0, 0, 0, 1, 0}, // speedX
+    {0, 0, 0, 0, 0, 0, 1}  // speedY
+};
 
-double Q[3][3] = {{0.005, 0, 0}, {0, 0.005, 0}, {0, 0, 0.01}}; // Bruit de processus
-double R[6] = {1, 1, 0.01, 0.4, 0.4, 0.1}; // Bruit de mesure pour chaque variable d'état
+
+double Q[7][7] = {
+    {0.005, 0, 0, 0, 0, 0, 0},
+    {0, 0.005, 0, 0, 0, 0, 0},
+    {0, 0, 0.01, 0, 0, 0, 0},
+    {0, 0, 0, 0.01, 0, 0, 0},
+    {0, 0, 0, 0, 0.01, 0, 0},
+    {0, 0, 0, 0, 0, 100, 0},
+    {0, 0, 0, 0, 0, 0, 100}
+}; // Bruit de processus
+double R[7] = {0.7, 0.7, 0.05, 0.4, 0.4, 0.001, 0.001}; // Bruit de mesure pour chaque variable d'état
 double oldTheta;
 double meanTheta = 0;
 uint8_t thetaForcedFlag = 0;
 
 // Fonction de mise à jour du filtre de Kalman
 void* updateKalman(void* args) {
+    double y;
     pthread_mutex_lock(&lockPosition);
-    double measurements[3] = {*(myPos.x), *(myPos.y), *(myPos.theta)}; // Obtention des mesures
+    pthread_mutex_lock(&lockFilteredOpponent);
+    double measurements[7] = {*(myPos.x), *(myPos.y), *(myPos.theta), *(myOpponent.x), *(myOpponent.y), measuredSpeedX, measuredSpeedY}; // Obtention des mesures
+    pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockPosition);
-    double measurementsCombined[6];
+    double measurementsCombined[10];
 
     // Obtention des mesures du deuxième capteur (à remplacer par les vraies valeurs)
     double secondSensorMeasurement[3] = {*myOdometryPos.x, *myOdometryPos.y, *myOdometryPos.theta}; // Remplacez par les vraies valeurs
 
-    // Combinaison des mesures des deux capteurs
-    pthread_mutex_lock(&lidarFlagLock);
-    if(lidarAcquisitionFlag){
-        measurementsCombined[0] = measurements[0];
-        measurementsCombined[1] = measurements[1];
-        measurementsCombined[2] = measurements[2];
-        measurementsCombined[3] = secondSensorMeasurement[0];
-        measurementsCombined[4] = secondSensorMeasurement[1];
-        measurementsCombined[5] = secondSensorMeasurement[2];
-    }
-    else{
-        measurementsCombined[0] = secondSensorMeasurement[0];
-        measurementsCombined[1] = secondSensorMeasurement[1];
-        measurementsCombined[2] = secondSensorMeasurement[2];
-        measurementsCombined[3] = secondSensorMeasurement[0];
-        measurementsCombined[4] = secondSensorMeasurement[1];
-        measurementsCombined[5] = secondSensorMeasurement[2];
-    }
-    meanTheta = (measurementsCombined[2] + measurementsCombined[5])/2;
-    pthread_mutex_unlock(&lidarFlagLock);
-    
-    // Étape de prédiction
-    double x_pred[3];
-    double P_pred[3][3];
-    for (int i = 0; i < 3; i++) {
-        x_pred[i] = 0;
-        for (int j = 0; j < 3; j++) {
-            x_pred[i] += F[i][j] * x[j]; // Prédiction de l'état
-            P_pred[i][j] = 0;
-            for (int k = 0; k < 3; k++) {
-                P_pred[i][j] += F[i][k] * P[k][j]; // Prédiction de la covariance de l'état
-            }
-            P_pred[i][j] += Q[i][j]; // Ajout du bruit de processus
-        }
-    }
+// ... (reste du code inchangé)
 
-    // Étape de mise à jour
+// Combinaison des mesures des deux capteurs
+pthread_mutex_lock(&lidarFlagLock);
+if(lidarAcquisitionFlag){
+    for(int i = 0; i < 3; i++){
+        measurementsCombined[i] = measurements[i];
+        measurementsCombined[i+3] = secondSensorMeasurement[i];
+    }
+}
+else{
+    for(int i = 0; i < 3; i++){
+        measurementsCombined[i] = secondSensorMeasurement[i];
+        measurementsCombined[i+3] = secondSensorMeasurement[i];
+    }
+}
+measurementsCombined[6] = measurements[3];
+measurementsCombined[7] = measurements[4];
+measurementsCombined[8] = measurements[5];
+measurementsCombined[9] = measurements[6];
+pthread_mutex_unlock(&lidarFlagLock);
+
+// Étape de prédiction
+double x_pred[7];
+double P_pred[7][7];
+for (int i = 0; i < 7; i++) {
+    x_pred[i] = 0;
+    for (int j = 0; j < 7; j++) {
+        x_pred[i] += F[i][j] * x[j]; // Prédiction de l'état
+        P_pred[i][j] = 0;
+        for (int k = 0; k < 7; k++) {
+            P_pred[i][j] += F[i][k] * P[k][j]; // Prédiction de la covariance de l'état
+        }
+        P_pred[i][j] += Q[i][j]; // Ajout du bruit de processus
+    }
+}
+
+// ... (reste du code inchangé)
+
 // Étape de mise à jour
-for (int j = 0; j < 3; j++) {
+for (int j = 0; j < 7; j++) {
     double innovationSum = 0;
     double covarianceSum = 0;
-    for (int i = 0; i < 6; i++) {
-        double y;
-        if (j == 2) {
+    for (int i = 0; i < 10; i++) {
+        if (i == j || (i-3) == j) { // Utiliser seulement les mesures pertinentes pour chaque mise à jour d'état
             double diff = measurementsCombined[i] - x_pred[j];
             // Ajustement de l'innovation pour les transitions entre 0 et 360 degrés
-            if (diff > 180) {
-                diff -= 360;
-            } else if (diff < -180) {
-                diff += 360;
+            if (j == 2) {
+                if (diff > 180) {
+                    diff -= 360;
+                } else if (diff < -180) {
+                    diff += 360;
+                }
             }
             y = diff; // Innovation ajustée
-        } else {
-            y = measurementsCombined[i] - (H[i][0] * x_pred[0] + H[i][1] * x_pred[1] + H[i][2] * x_pred[2]); // Innovation
+            double S = H[i][0] * P_pred[0][0] * H[i][0] + H[i][1] * P_pred[1][1] * H[i][1] + H[i][2] * P_pred[2][2] * H[i][2] + H[i][3] * P_pred[3][3] * H[i][3] + H[i][4] * P_pred[4][4] * H[i][4] + H[i][5] * P_pred[5][5] * H[i][5] + H[i][6] * P_pred[6][6] * H[i][6] + R[i]; // Covariance de l'innovation
+            double K = P_pred[j][j] * H[i][j] / S; // Gain de Kalman
+            innovationSum += K * y;
+            covarianceSum += K * H[i][j] * P_pred[j][j];
         }
-        double S = H[i][0] * P_pred[0][0] * H[i][0] + H[i][1] * P_pred[1][1] * H[i][1] + H[i][2] * P_pred[2][2] * H[i][2] + R[i]; // Covariance de l'innovation
-        
-        double K = P_pred[j][j] * H[i][j] / S; // Gain de Kalman
-        innovationSum += K * y;
-        covarianceSum += K * H[i][j] * P_pred[j][j];
     }
     x[j] = x_pred[j] + innovationSum; // Mise à jour de l'état
     P[j][j] = P_pred[j][j] - covarianceSum; // Mise à jour de la covariance de l'état
 }
 
 
+// ... (reste du code inchangé)
+
+    //printf("speedXFiltered = %f speedYFiltered = %f realSpeedX = %f realSpeedY = %f \n", x[5],x[6],measuredSpeedX,measuredSpeedY);
+    // Mise à jour de la position filtrée
     pthread_mutex_lock(&lockFilteredPosition);
     *(myFilteredPos.x) = x[0];
     *(myFilteredPos.y) = x[1];
-    double tempoTheta = x[2];
-    while(tempoTheta> 360) tempoTheta = x[2] - 360;
-    while (tempoTheta < 0) tempoTheta = x[2]+360;
-    *myFilteredPos.theta = tempoTheta;
-    *(myFilteredPos.theta) = fmod(x[2],360);
+    double filteredTheta = x[2];
+    while(filteredTheta > 360) filteredTheta -= 360;
+    while (filteredTheta < 0) filteredTheta += 360;
+    *myFilteredPos.theta = filteredTheta;
     pthread_mutex_unlock(&lockFilteredPosition);
+
+    // Mise à jour de la position de l'opposant filtrée
+    pthread_mutex_lock(&lockFilteredOpponent);
+    *(myFilteredOpponent.x) = x[3];
+    *(myFilteredOpponent.y) = x[4];
+    pthread_mutex_unlock(&lockFilteredOpponent);
 
     return NULL;
 }
 
+
 void defineInitialPosition(){
-    x[0] = *myPos.x; x[1] = *myPos.y; x[2] = *myPos.theta;
+    x[0] = *myPos.x; x[1] = *myPos.y; x[2] = *myPos.theta; x[3] = -1; x[4] = -1; x[5] = 0; x[6] = 0;
     pthread_mutex_lock(&lockFilteredPosition);
     *(myFilteredPos.x) = x[0];
     *(myFilteredPos.y) = x[1];
     *(myFilteredPos.theta) = x[2];
     oldTheta = x[2];
     pthread_mutex_unlock(&lockFilteredPosition);
+}
 
+void defineOpponentPosition(float posX, float posY){
+    x[3] = posX; x[4] = posY;
 }

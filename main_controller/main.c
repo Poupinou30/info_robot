@@ -12,7 +12,10 @@ forceVector myForce;
 position destination;
 position myPos;
 position myFilteredPos;
+
 position myOpponent;
+position myFilteredOpponent;
+
 uint8_t *SPI_reception_buffer_rear;
 uint8_t *SPI_reception_buffer_front;
 int spi_handle_front;
@@ -82,16 +85,12 @@ int mainPatternOdometryOld(){
 }
 
 int main(){
-
-
     //initialisation
-
     initializeMainController();
-
     printObstacleLists();
     pthread_mutex_lock(&lockDestination);
-    *destination.x = 1.7;
-    *destination.y = 2;
+    *destination.x = 1.5;
+    *destination.y = 1.5;
     *destination.theta = 0;
     destination_set = 1;
     pthread_mutex_unlock(&lockDestination);
@@ -100,22 +99,24 @@ int main(){
     *myPos.theta = 180;
     //ADDING OPPONENT OBSTACLE DONE IN INITIALIZATION
 
-
     //
     double speedTabRobotFrame[3] = {0,0,0};
 
+    int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
+    pipe(pipefdLC);
+    int pipefdCL[2]; //PIPE CONTROLLER->LIDAR
+    pipe(pipefdCL);
+    int pipesfd[2] = {pipefdLC[1],pipefdCL[0]}; //1 car le lidar va ENVOYER et 0 car le lidar va RECEVOIR
 
-    int pipefd[2];
-    pipe(pipefd);
     pthread_t lidarExecuteThread;
     
     //Lancer la localisation lidar
-    pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipefd[1]); // Passage de l'adresse de pipefd[1] à pthread_create
+    pthread_create(&lidarExecuteThread,NULL,executeProgram,&pipesfd); // Passage de l'adresse des pipefd[1] à pthread_create
     fprintf(stderr,"Thread for execution launched \n");
 
     //initialisation thread qui récupère les données du pipe provenant du programme lidar
     pthread_t pipeComThread;
-    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
+    pthread_create(&pipeComThread,NULL,receptionPipe,&pipefdLC[0]);
     fprintf(stderr,"Thread for capture launched \n");
     //Wait for the lidar to be ready
     //readyToGo = 1;
@@ -131,32 +132,40 @@ int main(){
 
     struct timeval lastExecutionTime, currentTime;
     gettimeofday(&lastExecutionTime, NULL);
+    double elapsedTime = 0;
 
     while (1)
     {
-        //lidarAcquisitionFlag = 0; //A RETIRER CETAIT POUR TEST ODOMETRIE
         gettimeofday(&currentTime, NULL);
-        double elapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
-        elapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
+        double currentElapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
+        currentElapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
 
-        if (elapsedTime >= 30)
+        if (currentElapsedTime >= 30)
         {
             if(makeLog) writeLog();
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
-            
-            if(VERBOSE){
-                printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
-                printf("opponent x = %f y = %f \n",*myOpponent.x,*myOpponent.y);
-                //printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
-                //printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
-                printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
+            sendFilteredPos(pipefdCL[1]);
+            elapsedTime += currentElapsedTime;
+            if (elapsedTime >= 1000)
+            {
+                
+                
+                if(VERBOSE){
+                    printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
+                    printf("opponent x = %f y = %f \n",*myFilteredOpponent.x,*myFilteredOpponent.y);
+                    //printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
+                    //printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
+                    printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
+                }
+
+                elapsedTime = 0;
             }
 
             gettimeofday(&lastExecutionTime, NULL);
             //ON EST ARRIVE A DESTINATION?
-            printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
+            //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
 
             pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
@@ -164,11 +173,11 @@ int main(){
             pthread_mutex_unlock(&lidarTimeLock);
             //printf("conditions = %d %d %d %d \n",measuredSpeedX < 0.03 , measuredSpeedY < 0.03 , measuredSpeedOmega < 0.1 , lidarElapsedTime < 200);
             //printf("time elapsed = %lf \n",lidarElapsedTime);
-            printf("myControllerState = %d \n",myControllerState);
+            //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
             pthread_mutex_lock(&lidarFlagLock);
-            if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 400){
+            if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -176,19 +185,14 @@ int main(){
                 lidarAcquisitionFlag = 0;
             }
             pthread_mutex_unlock(&lidarFlagLock);
-
         }
     }
-
-
-
 
     //DANS UNE LOOP---------------
         //Lancer le controle en vitesse (envoyer des 0)
 
         //Lancer le path planning
         //KALMAN
-    
 }
 
 int mainTestKalman(){
@@ -229,7 +233,7 @@ int mainPatternOdometry(){
     while(1){
         gettimeofday(&now, NULL);
         currentTime = now.tv_sec*1000+now.tv_usec/1000;
-        if (currentTime - nowValue >= 20000 ) {
+        if (currentTime - nowValue >= 50000 ) {
             break;
         }
 
@@ -237,13 +241,13 @@ int mainPatternOdometry(){
         double elapsedTime = endInst.tv_sec*1000+endInst.tv_usec/1000 - instValue;
         if (elapsedTime >= 30) {
             myOdometry();
-            processInstructionNew(0.0,0.0,20,i2c_handle_front,i2c_handle_rear);
+            processInstructionNew(0.2,0.0,0,i2c_handle_front,i2c_handle_rear);
             double wheelSpeed[4] = {motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR};
             
             computeSpeedFromOdometry(wheelSpeed,&vx,&vy,&omega);
             
             
-            if(*myOdometryPos.theta > 359) break;
+            if(*myOdometryPos.x > 1) break;
             instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
         }
 
@@ -401,6 +405,9 @@ void initializeMainController(){
     myPos.theta = &positionReceived[2];
     myOpponent.x = (float*)malloc(sizeof(float));
     myOpponent.y = (float*)malloc(sizeof(float));
+    myOdometryPos.x = (float*)malloc(sizeof(float));
+    myFilteredOpponent.x = (float*)malloc(sizeof(float));
+    myFilteredOpponent.y = (float*)malloc(sizeof(float));
     myOdometryPos.x = (float*)malloc(sizeof(float));
     myOdometryPos.y = (float*)malloc(sizeof(float));
     myOdometryPos.theta = (float*)malloc(sizeof(float));

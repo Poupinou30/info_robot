@@ -3,7 +3,8 @@
 #define HEADERS
 #endif
 
-float actionDistance = 0.30; //en cm
+float fixActionDistance = 0.2;
+float mobileActionDistance = 0.4;
 
 float computeEuclidianDistance(double x1, double y1, double x2, double y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
@@ -54,7 +55,7 @@ void computeInitialRepulsiveField(){
 }
 
 void updateRepulsiveField(int x1,int y1, int x2, int y2){
-
+    float actionDistance = 0.3;
     float scalingFactor = 100;
     int X1 = fmin(x1,x2);
     int X2 = fmax(x1,x2);
@@ -101,6 +102,7 @@ void resetRepulsiveField(int x1,int y1, int x2, int y2){
 }
 
 void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2){
+    float actionDistance = 0.3;
     //Mode 0 = calculer toute l'arène
     //Mode 1 = on précise sur quelle surface on doit mettre à jour le field
     if(mode == 0){
@@ -205,7 +207,7 @@ void addRoundObstacle(double posX, double posY, double size, uint8_t moving){
 
 void addOpponentObstacle(){
     obstacle myObstacle;
-    myObstacle.size = 0.3;
+    myObstacle.size = 0.15;
     myObstacle.isRectangle = 0;
     myObstacle.moving = 1;
     if(myForce.obstacleNumber == 0){
@@ -234,10 +236,10 @@ void addOpponentObstacle(){
 }
 
 void updateOpponentObstacle(){
-    pthread_mutex_lock(&lockOpponentPosition);
-    myForce.obstacleList[myForce.movingIndexes[0]].posX = *myOpponent.x;
-    myForce.obstacleList[myForce.movingIndexes[0]].posY = *myOpponent.y;
-    pthread_mutex_unlock(&lockOpponentPosition);
+    pthread_mutex_lock(&lockFilteredOpponent);
+    myForce.obstacleList[myForce.movingIndexes[0]].posX = *myFilteredOpponent.x;
+    myForce.obstacleList[myForce.movingIndexes[0]].posY = *myFilteredOpponent.y;
+    pthread_mutex_unlock(&lockFilteredOpponent);
 }
 
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving){
@@ -313,9 +315,9 @@ void printObstacleLists(){
 void computeForceVector(){
     
     
-    float k_att_xy = /*0.2*/ 0.3;
+    float k_att_xy = 0.3;
     float k_att_theta = /*0.3*/ 0.3;
-    float k_repul = -0.05;
+    float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
     pthread_mutex_lock(&lockFilteredPosition); 
@@ -323,6 +325,8 @@ void computeForceVector(){
     double f_att_y = -destination_set*k_att_xy * (*myFilteredPos.y - *destination.y);
     double theta = *myFilteredPos.theta;
     double desiredTheta = *destination.theta;
+    uint8_t sign_f_rep_x;
+    uint8_t sign_f_rep_y;
     
 
     if(theta > 180) theta +=-360;
@@ -336,7 +340,7 @@ void computeForceVector(){
         error-=360;
     }
 
-    printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
+    //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
     
 
     if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.02 && fabs(error) < 0.5){
@@ -360,6 +364,7 @@ void computeForceVector(){
     double tempoX;
     double tempoY;
     double distance;
+    float actionDistance = 0.3;
     position tempoRectangle[2];
     position tempoPoint1, tempoPoint2;
     tempoPoint1.x = (float*) malloc(sizeof(float)*1);
@@ -372,6 +377,8 @@ void computeForceVector(){
     //Calcul de la force de répulsion totale
     for (int i = 0; i < myForce.obstacleNumber; ++i) {
         tempoObstacle = &myForce.obstacleList[i];
+        if(tempoObstacle -> moving) actionDistance = mobileActionDistance;
+        else actionDistance = fixActionDistance;
         if(tempoObstacle->isRectangle){
             *tempoPoint1.x = tempoObstacle->x1;
             *tempoPoint1.y = tempoObstacle->y1;
@@ -392,13 +399,20 @@ void computeForceVector(){
             tempoX = tempoObstacle->posX; //Calcule la position en x
             tempoY = tempoObstacle->posY; //Calcule la position en y
             pthread_mutex_lock(&lockFilteredPosition);
-            distance = computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size; //Calcule la distance
+            distance = fabs(computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size); //Calcule la distance
             pthread_mutex_unlock(&lockFilteredPosition);
         }
+        //printf("distance = %f and actionDistance = %f \n",distance,actionDistance);
+        
         if(distance < actionDistance){
             pthread_mutex_lock(&lockFilteredPosition);
-            f_repul_x = f_repul_x + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoX - *myFilteredPos.x);
-            f_repul_y = f_repul_y + k_repul*(1/distance - 1/actionDistance)*(1/pow(distance,3))*(tempoY - *myFilteredPos.y);
+            if(*myFilteredPos.x > tempoX) sign_f_rep_x = -1;
+            else sign_f_rep_x = 1;
+            if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
+            else sign_f_rep_y = 1;
+            f_repul_x = f_repul_x + k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
+            f_repul_y = f_repul_y + k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
+
             pthread_mutex_unlock(&lockFilteredPosition);
 
         }
@@ -409,6 +423,7 @@ void computeForceVector(){
     free(tempoPoint2.y);
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
+    //printf("f_repul_x = %lf f_repul_y = %lf \n",f_repul_x,f_repul_y);
     f_theta = f_att_theta;
     //fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
     //Calcul de la force de attraction totale
@@ -419,7 +434,7 @@ void myPotentialFieldController(){
     double outputSpeed[3];
     computeForceVector();
     convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
-    printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
+    //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
     if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear);
     processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
     }

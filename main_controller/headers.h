@@ -123,7 +123,7 @@ int i2c_handle_rear;
 //FIN COMMUNICATION
 
 //Communication LIDAR
-void sendFilteredPos()
+void sendFilteredPos(int pipefdCL);
 //FIN LIDAR
 
 //FORKS - ACTUATORS
@@ -202,3 +202,9 @@ FILE* logFile;
 //LOG AND OTHERS
 void generateLog();
 void writeLog();
+
+pthread_mutex_t lockFilteredOpponent;
+extern position myFilteredOpponent;
+
+//KALMAN
+void defineOpponentPosition(float posX, float posY);

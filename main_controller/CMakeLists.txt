@@ -5,6 +5,8 @@ set(CMAKE_C_STANDARD 99)
 
 include_directories(.)
 find_package(pigpio REQUIRED)
+#add_compile_options(-g)
+
 
 add_executable(main_controller main.c
         variables.c

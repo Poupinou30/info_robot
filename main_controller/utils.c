@@ -3,6 +3,8 @@
 #define HEADERS
 #endif
 
+#include <fcntl.h>
+
 double radius = 0.03;
 double l_y = 0.175;
 double l_x = 0.21;
@@ -40,8 +42,8 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
     lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
     pthread_mutex_unlock(&lidarTimeLock);
-    if(lidarElapsedTime > 500) v_max = 0.3;
-    else v_max = 0.3;
+    if(lidarElapsedTime > 500) v_max = 0.15;
+    else v_max = 0.15;
 
 
 
@@ -76,9 +78,9 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 }
 
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
-    *v_x = radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+    *v_x = 1.02*1.04*radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
-    *v_y = radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
+    *v_y = 1.0167*radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
 
     *omega = 112.5*/*1.043**/radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
@@ -252,9 +254,11 @@ void handle_sigint(int sig) {
 }
 
 void* executeProgram(void* arg){
-    int pipefd = *((int*)arg);
+    int *pipesfd = (int*) arg;
+    int pipefdLC = pipesfd[0];
+    int pipefdCL = pipesfd[1];
     char cmd[256];
-    sprintf(cmd,"/home/pi/Documents/lab_git_augu_new/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
+    sprintf(cmd,"/home/pi/Documents/lab_git_augu_new/info_robot/lidar_dir/output/Linux/Release/main_folder %d %d", pipefdLC, pipefdCL);
     //sprintf(cmd,"/home/student/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
 
     child_pid = fork();
@@ -276,20 +280,32 @@ void* executeProgram(void* arg){
 }
 
 uint8_t kalmanLaunched = 0;
-pipeCL_set = 0;
-int pipefdCL;
 
-void sendFilteredPos(){
-    float buffer[5];
+void sendFilteredPos(int pipefdCL){
+    float buffer[3];
     buffer[0] = *myFilteredPos.x;
     buffer[1] = *myFilteredPos.y;
     buffer[2] = *myFilteredPos.theta;
-    write(pipefd,buffer,3*sizeof(float));
+    int writeDebugger = write(pipefdCL,(void*) (&buffer),3*sizeof(float));
+    if(writeDebugger == -1){
+        perror("Error while writing RIP");
+    }
+    //printf("FilteredPositionWritten and write returned %d for pipefdCL = %d\n",writeDebugger,pipefdCL);
+    int flags = fcntl(pipefdCL, F_GETFL);
+    if (flags == -1) {
+        perror("fcntl");
+        // Gérer l'erreur de récupération des drapeaux du descripteur de fichier
+    } else {
+        // Le descripteur de fichier est valide et correspond à un tube
+        //printf("Le descripteur de fichier est valide et correspond à un tube.\n");
+    }
+
 }
 
 
 
 void* receptionPipe(void* pipefdvoid){
+    uint8_t opponentInitialized = 0;
     float *buffer = (float*) malloc(5*sizeof(float));
     uint8_t first = 1;
     fprintf(stderr,"waiting for reading \n");
@@ -312,10 +328,6 @@ void* receptionPipe(void* pipefdvoid){
         } else if (ret == 0) {
             //printf("No data within one seconds.\n");
         } //DES DONNEES SONT DISPONIBLES
-        else if (!pipeCL_set){
-            read(pipefd[0],&pipefdCL,sizeof(int));
-            pipeCL_set = 1;
-        }
         else {
             
             read(pipefd[0], buffer, 5*sizeof(float));
@@ -336,6 +348,11 @@ void* receptionPipe(void* pipefdvoid){
             *myOpponent.y = buffer[4];
             pthread_mutex_unlock(&lockPosition);
             pthread_mutex_unlock(&lockOpponentPosition);
+
+            if(buffer[3] != 0 && !opponentInitialized){
+                opponentInitialized = 1;
+                defineOpponentPosition(buffer[3],buffer[4]);
+            }
             
             
             pthread_mutex_lock(&lockRefreshCounter);
@@ -353,7 +370,7 @@ void* receptionPipe(void* pipefdvoid){
             kalmanLaunched = 1;*/
             
             }
-            else printf("Condition = %d %d %d %d %d OR %d \n",buffer[0] > 0 , buffer[1] > 0 , buffer[0] < 2 , buffer[1]< 3 , (computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.20),first);
+            //else if(VERBOSE) printf("Condition = %d %d %d %d %d OR %d \n",buffer[0] > 0 , buffer[1] > 0 , buffer[0] < 2 , buffer[1]< 3 , (computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.20),first);
             
             /*
             if(VERBOSE){
@@ -396,5 +413,5 @@ void generateLog(){
 }
 
 void writeLog(){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y);
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myFilteredOpponent.x, *myFilteredOpponent.y);
 }

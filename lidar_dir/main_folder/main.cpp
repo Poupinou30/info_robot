@@ -11,25 +11,30 @@ using namespace sl;
 #endif
 
 
+#include <fcntl.h>
+
 int verbose;
 
 lidarPos myPos;
 lidarPos filteredPos;
 Opponent myOpponent;
 bool filteredPosAcquired = false;
+FILE* logFile;
 
 beaconAbsolutePos beaconRefPosition[3];
 lidarPos calibPos;
 pthread_mutex_t filteredPositionLock;
 
 
-float perimetre = 8.4;
+float perimetre = 8.40; /*8.4 sur l'arène!!!!*/
 float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
-float triangleErrorTolerance = 0.12;//il est à 0.08 par défaut
-float isoceleTolerance = 0.12; //ETAIT A 0.08
+float triangleErrorTolerance = 0.1;//il est à 0.08 par défaut
+float isoceleTolerance = 0.1; //ETAIT A 0.08
+float longSideLength = 3.25; //Longueur des deux grands côtés du triangle
+float shortSideLength = 1.9; //Longueur des deux petits côtés du triangle
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t lidarDataLock = PTHREAD_MUTEX_INITIALIZER;
@@ -101,6 +106,8 @@ float triangulationPierlot(float *x, float *y,
 
 
 void* beacon_data(void* argument){
+    float distanceToCenter;
+
     if(verbose) printf("rentre dans beaconData\n");
     float oldPerimetre = 0;
     float oldIsoceleCondition = 999;
@@ -197,6 +204,7 @@ void* beacon_data(void* argument){
                 if(verbose) fprintf(stderr,"Object fusion engaged \n");
                 if(verbose) fprintf(stderr,"distance for fusion is %f \n",distance(newa[0],moya/moy_count,newd[0],moyd/moy_count));
                         newa[i] = (newa[0]*newWidth[i]+(moya/moy_count -360) *object_width)/(object_width+newWidth[0]);
+                        if(newa[i] < 0) newa[i] = newa[i] + 360;
                         //newd[i] = (newd[i]*newWidth[i]+(moyd/moy_count) *object_width)/(object_width+newWidth[i]);
                         newWidth[0] = newWidth[0] + object_width;
                         already_added = 1;
@@ -304,11 +312,12 @@ void* beacon_data(void* argument){
                     dik=distance(beaconTab[0].angle,beaconTab[2].angle,beaconTab[0].distance,beaconTab[2].distance);
                     //fprintf(stderr,"djk = %f\n",djk);
                     
-
-                    uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=3.25+isoceleTolerance && dij>=3.25-isoceleTolerance && djk<=3.25+isoceleTolerance && djk>=3.25-isoceleTolerance && dik>=1.9-isoceleTolerance && dik<=1.9+isoceleTolerance;
-                    if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
+                    float oldError = fabs(oldPerimetre-perimetre) + 2*fabs(oldIsoceleCondition);
+                    float actualError = fabs(triangle-perimetre) + 2*fabs(fabs(dij-djk));
+                    uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
+                    //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
                     //if(verbose && triangle >8.1&& triangle < 8.8 && beaconTab[0].angle > 270) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
-                    if(condition && fabs(triangle-perimetre) < fabs(oldPerimetre-perimetre) && fabs(oldIsoceleCondition-fabs(dij-djk))){//faudrait rajouter une condition brrr genre sur les anngles
+                    if(condition && actualError < oldError){//faudrait rajouter une condition brrr genre sur les anngles
                         beaconFound = 1;
                         bestBeaconTab[0] = beaconTab[0];
                         bestBeaconTab[1] = beaconTab[1];
@@ -328,16 +337,20 @@ void* beacon_data(void* argument){
                     
                         }
 
+                        
+
                     }
                     
                 }
             
             }
             if(beaconFound){
-            pthread_mutex_lock(&positionLock);
-            float* myX = (float*) malloc(sizeof(float));
-            float* myY = (float*) malloc(sizeof(float));
-            *myX = 0; *myY = 0;
+                if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",bestBeaconTab[0].angle,bestBeaconTab[0].distance,bestBeaconTab[0].width,bestBeaconTab[1].angle,bestBeaconTab[1].distance,bestBeaconTab[1].width,bestBeaconTab[2].angle,bestBeaconTab[2].distance,bestBeaconTab[2].width );
+                if(verbose) printf("triangle: %f \n", oldPerimetre);
+                pthread_mutex_lock(&positionLock);
+                float* myX = (float*) malloc(sizeof(float));
+                float* myY = (float*) malloc(sizeof(float));
+                *myX = 0; *myY = 0;
             
             pthread_mutex_unlock(&positionLock);
             triangulationPierlot( myX,  myY, (360-bestBeaconTab[0].angle)*DEG2RAD,  (360-bestBeaconTab[1].angle)*DEG2RAD,  (360-bestBeaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
@@ -358,26 +371,46 @@ void* beacon_data(void* argument){
             }
 
             if(filteredPosAcquired){
+            float tempoX, tempoY, tempoA, tempoD = 0;
+            bool opponentFound = 0;
             lidarPos object;
             pthread_mutex_lock(&lockOpponentPosition);
             pthread_mutex_lock(&filteredPositionLock);
+            float previousDistanceToCenter = 3;
+            float previousD = 3;
+            float score, previousScore = 0;
             for (int k = 0;k<newa.size();k++){
-                    object.x = filteredPos.x + newd[k] * cos((filteredPos.theta - newa[k] + 90)*DEG2RAD);
-                    object.y = filteredPos.y + newd[k] * sin((filteredPos.theta - newa[k] + 90)*DEG2RAD);
+                    object.x = filteredPos.x + newd[k] * cos((myPos.theta - newa[k] + 90)*DEG2RAD);
+                    object.y = filteredPos.y + newd[k] * sin((myPos.theta - newa[k] + 90)*DEG2RAD);
+                    //object.x = filteredPos.x + newd[k] * cos((90-(360-newa[k]-filteredPos.theta))*DEG2RAD);
+                    //object.y = filteredPos.y + newd[k] * sin((90-(360-newa[k]-filteredPos.theta))*DEG2RAD);
 
 
                     objects_coordinates.push_back(object);
                     //fprintf(stderr,"object position: x = %f and y = %f angle = %f\n",object.x,object.y,newa[k]);
-                    if(object.x < 1.95 && object.x > 0.05 && object.y < 2.95 && object.y > 0.05){
+                    distanceToCenter = pow((object.x-1)*(object.x-1)+(object.y-1.5)*(object.y-1.5),0.5);
+
+                    //printf("distanceToCenter = %f\n",distanceToCenter);
+                    score = 3/(distanceToCenter+0.5) + 1/(newd[k]+0.5);
+                    if(object.x < 1.87 && object.x > 0.13 && object.y < 2.87 && object.y > 0.13 && score>previousScore){
+                        //printf("PotentialOpponent at %f %f \n",object.x,object.y);
                         //if(verbose) fprintf(stderr, "opponent added \n");
-                        pthread_mutex_lock(&lockOpponentPosition);
-                        myOpponent.x = object.x;
-                        myOpponent.y = object.y;
+                        tempoX = object.x;
+                        tempoY = object.y;
+                        tempoA = newa[k];
+                        tempoD = newd[k];
                         myOpponent.isDetected = 1;
-                        pthread_mutex_unlock(&lockOpponentPosition);
+                        previousDistanceToCenter = distanceToCenter;
+                        opponentFound = 1;
+                        previousScore = score;
 
                     }
-
+                }
+            if(opponentFound){
+                    if(tempoD < 0.3) printf("chosen Opponent = %f %f \n",tempoX,tempoY);
+                    myOpponent.x = tempoX;
+                    myOpponent.y = tempoY;
+                    writeLog(tempoA,tempoD,previousDistanceToCenter);
                 }
             pthread_mutex_unlock(&filteredPositionLock);
             pthread_mutex_unlock(&lockOpponentPosition);
@@ -396,6 +429,7 @@ void* beacon_data(void* argument){
     return NULL;
 }
 
+int read_fd;
 
 
 int main(int argc, const char * argv[]){
@@ -419,12 +453,20 @@ int main(int argc, const char * argv[]){
     pthread_mutex_unlock(&lockMyState);
     if(verbose) fprintf(stderr,"Argc  = %d\n",argc);
     int write_fd;
+    
+    pthread_t acquisitionThread;
+
     if(argc > 1){ 
         write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
+        read_fd = atoi(argv[2]);
         verbose = 0;
-        int pipe_fd2[2];
-        pipe(pipe_fd2);
-        write(write_fd, pipe_fd2[1], sizeof(int)); // Écriture de l'adresse du pipe controlleur->lidar dans le pipe lidar->controller
+        generateLog();
+        
+        if (pthread_create(&acquisitionThread, NULL, filteredPositionAcquisition, NULL) != 0) {
+        fprintf(stderr, "Erreur lors de la création du thread\n");
+        exit(EXIT_FAILURE);
+    }
+        
         }
     lidarPos *position = &myPos;
     //clock_t begin= clock();
@@ -551,24 +593,10 @@ else{
         write(write_fd, numbers.data(), numbers.size() * sizeof(float)); // Écriture des nombres dans le pipe
     }
     pthread_mutex_unlock(&isReadyLock);
-    //Reception position filtrée
-    ret = select(pipefd[0] + 1, &set, NULL, NULL, &timeout);
-    if (ret == -1) {
-            perror("select");
-            exit(EXIT_FAILURE);
-        } else if (ret == 0) {
-            //printf("No data within one seconds.\n");
-        } //DES DONNEES SONT DISPONIBLES
-        else{
-            double buffer[3];
-            read(pipefd[0], buffer, sizeof(buffer));
-            pthread_mutex_lock(&filteredPositionLock);
-            filteredPos.x = buffer[0];
-            filteredPos.y = buffer[1];
-            filteredPos.theta = buffer[2];
-            pthread_mutex_unlock(&filteredPositionLock);
-            filteredPosAcquired = true;
-        }
+    
+    
+    
+    
     
     }
     
@@ -610,4 +638,51 @@ else{
     //double time_spent= (double)(end-begin)/CLOCKS_PER_SEC;
     //printf("execution time: %f \n", time_spent);
     //close(write_fd); // Fermeture du descripteur de fichier d'écriture du pipe
+    pthread_join(acquisitionThread,NULL);
+}
+
+void* filteredPositionAcquisition(void* arg){
+    struct timeval timeout;
+    timeout.tv_sec = 0; // Timeout de 1 seconde pour la reception de la position filtrée
+    timeout.tv_usec = 3000;
+
+    while(1){
+    fd_set set;
+    FD_ZERO(&set); // Initialiser le set à zéro
+    FD_SET(read_fd, &set); // Ajouter le descripteur de fichier de lecture du pipe au set
+    int ret = select(read_fd + 1, &set, NULL, NULL, &timeout);
+    if(verbose) printf("ret = %d \n",ret);
+    if (ret == -1) {
+            perror("select");
+            exit(EXIT_FAILURE);
+        } else if (ret == 0) {
+            //printf("No data within one seconds.\n");
+        } //DES DONNEES SONT DISPONIBLES
+        else{
+            float buffer[3];
+            read(read_fd, buffer, sizeof(buffer));
+            pthread_mutex_lock(&filteredPositionLock);
+            filteredPos.x = buffer[0];
+            filteredPos.y = buffer[1];
+            filteredPos.theta = buffer[2];
+            pthread_mutex_unlock(&filteredPositionLock);
+            filteredPosAcquired = true;
+            if(verbose) printf("BUFFER SETTED and position filtered is %f %f %f \n",buffer[0],buffer[1],buffer[2]);
+        }
+    }
+}
+
+void generateLog(){
+    int variable = 0;
+
+    logFile = fopen("../logFiles/logLidar.txt", "w");
+    if (logFile == NULL) {
+        printf("Erreur lors de l'ouverture du fichier\n");
+    }
+    fprintf(logFile, "myFilteredPos ; myLidarPos ; opponentPos ; opponentAngle ; opponentDistance ; DistanceFromCenter\n");
+    printf("File generated i guess\n");
+}
+
+void writeLog(float angle, float distance, float distanceFromCenter){
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f ; %f ; %f ; %f\n",filteredPos.x, filteredPos.y, filteredPos.theta,myPos.x,myPos.y,myPos.theta,myOpponent.x,myOpponent.y,angle, distance, distanceFromCenter);
 }

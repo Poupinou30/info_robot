@@ -56,3 +56,6 @@ float triangulationPierlot(float *x, float *y,
 						float x1, float y1, float x2, float y2, float x3, float y3);
 
 void* beacon_data(void* argument);
+void generateLog();
+void writeLog(float angle, float distance, float distanceFromCenter);
+void* filteredPositionAcquisition(void* arg);
