@@ -19,6 +19,7 @@
 #
 HOME_TREE := ../
 
+
 MODULE_NAME := $(notdir $(CURDIR))
 
 include $(HOME_TREE)/mak_def.inc

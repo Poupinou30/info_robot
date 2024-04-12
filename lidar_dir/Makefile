@@ -34,6 +34,7 @@
 
 HOME_TREE := .
 
+
 MAKE_TARGETS := sdk main_folder
 
 include $(HOME_TREE)/mak_def.inc

@@ -43,7 +43,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
     pthread_mutex_unlock(&lidarTimeLock);
     if(lidarElapsedTime > 500) v_max = 0.15;
-    else v_max = 0.15;
+    else v_max = 0.5;
 
 
 
@@ -311,8 +311,9 @@ void* receptionPipe(void* pipefdvoid){
     fprintf(stderr,"waiting for reading \n");
     //float *buffer = positionReceived; //Position stored in positionRecevived and buffer
     int* pipefd = (int*) pipefdvoid;
+    fd_set set;
     while(1){
-        fd_set set;
+        
         int ret;
         FD_ZERO(&set); // Initialiser le set à zéro
         FD_SET(pipefd[0], &set); // Ajouter le descripteur de fichier de lecture du pipe au set
