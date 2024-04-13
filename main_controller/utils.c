@@ -409,10 +409,10 @@ void generateLog(){
         printf("Erreur lors de l'ouverture du fichier\n");
         return 1;
     }
-    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos\n");
+    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos ; opponentFilteredPos\n");
     printf("File generated i guess\n");
 }
 
 void writeLog(){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myFilteredOpponent.x, *myFilteredOpponent.y);
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y);
 }
