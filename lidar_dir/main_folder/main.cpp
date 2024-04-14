@@ -35,7 +35,7 @@ double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
 float triangleErrorTolerance = 0.08;//il est à 0.08 par défaut
 float isoceleTolerance = 0.08; //ETAIT A 0.08
-float longSideLength = 3.25; //Longueur des deux grands côtés du triangle
+float longSideLength = 3.326; //Longueur des deux grands côtés du triangle
 float shortSideLength = 1.9; //Longueur des deux petits côtés du triangle
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
@@ -278,25 +278,25 @@ void* beacon_data(void* argument){
     {
 	//std::cout<<"il rentre dans la boucle?";
         float a1=newa[i];
-        float d1=newd[i];
+        float d1=newd[i] +baliseRadius;
         float w1 = newWidth[i];
         for (int j = i+1; j<obj_iter; j++)//on va dans ce sens là pour aller plus vite
         {
 	    //std::cout<<"et dans celle ci aussi?";
             float a2=newa[j];
-            float d2=newd[j];
+            float d2=newd[j] +baliseRadius;
             float w2 = newWidth[j];
             for (int k = j+1; k<obj_iter; k++)
             {
                 float a3=newa[k];
-                float d3=newd[k];
+                float d3=newd[k] +baliseRadius;
                 float w3 = newWidth[k];
-                float triangle= distance(a1,a2,d1+baliseRadius,d2+baliseRadius)+distance(a1,a3,d1+baliseRadius,d3+baliseRadius)+distance(a2,a3,d2+baliseRadius,d3+baliseRadius); //sensé être 3+2.5+2.5 donc 8
+                float triangle= distance(a1,a2,d1,d2)+distance(a1,a3,d1,d3)+distance(a2,a3,d2,d3); //sensé être 3+2.5+2.5 donc 8
                 //printf("triangle: %f, i: %d, j: %d, k: %d \n", triangle, i, j, k);
 		//printf("ai: %f, aj: %f, ak: %f \n", newa[i], newa[j], newa[k]);
-                float dij=distance(newa[i],newa[j],newd[i],newd[j]);
-                float djk=distance(newa[j],newa[k],newd[j],newd[k]);
-                float dik=distance(newa[i],newa[k],newd[i],newd[k]);
+                float dij=distance(a1,a2,d1,d2);
+                float djk=distance(a2,a3,d2,d3);
+                float dik=distance(a1,a3,d1,d3);
                 
                 
                 
