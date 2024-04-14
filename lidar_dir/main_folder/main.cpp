@@ -25,6 +25,10 @@ beaconAbsolutePos beaconRefPosition[3];
 lidarPos calibPos;
 pthread_mutex_t filteredPositionLock;
 
+int startPosition = 0;
+typedef enum{BLUE, YELLOW} TEAM_COLOR;
+TEAM_COLOR myColor;
+
 
 float perimetre = 8.40; /*8.4 sur l'arène!!!!*/
 float limit_of_detection = 3.6;
@@ -314,7 +318,25 @@ void* beacon_data(void* argument){
                     
                     float oldError = fabs(oldPerimetre-perimetre) + 2*fabs(oldIsoceleCondition);
                     float actualError = fabs(triangle-perimetre) + 2*fabs(fabs(dij-djk));
-                    uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
+
+                    // BeaconSelection
+                    double dx = beaconRef[0].x - myFilteredPos.x;
+                    double dy = beaconRef[0].y - myFilteredPos.y;
+
+                    double angle_balise_robot = atan2(dy, dx) * 180.0 / M_PI; // Angle entre le robot et la balise dans le sens trigonométrique
+                    double angle_robot_trigo = myFilteredPos.theta; // Angle du robot par rapport à l'axe y dans le sens trigonométrique
+
+                    // Conversion de l'angle du sens trigonométrique au sens horlogique
+                    double angle_balise_robot_horloge = fmod((450 - angle_balise_robot), 360);
+                    double angle_robot_trigo_horloge = fmod((450 - angle_robot_trigo), 360);
+
+                    // Calcul de l'angle entre le robot et la balise dans le sens horlogique
+                    double angle_horlogique = fmod((angle_balise_robot_horloge - angle_robot_trigo_horloge), 360);
+
+
+
+
+                    uint8_t condition = (beaconTab[0].angle > (angle_horlogique - 30) && beaconTab[0].angle < angle_horlogique + 30) && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
                     //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
                     //if(verbose && triangle >8.1&& triangle < 8.8 && beaconTab[0].angle > 270) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
                     if(condition && actualError < oldError){//faudrait rajouter une condition brrr genre sur les anngles
@@ -434,12 +456,6 @@ int read_fd;
 
 int main(int argc, const char * argv[]){
     pthread_mutex_lock(&lockMyState);
-    beaconRefPosition[0].x = 0.05;
-    beaconRefPosition[0].y = -0.08;
-    beaconRefPosition[1].x = 1;
-    beaconRefPosition[1].y= 3.08;
-    beaconRefPosition[2].x = 1.95;
-    beaconRefPosition[2].y = -0.08;
     
 
     calibPos.x = 0.13;
@@ -454,11 +470,67 @@ int main(int argc, const char * argv[]){
     if(verbose) fprintf(stderr,"Argc  = %d\n",argc);
     int write_fd;
     
+    
     pthread_t acquisitionThread;
-
+    myColor = BLUE;
     if(argc > 1){ 
         write_fd = atoi(argv[1]); // Récupération du descripteur de fichier d'écriture du pipe à partir des arguments de la ligne de commande
         read_fd = atoi(argv[2]);
+        startPosition = atoi(argv[3]);
+
+        pthread_mutex_lock(&lockFilteredPosition);
+        if(startPosition == 1) {
+            filteredPos.x = 0.2;
+            filteredPos.y = 0.2;
+            myColor = BLUE;
+        }
+        else if(startPosition == 2) {
+            filteredPos.x = 1;
+            filteredPos.y = 2.8;
+            myColor = BLUE;
+        }
+        else if(startPosition == 3) {
+            filteredPos.x = 1.8;
+            filteredPos.y = 0.2;
+            myColor = BLUE;
+        }
+        else if(startPosition == 4) {
+            filteredPos.x = 1.8;
+            filteredPos.y = 2.8;
+            myColor = YELLOW;
+        }
+        else if(startPosition == 5){
+            filteredPos.x = 1;
+            filteredPos.y = 0.2;
+            myColor = YELLOW;
+        }
+        else if(startPosition == 6){
+            filteredPos.x = 0.2;
+            filteredPos.y = 2.8;
+            myColor = YELLOW;
+        }
+
+        if(myColor = BLUE){
+            beaconRefPosition[0].x = 0.05;
+            beaconRefPosition[0].y = -0.08;
+            beaconRefPosition[1].x = 1;
+            beaconRefPosition[1].y= 3.08;
+            beaconRefPosition[2].x = 1.95;
+            beaconRefPosition[2].y = -0.08;
+        }
+        else{
+            beaconRefPosition[0].x = 1.95;
+            beaconRefPosition[0].y = 3.08;
+            beaconRefPosition[1].x = 1;
+            beaconRefPosition[1].y= -0.08;
+            beaconRefPosition[2].x = 0.05;
+            beaconRefPosition[2].y = 3.08;
+        }
+
+        
+        
+    
+
         verbose = 0;
         generateLog();
         
