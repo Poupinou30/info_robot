@@ -207,7 +207,7 @@ void addRoundObstacle(double posX, double posY, double size, uint8_t moving){
 
 void addOpponentObstacle(){
     obstacle myObstacle;
-    myObstacle.size = 0.15;
+    myObstacle.size = 0.25;
     myObstacle.isRectangle = 0;
     myObstacle.moving = 1;
     if(myForce.obstacleNumber == 0){
@@ -323,6 +323,7 @@ void computeForceVector(){
     pthread_mutex_lock(&lockFilteredPosition); 
     double f_att_x = -destination_set*k_att_xy * (*myFilteredPos.x- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (*myFilteredPos.y - *destination.y);
+    double distanceFromDest = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
     double theta = *myFilteredPos.theta;
     double desiredTheta = *destination.theta;
     uint8_t sign_f_rep_x;
@@ -343,7 +344,7 @@ void computeForceVector(){
     //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
     
 
-    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.02 && fabs(error) < 0.5){
+    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.005 && fabs(error) < 0.2){
         myControllerState = STOPPED;
     }
     else{
@@ -364,6 +365,7 @@ void computeForceVector(){
     double tempoX;
     double tempoY;
     double distance;
+    double k_reduc_repul;
     float actionDistance = 0.3;
     position tempoRectangle[2];
     position tempoPoint1, tempoPoint2;
@@ -410,8 +412,13 @@ void computeForceVector(){
             else sign_f_rep_x = 1;
             if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
             else sign_f_rep_y = 1;
-            f_repul_x = f_repul_x + k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
-            f_repul_y = f_repul_y + k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
+            if(tempoObstacle->moving) k_reduc_repul = 1;
+            else{
+                if(distanceFromDest < 0.15) k_reduc_repul = 0.3;
+                else k_reduc_repul = 1;
+            } 
+            f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
+            f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
 
             pthread_mutex_unlock(&lockFilteredPosition);
 

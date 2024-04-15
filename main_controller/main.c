@@ -84,20 +84,21 @@ int mainPatternOdometryOld(){
 
 }
 
-main(){
+mainTestCorde(){
+    initializeMainController();
     initializeLaunchGPIO();
     while(1)
-    printf("Valeur GPIO %d \n",gpioRead(22));
+    printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int mainDINGUERIE(){
+int main(){
     //initialisation
     initializeMainController();
     printObstacleLists();
     pthread_mutex_lock(&lockDestination);
-    *destination.x = 1.5;
-    *destination.y = 2.5;
-    *destination.theta = 0;
+    *destination.x = 1.7824;
+    *destination.y = 2.275;
+    *destination.theta = 180;
     destination_set = 1;
     pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
@@ -183,7 +184,7 @@ int mainDINGUERIE(){
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
             pthread_mutex_lock(&lidarFlagLock);
-            if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }

@@ -31,4 +31,4 @@ double measuredSpeedX = 0;
 double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
-uint8_t startingPoint = 3;
+uint8_t startingPoint = 4;

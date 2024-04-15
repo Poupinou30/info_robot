@@ -10,7 +10,7 @@ double l_y = 0.175;
 double l_x = 0.21;
 
 double v_max = 0.4;
-double omega_max = 10.0;
+double omega_max = 18;
 
 void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2) {
     int16_t num1 = (data[0] << 8) | data[1]; // Récupère le premier nombre
@@ -54,6 +54,9 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockFilteredPosition);
 
+    if (fabs(omega) > omega_max) {
+        omega = (omega > 0 ? omega_max : -omega_max);
+    }
 
     omega = omega/112.5;
     // Calculate the magnitude of the velocity vector
@@ -69,9 +72,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
         v_y *= scaling_factor;
     }
 
-    if (fabs(omega) > omega_max) {
-        omega = (omega > 0 ? omega_max : -omega_max);
-    }
+    
     double omega_fl = 1.0/radius *(v_y+v_x-(l_x+l_y)*omega); //front left
     double omega_fr = 1.0/radius *(v_y-v_x+(l_x+l_y)*omega); //front right
     double omega_rl = 1.0/radius *(v_y-v_x-(l_x+l_y)*omega); //rear left
@@ -164,7 +165,7 @@ uint8_t UART_receive(int UART_handle, char* received){
     return 0;}
 
 void initializeLaunchGPIO(){
-    int gpio = 22; // Remplacez par le numéro de votre broche GPIO
+    int gpio = 25; // Remplacez par le numéro de votre broche GPIO
 
     // Configure la broche en entrée
     gpioSetMode(gpio, PI_INPUT);
@@ -277,7 +278,7 @@ void* executeProgram(void* arg){
     int pipefdLC = pipesfd[0];
     int pipefdCL = pipesfd[1];
     char cmd[256];
-    sprintf(cmd,"/home/pi/Documents/lab_git_augu_new/info_robot/lidar_dir/output/Linux/Release/main_folder %d %d %d", pipefdLC, pipefdCL, startingPoint);
+    sprintf(cmd,"/home/pi/Documents/lastGit/info_robot/lidar_dir/output/Linux/Release/main_folder %d %d %d", pipefdLC, pipefdCL, startingPoint);
     //sprintf(cmd,"/home/student/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
 
     child_pid = fork();
@@ -358,7 +359,7 @@ void* receptionPipe(void* pipefdvoid){
             *myOpponent.y = buffer[4];
             pthread_mutex_unlock(&lockOpponentPosition);
             //POSITION
-            
+            //printf("conditions: %d %d %d %d %d %d\n",buffer[0] > 0 , buffer[1] > 0 , buffer[0] < 2 , buffer[1]< 3 , (computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.40),first);
             if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.40 && fabs(*myFilteredPos.theta - buffer[2])<30)||(first && buffer[0] > 0.01 && buffer[1] > 0.01 && buffer[0] < 2 && buffer[1]< 3) ){
             first = 0;
             pthread_mutex_lock(&lockPosition);
