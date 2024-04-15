@@ -79,7 +79,7 @@ void* updateKalman(void* args) {
 
     // Combinaison des mesures des deux capteurs
     pthread_mutex_lock(&lidarTimeLock);
-    if(lidarElapsedTime < 150||1){
+    if(lidarElapsedTime < 150){
         for(int i = 0; i < 3; i++){
             measurementsCombined[i] = measurements[i];
             measurementsCombined[i+3] = secondSensorMeasurement[i];
