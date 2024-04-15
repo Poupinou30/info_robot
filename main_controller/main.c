@@ -210,6 +210,9 @@ int main(){
     *myOdometryPos.x = 0;
     *myOdometryPos.y = 0;
     *myOdometryPos.theta = 32;
+    *measuredSpeedX = 0.4;
+    *measuredSpeedY = -0.8;
+    *measuredSpeedOmega = 20;
     
     
     while(1){
