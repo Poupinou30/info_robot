@@ -91,7 +91,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int main(){
+int mainDINGUERIE(){
     //initialisation
     initializeMainController();
     printObstacleLists();
@@ -202,7 +202,7 @@ int main(){
         //KALMAN
 }
 
-int mainTestKalman(){
+int main(){
     initializeMainController();
     *myPos.x = 0;
     *myPos.y = 0;
@@ -210,13 +210,17 @@ int mainTestKalman(){
     *myOdometryPos.x = 0.72;
     *myOdometryPos.y = 1.23;
     *myOdometryPos.theta = 29;
+    
+    
     while(1){
-
+        *myPos.x += 0.1;
+        *myPos.y -= 0.2;
         updateKalman(NULL);
         printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
         printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
         printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
-        sleep(1);
+        writeLog();
+        sleep(0.5);
     }
     
 }
