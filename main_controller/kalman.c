@@ -67,7 +67,7 @@ void* updateKalman(void* args) {
 
     // Combinaison des mesures des deux capteurs
     pthread_mutex_lock(&lidarFlagLock);
-    if(lidarAcquisitionFlag){
+    if(lidarElapsedTime < 150 || 1){//A CHANGER ICI LE "OU 1" NE DOIT PAS RESTER!!!
         for(int i = 0; i < 3; i++){
             measurementsCombined[i] = measurements[i];
             measurementsCombined[i+3] = secondSensorMeasurement[i];
