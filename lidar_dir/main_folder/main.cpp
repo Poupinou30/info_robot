@@ -10,6 +10,8 @@ using namespace sl;
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
 
+#define baliseRadius 0.0415
+
 
 #include <fcntl.h>
 
@@ -30,14 +32,14 @@ typedef enum{BLUE, YELLOW} TEAM_COLOR;
 TEAM_COLOR myColor;
 
 
-float perimetre = 8.40; /*8.4 sur l'arène!!!!*/
+float perimetre = 8.55; /*8.4 sur l'arène!!!!*/
 float limit_of_detection = 3.6;
 double objectMaxStep = 0.09;
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
-float triangleErrorTolerance = 0.1;//il est à 0.08 par défaut
-float isoceleTolerance = 0.1; //ETAIT A 0.08
-float longSideLength = 3.25; //Longueur des deux grands côtés du triangle
+float triangleErrorTolerance = 0.08;//il est à 0.08 par défaut
+float isoceleTolerance = 0.08; //ETAIT A 0.08
+float longSideLength = 3.326; //Longueur des deux grands côtés du triangle
 float shortSideLength = 1.9; //Longueur des deux petits côtés du triangle
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t isReadyLock =PTHREAD_MUTEX_INITIALIZER;
@@ -50,6 +52,18 @@ uint8_t lidarDataCopied = 0;
 
 typedef enum{CALIB_MODE, LOCALIZE_MODE} PROGRAM_STATE;
 PROGRAM_STATE myState;
+
+
+void *safe_malloc(size_t size, int id) {
+    void *ptr = malloc(size);
+    if (ptr == NULL) {
+        fprintf(stderr, "Erreur : l'allocation de mémoire a échoué. ID malloc = %d \n",id);
+        exit(EXIT_FAILURE);
+    }
+    return ptr;
+}
+
+
 
 
 
@@ -111,7 +125,7 @@ float triangulationPierlot(float *x, float *y,
 
 void* beacon_data(void* argument){
     float distanceToCenter;
-
+    float oldError = 100;
     if(verbose) printf("rentre dans beaconData\n");
     float oldPerimetre = 0;
     float oldIsoceleCondition = 999;
@@ -268,25 +282,25 @@ void* beacon_data(void* argument){
     {
 	//std::cout<<"il rentre dans la boucle?";
         float a1=newa[i];
-        float d1=newd[i];
+        float d1=newd[i] +baliseRadius;
         float w1 = newWidth[i];
         for (int j = i+1; j<obj_iter; j++)//on va dans ce sens là pour aller plus vite
         {
 	    //std::cout<<"et dans celle ci aussi?";
             float a2=newa[j];
-            float d2=newd[j];
+            float d2=newd[j] +baliseRadius;
             float w2 = newWidth[j];
             for (int k = j+1; k<obj_iter; k++)
             {
                 float a3=newa[k];
-                float d3=newd[k];
+                float d3=newd[k] +baliseRadius;
                 float w3 = newWidth[k];
                 float triangle= distance(a1,a2,d1,d2)+distance(a1,a3,d1,d3)+distance(a2,a3,d2,d3); //sensé être 3+2.5+2.5 donc 8
                 //printf("triangle: %f, i: %d, j: %d, k: %d \n", triangle, i, j, k);
 		//printf("ai: %f, aj: %f, ak: %f \n", newa[i], newa[j], newa[k]);
-                float dij=distance(newa[i],newa[j],newd[i],newd[j]);
-                float djk=distance(newa[j],newa[k],newd[j],newd[k]);
-                float dik=distance(newa[i],newa[k],newd[i],newd[k]);
+                float dij=distance(a1,a2,d1,d2);
+                float djk=distance(a2,a3,d2,d3);
+                float dik=distance(a1,a3,d1,d3);
                 
                 
                 
@@ -316,7 +330,7 @@ void* beacon_data(void* argument){
                     dik=distance(beaconTab[0].angle,beaconTab[2].angle,beaconTab[0].distance,beaconTab[2].distance);
                     //fprintf(stderr,"djk = %f\n",djk);
                     
-                    float oldError = fabs(oldPerimetre-perimetre) + 2*fabs(oldIsoceleCondition);
+                    
                     float actualError = fabs(triangle-perimetre) + 2*fabs(fabs(dij-djk));
 
                     // BeaconSelection
@@ -338,7 +352,7 @@ void* beacon_data(void* argument){
 
                     uint8_t condition = (beaconTab[0].angle > (angle_horlogique - 30) && beaconTab[0].angle < angle_horlogique + 30) && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
                     //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
-                    //if(verbose && triangle >8.1&& triangle < 8.8 && beaconTab[0].angle > 270) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+                    if(verbose && triangle >8.5&& triangle < 8.7 /*&& fabs(beaconTab[0].angle-90) < 20*/) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
                     if(condition && actualError < oldError){//faudrait rajouter une condition brrr genre sur les anngles
                         beaconFound = 1;
                         bestBeaconTab[0] = beaconTab[0];
@@ -347,14 +361,10 @@ void* beacon_data(void* argument){
 
                         oldPerimetre = triangle;
                         oldIsoceleCondition = fabs(dij-djk);
+                        oldError = actualError;
                         if(verbose){
                             //fprintf(stderr,"Dij = %f Djk = %d Djk = %f",dij,djk,dik);
                         }
-                        
-                        
-
-                        if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",beaconTab[0].angle,beaconTab[0].distance,beaconTab[0].width,beaconTab[1].angle,beaconTab[1].distance,beaconTab[1].width,beaconTab[2].angle,beaconTab[2].distance,beaconTab[2].width );
-                        if(verbose) printf("triangle: %f \n", triangle);
                         
                     
                         }
@@ -370,8 +380,8 @@ void* beacon_data(void* argument){
                 if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",bestBeaconTab[0].angle,bestBeaconTab[0].distance,bestBeaconTab[0].width,bestBeaconTab[1].angle,bestBeaconTab[1].distance,bestBeaconTab[1].width,bestBeaconTab[2].angle,bestBeaconTab[2].distance,bestBeaconTab[2].width );
                 if(verbose) printf("triangle: %f \n", oldPerimetre);
                 pthread_mutex_lock(&positionLock);
-                float* myX = (float*) malloc(sizeof(float));
-                float* myY = (float*) malloc(sizeof(float));
+                float* myX = (float*) safe_malloc(sizeof(float),1);
+                float* myY = (float*) safe_malloc(sizeof(float),2);
                 *myX = 0; *myY = 0;
             
             pthread_mutex_unlock(&positionLock);
@@ -386,7 +396,8 @@ void* beacon_data(void* argument){
             //fprintf(stderr,"myX = %f and myY = %d \n", *myX,*myY);
             myPos.x = *myX;
             myPos.y = *myY;
-            free(myX); free(myY);
+            if(myX != NULL) free(myX);
+            if(myY != NULL) free(myY);
             //if(verbose) fprintf(stderr,"beacon data\n");
             myPos.theta = alpha;
             pthread_mutex_unlock(&positionLock);
@@ -717,11 +728,13 @@ void* filteredPositionAcquisition(void* arg){
     struct timeval timeout;
     timeout.tv_sec = 0; // Timeout de 1 seconde pour la reception de la position filtrée
     timeout.tv_usec = 3000;
+    fd_set set;
+    
 
     while(1){
-    fd_set set;
-    FD_ZERO(&set); // Initialiser le set à zéro
+        FD_ZERO(&set); // Initialiser le set à zéro
     FD_SET(read_fd, &set); // Ajouter le descripteur de fichier de lecture du pipe au set
+    
     int ret = select(read_fd + 1, &set, NULL, NULL, &timeout);
     if(verbose) printf("ret = %d \n",ret);
     if (ret == -1) {
@@ -749,7 +762,7 @@ void generateLog(){
 
     logFile = fopen("../logFiles/logLidar.txt", "w");
     if (logFile == NULL) {
-        printf("Erreur lors de l'ouverture du fichier\n");
+        printf("Erreur lors de l'ouverture du fichier LogLidar\n");
     }
     fprintf(logFile, "myFilteredPos ; myLidarPos ; opponentPos ; opponentAngle ; opponentDistance ; DistanceFromCenter\n");
     printf("File generated i guess\n");

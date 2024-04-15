@@ -42,9 +42,17 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
     lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
     pthread_mutex_unlock(&lidarTimeLock);
-    if(lidarElapsedTime > 500) v_max = 0.15;
-    else v_max = 0.5;
+    pthread_mutex_lock(&lockFilteredOpponent);
+    pthread_mutex_lock(&lockFilteredPosition);
+    double distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
 
+    if(lidarElapsedTime > 500) v_max = 0.15;
+    else if (distanceFromOpponent<0.7){
+        v_max = 0.5*distanceFromOpponent/0.7;
+    }
+    else v_max = 0.5;
+    pthread_mutex_unlock(&lockFilteredOpponent);
+    pthread_mutex_unlock(&lockFilteredPosition);
 
 
     omega = omega/112.5;
@@ -275,7 +283,7 @@ void* executeProgram(void* arg){
         waitpid(child_pid, &status, 0);
     }
 
-    fprintf(stderr,"Lidar program correctly launched \n");
+    fprintf(stderr,"Lidar program stopped\n");
     return NULL;
 }
 
@@ -333,7 +341,7 @@ void* receptionPipe(void* pipefdvoid){
             
             read(pipefd[0], buffer, 5*sizeof(float));
             
-            if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.50)||(first && buffer[0] > 0.01 && buffer[1] > 0.01 && buffer[0] < 2 && buffer[1]< 3) ){
+            if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.40 && fabs(*myFilteredPos.theta - buffer[2])<30)||(first && buffer[0] > 0.01 && buffer[1] > 0.01 && buffer[0] < 2 && buffer[1]< 3) ){
             first = 0;
             pthread_mutex_lock(&lockPosition);
             pthread_mutex_lock(&lockOpponentPosition);
@@ -353,6 +361,7 @@ void* receptionPipe(void* pipefdvoid){
             if(buffer[3] != 0 && !opponentInitialized){
                 opponentInitialized = 1;
                 defineOpponentPosition(buffer[3],buffer[4]);
+                if(VERBOSE) printf("define opponent position called\n");
             }
             
             

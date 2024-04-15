@@ -144,7 +144,7 @@ void makeHeatmap(){
     // Écrire les données du tableau dans un fichier
     FILE *file = fopen("data.txt", "w");
     if(file == NULL) {
-        printf("Erreur lors de l'ouverture du fichier\n");
+        printf("Erreur lors de l'ouverture du fichier data.txt\n");
         return 1;
     }
     for(int i = 0; i < sizeY; i++) {
