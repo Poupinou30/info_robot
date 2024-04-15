@@ -120,6 +120,7 @@ int I2C_initialize(int address);
 void I2C_send(char* data,char* received, int I2C_handle);
 int i2c_handle_front;
 int i2c_handle_rear;
+void initializeLaunchGPIO();
 //FIN COMMUNICATION
 
 //Communication LIDAR

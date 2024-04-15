@@ -84,7 +84,13 @@ int mainPatternOdometryOld(){
 
 }
 
-int main(){
+main(){
+    initializeLaunchGPIO();
+    while(1)
+    printf("Valeur GPIO %d \n",gpioRead(22));
+}
+
+int mainDINGUERIE(){
     //initialisation
     initializeMainController();
     printObstacleLists();

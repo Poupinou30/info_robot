@@ -163,6 +163,17 @@ uint8_t UART_receive(int UART_handle, char* received){
     
     return 0;}
 
+void initializeLaunchGPIO(){
+    int gpio = 22; // Remplacez par le numéro de votre broche GPIO
+
+    // Configure la broche en entrée
+    gpioSetMode(gpio, PI_INPUT);
+
+    // Active le pull-up
+    gpioSetPullUpDown(gpio, PI_PUD_UP);
+
+}
+
 
 
 
