@@ -62,10 +62,13 @@ void* updateKalman(void* args) {
     pthread_mutex_unlock(&lockPosition);
     double measurementsCombined[10];
 
+    struct timeval currentTime;
+    gettimeofday(&currentTime,NULL);
     pthread_mutex_lock(&lidarTimeLock);
     double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
     lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
     pthread_mutex_unlock(&lidarTimeLock);
+    
 
     // Obtention des mesures du deuxième capteur (à remplacer par les vraies valeurs)
     double secondSensorMeasurement[3] = {*myOdometryPos.x, *myOdometryPos.y, *myOdometryPos.theta}; // Remplacez par les vraies valeurs
