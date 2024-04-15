@@ -210,7 +210,6 @@ int main(){
     *myOdometryPos.x = 0.72;
     *myOdometryPos.y = 1.23;
     *myOdometryPos.theta = 29;
-    lidarElapsedTime = 0;
     
     
     while(1){
