@@ -42,16 +42,16 @@ double H[11][8] = {
 };
 
 double Q[8][8] = {
-    {0.005, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0.005, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0.01, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0.005, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0.005, 0, 0, 0},
-    {0, 0, 0, 0, 0, 100, 0, 0},
-    {0, 0, 0, 0, 0, 0, 100, 0},
-    {0, 0, 0, 0, 0, 0, 0, 100}
+    {0.05, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0.05, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0.05, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0.05, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0.05, 0, 0, 0},
+    {0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 0, 0, 1, 0},
+    {0, 0, 0, 0, 0, 0, 0, 1}
 }; // Bruit de processus
-double R[10] = {0.3, 0.3, 0.05,0.7, 0.7, 0.05, 0.4, 0.4, 0.001, 0.001}; // Bruit de mesure pour chaque variable d'état
+double R[11] = {0.3, 0.3, 1,0.7, 0.7, 2, 0.5, 0.5, 0.001, 0.001,0.5}; // Bruit de mesure pour chaque variable d'état
 double oldTheta;
 double meanTheta = 0;
 uint8_t thetaForcedFlag = 0;
@@ -79,7 +79,7 @@ void* updateKalman(void* args) {
 
     // Combinaison des mesures des deux capteurs
     pthread_mutex_lock(&lidarTimeLock);
-    if(lidarElapsedTime < 150){
+    if(lidarElapsedTime < 150||1){
         for(int i = 0; i < 3; i++){
             measurementsCombined[i] = measurements[i];
             measurementsCombined[i+3] = secondSensorMeasurement[i];

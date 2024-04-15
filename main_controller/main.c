@@ -206,28 +206,28 @@ int main(){
     initializeMainController();
     *myPos.x = 0;
     *myPos.y = 0;
-    *myPos.theta = 32;
+    *myPos.theta = 0;
     *myOdometryPos.x = 0;
     *myOdometryPos.y = 0;
-    *myOdometryPos.theta = 32;
+    *myOdometryPos.theta = 0;
     measuredSpeedX = 0.4;
     measuredSpeedY = -0.8;
-    measuredSpeedOmega = 20;
+    measuredSpeedOmega = 40;
     
     
     while(1){
-        *myPos.x += 0.2;
-        *myPos.y -= 0.4;
-        *myOdometryPos.x += 0.2;
-        *myOdometryPos.y -= 0.4;
-        *myOdometryPos.theta += 1;
-        *myPos.theta += 10;
+        *myPos.x += 0.4/33.33;
+        *myPos.y -= 0.8/33.33;
+        *myOdometryPos.x += 0.4/33.33;
+        *myOdometryPos.y -= 0.8/33.33;
+        *myOdometryPos.theta += 40/33.33;
+        *myPos.theta += 40/33.33;
         updateKalman(NULL);
         printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
         printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
         printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
         writeLog();
-        usleep(500000);
+        usleep(30000);
     }
     
 }
