@@ -209,18 +209,22 @@ int main(){
     *myPos.theta = 32;
     *myOdometryPos.x = 0.72;
     *myOdometryPos.y = 1.23;
-    *myOdometryPos.theta = 29;
+    *myOdometryPos.theta = 32;
     
     
     while(1){
-        *myPos.x += 0.1;
-        *myPos.y -= 0.2;
+        *myPos.x += 0.2;
+        *myPos.y -= 0.4;
+        *myOdometryPos.x += 0.2;
+        *myOdometryPos.y -= 0.4;
+        *myOdometryPos.theta += 1;
+        *myPos.theta += 10;
         updateKalman(NULL);
         printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
         printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
         printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
         writeLog();
-        sleep(0.5);
+        usleep(500000);
     }
     
 }
