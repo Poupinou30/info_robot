@@ -2,8 +2,8 @@
 
 
 camera_program:
-	@gcc ./cam.cpp -lstdc++ -o miaou.o -lpthread -I/usr/include/opencv4/ 
-	#@g++ ./cam.cpp -o miaou.o -lpthread -I/usr/include/opencv4/
+	@gcc ./cam.c -lstdc++ -o miaou.o -lpthread -I/usr/include/opencv4/ 
+	
 	@echo "Poupon je crois que la cam est là"
 
 test_obj_detect:
