@@ -37,8 +37,8 @@ float limit_of_detection = 3.6;
 double objectMaxStep = 0.12; //ETAIT A 0.9 JE LAI CHANGE AJD
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
-float triangleErrorTolerance = 0.1;//il est à 0.08 par défaut
-float isoceleTolerance = 0.1; //ETAIT A 0.08
+float triangleErrorTolerance = 0.15;//il est à 0.08 par défaut
+float isoceleTolerance = 0.15; //ETAIT A 0.08
 float longSideLength = 3.326; //Longueur des deux grands côtés du triangle
 float shortSideLength = 1.9; //Longueur des deux petits côtés du triangle
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
@@ -331,28 +331,31 @@ void* beacon_data(void* argument){
                     //fprintf(stderr,"djk = %f\n",djk);
                     
                     
-                    float actualError = fabs(triangle-perimetre) + 2*fabs(fabs(dij-djk));
+                    float actualError;
 
                     // BeaconSelection
-                    double dx = beaconRef[0].x - myFilteredPos.x;
-                    double dy = beaconRef[0].y - myFilteredPos.y;
+                    double dx = beaconRefPosition[0].x - filteredPos.x;
+                    double dy = beaconRefPosition[0].y - filteredPos.y;
 
-                    double angle_balise_robot = atan2(dy, dx) * 180.0 / M_PI; // Angle entre le robot et la balise dans le sens trigonométrique
-                    double angle_robot_trigo = myFilteredPos.theta; // Angle du robot par rapport à l'axe y dans le sens trigonométrique
+                    double angle_balise_robot = atan2(dx, dy) * 180.0 / M_PI; // Angle entre le robot et la balise dans le sens trigonométrique
+                    double angle_robot_trigo = filteredPos.theta; // Angle du robot par rapport à l'axe y dans le sens trigonométrique
 
                     // Conversion de l'angle du sens trigonométrique au sens horlogique
-                    double angle_balise_robot_horloge = fmod((450 - angle_balise_robot), 360);
-                    double angle_robot_trigo_horloge = fmod((450 - angle_robot_trigo), 360);
+                    // Conversion de l'angle du sens trigonométrique au sens horlogique
+                    double angle_balise_robot_horloge = fmod((360 - angle_balise_robot), 360);
+                    double angle_robot_trigo_horloge = fmod((360 - angle_robot_trigo), 360);
 
                     // Calcul de l'angle entre le robot et la balise dans le sens horlogique
-                    double angle_horlogique = fmod((angle_balise_robot_horloge - angle_robot_trigo_horloge), 360);
+                    double angle_horlogique = 360-fmod((angle_balise_robot_horloge - angle_robot_trigo_horloge), 360);
+                    if(angle_horlogique<0) angle_horlogique+=360;
+                    if(angle_horlogique > 360) angle_horlogique+=-360;
 
-
+                    //printf("angle horlogique = %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f \n dx = %f et dy = %f \n",angle_horlogique,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot,dx,dy);
 
 
                     uint8_t condition = (beaconTab[0].angle > (angle_horlogique - 30) && beaconTab[0].angle < angle_horlogique + 30) && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
-                    float actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
-                    uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
+                    actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
+                    
                     //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
                     //if(verbose && triangle >8.5&& triangle < 8.7 /*&& fabs(beaconTab[0].angle-90) < 20*/) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
                     if(condition && actualError < oldError){//faudrait rajouter une condition brrr genre sur les anngles
@@ -379,18 +382,23 @@ void* beacon_data(void* argument){
             
             }
             if(beaconFound){
-                if(verbose) fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f \n",bestBeaconTab[0].angle,bestBeaconTab[0].distance,bestBeaconTab[0].width,bestBeaconTab[1].angle,bestBeaconTab[1].distance,bestBeaconTab[1].width,bestBeaconTab[2].angle,bestBeaconTab[2].distance,bestBeaconTab[2].width );
+
+                //fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f perimetre = %f, dij = %f, djk = %f dik = %f  \n",bestBeaconTab[0].angle,bestBeaconTab[0].distance,bestBeaconTab[0].width,bestBeaconTab[1].angle,bestBeaconTab[1].distance,bestBeaconTab[1].width,bestBeaconTab[2].angle,bestBeaconTab[2].distance,bestBeaconTab[2].width, oldPerimetre,distance(bestBeaconTab[0].angle,bestBeaconTab[1].angle,bestBeaconTab[0].distance,bestBeaconTab[1].distance),distance(bestBeaconTab[1].angle,bestBeaconTab[2].angle,bestBeaconTab[1].distance,bestBeaconTab[2].distance),distance(bestBeaconTab[0].angle,bestBeaconTab[2].angle,bestBeaconTab[0].distance,bestBeaconTab[2].distance) );
                 if(verbose) printf("triangle: %f \n", oldPerimetre);
                 pthread_mutex_lock(&positionLock);
                 float* myX = (float*) safe_malloc(sizeof(float),1);
                 float* myY = (float*) safe_malloc(sizeof(float),2);
                 *myX = 0; *myY = 0;
+                
             
             pthread_mutex_unlock(&positionLock);
             triangulationPierlot( myX,  myY, (360-bestBeaconTab[0].angle)*DEG2RAD,  (360-bestBeaconTab[1].angle)*DEG2RAD,  (360-bestBeaconTab[2].angle)*DEG2RAD, beaconRefPosition[0].x, beaconRefPosition[0].y,beaconRefPosition[1].x, beaconRefPosition[1].y,beaconRefPosition[2].x, beaconRefPosition[2].y);
             //fprintf(stderr,"myX = %f and myY = %d \n", myX,myY);
             //Calcul angle augustin
-            float alpha = 180-(360-bestBeaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
+            float alpha;
+            if(myColor == BLUE) alpha = 180-(360-bestBeaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
+            else alpha = 360-((360 - bestBeaconTab[0].angle) + atan((*myX - beaconRefPosition[0].x) / (*myY - beaconRefPosition[0].y)) * RAD2DEG);
+
             if(alpha<0) alpha = alpha+360;
             //if(verbose) fprintf(stderr,"angle = %f \n",alpha);
             
@@ -398,10 +406,12 @@ void* beacon_data(void* argument){
             //fprintf(stderr,"myX = %f and myY = %d \n", *myX,*myY);
             myPos.x = *myX;
             myPos.y = *myY;
+            //fprintf(stderr,"position: x = %f y = %f theta = %f \n",*myX,*myY,alpha);
             if(myX != NULL) free(myX);
             if(myY != NULL) free(myY);
             //if(verbose) fprintf(stderr,"beacon data\n");
             myPos.theta = alpha;
+            
             pthread_mutex_unlock(&positionLock);
             }
 
@@ -415,8 +425,8 @@ void* beacon_data(void* argument){
             float previousD = 3;
             float score, previousScore = 0;
             for (int k = 0;k<newa.size();k++){
-                    object.x = filteredPos.x + newd[k] * cos((myPos.theta - newa[k] + 90)*DEG2RAD);
-                    object.y = filteredPos.y + newd[k] * sin((myPos.theta - newa[k] + 90)*DEG2RAD);
+                    object.x = filteredPos.x + newd[k] * cos((filteredPos.theta - newa[k] + 90)*DEG2RAD);
+                    object.y = filteredPos.y + newd[k] * sin((filteredPos.theta - newa[k] + 90)*DEG2RAD);
                     //object.x = filteredPos.x + newd[k] * cos((90-(360-newa[k]-filteredPos.theta))*DEG2RAD);
                     //object.y = filteredPos.y + newd[k] * sin((90-(360-newa[k]-filteredPos.theta))*DEG2RAD);
 
@@ -491,39 +501,48 @@ int main(int argc, const char * argv[]){
         read_fd = atoi(argv[2]);
         startPosition = atoi(argv[3]);
 
-        pthread_mutex_lock(&lockFilteredPosition);
+        pthread_mutex_lock(&filteredPositionLock);
         if(startPosition == 1) {
             filteredPos.x = 0.2;
             filteredPos.y = 0.2;
+            filteredPos.theta = 0;
             myColor = BLUE;
         }
         else if(startPosition == 2) {
             filteredPos.x = 1;
             filteredPos.y = 2.8;
+            filteredPos.theta = 180;
             myColor = BLUE;
         }
         else if(startPosition == 3) {
             filteredPos.x = 1.8;
             filteredPos.y = 0.2;
+            filteredPos.theta = 0;
             myColor = BLUE;
         }
         else if(startPosition == 4) {
-            filteredPos.x = 1.8;
+            filteredPos.x = 0.2;
             filteredPos.y = 2.8;
+            filteredPos.theta = 180;
             myColor = YELLOW;
         }
         else if(startPosition == 5){
             filteredPos.x = 1;
             filteredPos.y = 0.2;
+            filteredPos.theta = 0;
             myColor = YELLOW;
         }
         else if(startPosition == 6){
-            filteredPos.x = 0.2;
+            filteredPos.x = 1.8;
             filteredPos.y = 2.8;
+            filteredPos.theta = 180;
             myColor = YELLOW;
         }
+        pthread_mutex_unlock(&filteredPositionLock);
 
-        if(myColor = BLUE){
+        printf("startingPoint = %d and initialPosition = %f %f %f and team = %d\n",startPosition,filteredPos.x,filteredPos.y,filteredPos.theta,myColor);
+
+        if(myColor == BLUE){
             beaconRefPosition[0].x = 0.05;
             beaconRefPosition[0].y = -0.08;
             beaconRefPosition[1].x = 1;

@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-float fixActionDistance = 0.2;
+float fixActionDistance = 0.3;
 float mobileActionDistance = 0.4;
 
 float computeEuclidianDistance(double x1, double y1, double x2, double y2){
@@ -315,7 +315,7 @@ void printObstacleLists(){
 void computeForceVector(){
     
     
-    float k_att_xy = 0.3;
+    float k_att_xy = 0.5;
     float k_att_theta = /*0.3*/ 0.3;
     float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta

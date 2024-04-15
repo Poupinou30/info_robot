@@ -340,11 +340,18 @@ void* receptionPipe(void* pipefdvoid){
         else {
             
             read(pipefd[0], buffer, 5*sizeof(float));
+
+            //OPPONENT
+            pthread_mutex_lock(&lockOpponentPosition);
+            *myOpponent.x = buffer[3]; //A SORTIR DE LA CONDITION WALLAH
+            *myOpponent.y = buffer[4];
+            pthread_mutex_unlock(&lockOpponentPosition);
+            //POSITION
             
             if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.40 && fabs(*myFilteredPos.theta - buffer[2])<30)||(first && buffer[0] > 0.01 && buffer[1] > 0.01 && buffer[0] < 2 && buffer[1]< 3) ){
             first = 0;
             pthread_mutex_lock(&lockPosition);
-            pthread_mutex_lock(&lockOpponentPosition);
+            
             if(*myPos.x != buffer[0] && *myPos.y != buffer[1] && *myPos.theta != buffer[2]){
                 pthread_mutex_lock(&lidarTimeLock);
                 gettimeofday(&lidarAcquisitionTime,NULL);
@@ -353,10 +360,9 @@ void* receptionPipe(void* pipefdvoid){
             *myPos.x = buffer[0];
             *myPos.y = buffer[1];
             *myPos.theta = buffer[2];
-            *myOpponent.x = buffer[3];
-            *myOpponent.y = buffer[4];
+            
             pthread_mutex_unlock(&lockPosition);
-            pthread_mutex_unlock(&lockOpponentPosition);
+            
 
             if(buffer[3] != 0 && !opponentInitialized){
                 opponentInitialized = 1;
