@@ -90,7 +90,7 @@ int main(){
     printObstacleLists();
     pthread_mutex_lock(&lockDestination);
     *destination.x = 1.5;
-    *destination.y = 0.5;
+    *destination.y = 2.5;
     *destination.theta = 0;
     destination_set = 1;
     pthread_mutex_unlock(&lockDestination);

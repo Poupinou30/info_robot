@@ -353,7 +353,7 @@ void* receptionPipe(void* pipefdvoid){
             *myPos.x = buffer[0];
             *myPos.y = buffer[1];
             *myPos.theta = buffer[2];
-            *myOpponent.x = buffer[3];
+            *myOpponent.x = buffer[3]; //A SORTIR DE LA CONDITION WALLAH
             *myOpponent.y = buffer[4];
             pthread_mutex_unlock(&lockPosition);
             pthread_mutex_unlock(&lockOpponentPosition);

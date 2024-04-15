@@ -192,7 +192,7 @@ pthread_mutex_t lidarFlagLock;
 
 //STATES
 extern movingState myControllerState;
-extern uint8_t startingPoint = 1;
+extern uint8_t startingPoint;
 
 void handle_sigint(int sig);
 
