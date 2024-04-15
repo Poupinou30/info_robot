@@ -4,48 +4,52 @@
 #endif
 
 // Déclaration initiale des variables globales
-double x[7]; // Vecteur d'état initial [x, y, theta, opponent_x, opponent_y, velocity_x, velocity_y]
-double P[7][7] = {
-    {0.01, 0, 0, 0, 0, 0, 0},
-    {0, 0.01, 0, 0, 0, 0, 0},
-    {0, 0, 0.01, 0, 0, 0, 0},
-    {0, 0, 0, 0.01, 0, 0, 0},
-    {0, 0, 0, 0, 0.01, 0, 0},
-    {0, 0, 0, 0, 0, 0.0001, 0},
-    {0, 0, 0, 0, 0, 0, 0.0001}
+double x[8]; // Vecteur d'état initial [x, y, theta, opponent_x, opponent_y, velocity_x, velocity_y]
+double P[8][8] = {
+    {0.01, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0.01, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0.01, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0.01, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0.01, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0.0001, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0.0001, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0.0001}
 }; // Covariance initiale de l'état
 
 // Matrices constantes pour le filtre de Kalman
-double F[7][7] = {
-    {1, 0, 0, 0, 0, 0.5, 0},
-    {0, 1, 0, 0, 0, 0, 0.5},
-    {0, 0, 1, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 0, 0},
-    {0, 0, 0, 0, 1, 0, 0},
-    {0, 0, 0, 0, 0, 1, 0},
-    {0, 0, 0, 0, 0, 0, 1}
+double F[8][8] = {
+    {1, 0, 0, 0, 0, 0.03, 0, 0}, //La position x est influencée par le vitesse en x
+    {0, 1, 0, 0, 0, 0, 0.03, 0}, //Idem Y
+    {0, 0, 1, 0, 0, 0, 0, 0.03}, //Idem omega
+    {0, 0, 0, 1, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1, 0, 0, 0},
+    {0, 0, 0, 0, 0, 1, 0, 0},
+    {0, 0, 0, 0, 0, 0, 1, 0},
+    {0, 0, 0, 0, 0, 0, 0, 1}
 }; // Matrice de transition d'état
-double H[10][7] = {
-    {1, 0, 0, 0, 0, 0, 0}, // myPos.x from sensor 1
-    {0, 1, 0, 0, 0, 0, 0}, // myPos.y from sensor 1
-    {0, 0, 1, 0, 0, 0, 0}, // myPos.theta from sensor 1
-    {1, 0, 0, 0, 0, 0, 0}, // myPos.x from sensor 2
-    {0, 1, 0, 0, 0, 0, 0}, // myPos.y from sensor 2
-    {0, 0, 1, 0, 0, 0, 0}, // myPos.theta from sensor 2
-    {0, 0, 0, 1, 0, 0, 0}, // opponentX
-    {0, 0, 0, 0, 1, 0, 0}, // opponentY
-    {0, 0, 0, 0, 0, 1, 0}, // speedX
-    {0, 0, 0, 0, 0, 0, 1}  // speedY
+double H[11][8] = {
+    {1, 0, 0, 0, 0, 0, 0, 0}, // myPos.x from sensor 1
+    {0, 1, 0, 0, 0, 0, 0, 0}, // myPos.y from sensor 1
+    {0, 0, 1, 0, 0, 0, 0, 0}, // myPos.theta from sensor 1
+    {1, 0, 0, 0, 0, 0, 0, 0}, // myPos.x from sensor 2
+    {0, 1, 0, 0, 0, 0, 0, 0}, // myPos.y from sensor 2
+    {0, 0, 1, 0, 0, 0, 0, 0}, // myPos.theta from sensor 2
+    {0, 0, 0, 1, 0, 0, 0, 0}, // opponentX
+    {0, 0, 0, 0, 1, 0, 0, 0}, // opponentY
+    {0, 0, 0, 0, 0, 1, 0, 0}, // speedX
+    {0, 0, 0, 0, 0, 0, 1, 0},  // speedY
+    {0, 0, 0, 0, 0, 0, 0, 1} //speedOmega
 };
 
-double Q[7][7] = {
-    {0.005, 0, 0, 0, 0, 0, 0},
-    {0, 0.005, 0, 0, 0, 0, 0},
-    {0, 0, 0.01, 0, 0, 0, 0},
-    {0, 0, 0, 0.005, 0, 0, 0},
-    {0, 0, 0, 0, 0.005, 0, 0},
-    {0, 0, 0, 0, 0, 100, 0},
-    {0, 0, 0, 0, 0, 0, 100}
+double Q[8][8] = {
+    {0.005, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0.005, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0.01, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0.005, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0.005, 0, 0, 0},
+    {0, 0, 0, 0, 0, 100, 0, 0},
+    {0, 0, 0, 0, 0, 0, 100, 0},
+    {0, 0, 0, 0, 0, 0, 0, 100}
 }; // Bruit de processus
 double R[10] = {0.3, 0.3, 0.05,0.7, 0.7, 0.05, 0.4, 0.4, 0.001, 0.001}; // Bruit de mesure pour chaque variable d'état
 double oldTheta;
@@ -57,10 +61,10 @@ void* updateKalman(void* args) {
     double y;
     pthread_mutex_lock(&lockPosition);
     pthread_mutex_lock(&lockFilteredOpponent);
-    double measurements[7] = {*(myPos.x), *(myPos.y), *(myPos.theta), *(myOpponent.x), *(myOpponent.y), measuredSpeedX, measuredSpeedY}; // Obtention des mesures
+    double measurements[8] = {*(myPos.x), *(myPos.y), *(myPos.theta), *(myOpponent.x), *(myOpponent.y), measuredSpeedX, measuredSpeedY, measuredSpeedOmega}; // Obtention des mesures
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockPosition);
-    double measurementsCombined[10];
+    double measurementsCombined[11];
 
     struct timeval currentTime;
     gettimeofday(&currentTime,NULL);
@@ -74,8 +78,8 @@ void* updateKalman(void* args) {
     double secondSensorMeasurement[3] = {*myOdometryPos.x, *myOdometryPos.y, *myOdometryPos.theta}; // Remplacez par les vraies valeurs
 
     // Combinaison des mesures des deux capteurs
-    pthread_mutex_lock(&lidarFlagLock);
-    if(lidarElapsedTime < 150 || 1){//A CHANGER ICI LE "OU 1" NE DOIT PAS RESTER!!!
+    pthread_mutex_lock(&lidarTimeLock);
+    if(lidarElapsedTime < 150){
         for(int i = 0; i < 3; i++){
             measurementsCombined[i] = measurements[i];
             measurementsCombined[i+3] = secondSensorMeasurement[i];
@@ -91,17 +95,18 @@ void* updateKalman(void* args) {
     measurementsCombined[7] = measurements[4];
     measurementsCombined[8] = measurements[5];
     measurementsCombined[9] = measurements[6];
-    pthread_mutex_unlock(&lidarFlagLock);
+    measurementsCombined[10] = measurements[7];
+    pthread_mutex_unlock(&lidarTimeLock);
 
     // Étape de prédiction
-    double x_pred[7];
-    double P_pred[7][7];
-    for (int i = 0; i < 7; i++) {
+    double x_pred[8];
+    double P_pred[8][8];
+    for (int i = 0; i < 8; i++) {
         x_pred[i] = 0;
-        for (int j = 0; j < 7; j++) {
+        for (int j = 0; j < 8; j++) {
             x_pred[i] += F[i][j] * x[j]; // Prédiction de l'état
             P_pred[i][j] = 0;
-            for (int k = 0; k < 7; k++) {
+            for (int k = 0; k < 8; k++) {
                 P_pred[i][j] += F[i][k] * P[k][j]; // Prédiction de la covariance de l'état
             }
             P_pred[i][j] += Q[i][j]; // Ajout du bruit de processus
@@ -109,10 +114,10 @@ void* updateKalman(void* args) {
     }
 
     // Étape de mise à jour
-    for (int j = 0; j < 7; j++) {
+    for (int j = 0; j < 8; j++) {
         double innovationSum = 0;
         double covarianceSum = 0;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 11; i++) {
             if (i == j || ((i-3) == j )) { // Utiliser seulement les mesures pertinentes pour chaque mise à jour d'état
                 double diff = measurementsCombined[i] - x_pred[j];
                 // Ajustement de l'innovation pour les transitions entre 0 et 360 degrés
