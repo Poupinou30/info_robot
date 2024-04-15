@@ -10,7 +10,7 @@ using namespace sl;
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
 
-#define baliseRadius 0.0415
+#define baliseRadius 0.04
 
 
 #include <fcntl.h>
@@ -28,13 +28,13 @@ lidarPos calibPos;
 pthread_mutex_t filteredPositionLock;
 
 
-float perimetre = 8.55; /*8.4 sur l'arène!!!!*/
+float perimetre = 8.6; /*8.4 sur l'arène!!!!*/
 float limit_of_detection = 3.6;
-double objectMaxStep = 0.09;
+double objectMaxStep = 0.12; //ETAIT A 0.9 JE LAI CHANGE AJD
 double max_object_width = 0.2;
 uint16_t angleTolerance = 2;
-float triangleErrorTolerance = 0.08;//il est à 0.08 par défaut
-float isoceleTolerance = 0.08; //ETAIT A 0.08
+float triangleErrorTolerance = 0.1;//il est à 0.08 par défaut
+float isoceleTolerance = 0.1; //ETAIT A 0.08
 float longSideLength = 3.326; //Longueur des deux grands côtés du triangle
 float shortSideLength = 1.9; //Longueur des deux petits côtés du triangle
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
@@ -327,10 +327,10 @@ void* beacon_data(void* argument){
                     //fprintf(stderr,"djk = %f\n",djk);
                     
                     
-                    float actualError = fabs(triangle-perimetre) + 2*fabs(fabs(dij-djk));
+                    float actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
                     uint8_t condition = triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
                     //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
-                    if(verbose && triangle >8.5&& triangle < 8.7 /*&& fabs(beaconTab[0].angle-90) < 20*/) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
+                    //if(verbose && triangle >8.5&& triangle < 8.7 /*&& fabs(beaconTab[0].angle-90) < 20*/) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
                     if(condition && actualError < oldError){//faudrait rajouter une condition brrr genre sur les anngles
                         beaconFound = 1;
                         bestBeaconTab[0] = beaconTab[0];
