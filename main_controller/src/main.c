@@ -41,7 +41,7 @@ int mainFORKS(){
     myActuatorsState = SENDING_INSTRUCTION;
     while(myGrabState != FINISHED){
         
-        manageGrabbing();
+        //manageGrabbing();
     }
 }
 
@@ -400,7 +400,10 @@ void initializeMainController(){
     UART_handle = initializeUART();
     i2c_handle_front = I2C_initialize(0x40);
     i2c_handle_rear = I2C_initialize(0x41);
+    initializeLaunchGPIO();
     if(makeLog) generateLog();
+    supremeState = WAITING_FOR_START
+
 
 
     //Initialisation variables
@@ -432,7 +435,7 @@ void initializeMainController(){
     *myOdometryPos.x = 0;
     *myOdometryPos.y = 0;
     *myOdometryPos.theta = 0;
-    addOpponentObstacle();
+    addOpponentObstacle(0);
     //Initialisation PID
     tunePID(30,15,i2c_handle_front,i2c_handle_rear);
 }

@@ -3,22 +3,27 @@ project(main_controller C)
 
 set(CMAKE_C_STANDARD 99)
 
-include_directories(.)
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
 find_package(pigpio REQUIRED)
 #add_compile_options(-g)
 
 
 add_executable(main_controller main.c
-        variables.c
-        fieldpath.c
-        headers.h
-        spi_com.c
-        utils.c
-        controller.c
-        kalman.c
-        feedbackOdometry.c
-        forkControl.c
-        strategy.c
+        src/variables.c
+        src/fieldpath.c
+        src/headers.h
+        src/spi_com.c
+        src/utils.c
+        src/controller.c
+        src/kalman.c
+        src/feedbackOdometry.c
+        src/forkControl.c
+        src/forkStrategy.c
+        src/mainStrategy.c
+        src/initializations.C
+        src/UART.C
+        src/lidarManagement.c
         )
 
 target_include_directories(main_controller PRIVATE ${pigpio_INCLUDE_DIR})

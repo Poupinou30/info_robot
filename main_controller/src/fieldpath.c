@@ -169,13 +169,14 @@ void makeHeatmap(){
 
 }
 
-void addRoundObstacle(double posX, double posY, double size, uint8_t moving){
+void addRoundObstacle(double posX, double posY, double size, uint8_t moving, int obstacleID){
     obstacle myObstacle;
     myObstacle.posX = posX;
     myObstacle.posY = posY;
     myObstacle.size = size;
     myObstacle.isRectangle = 0;
     myObstacle.moving = moving;
+    myObstacle.obstacleID = obstacleID;
     if(myForce.obstacleNumber == 0){
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
         myForce.obstacleList[0] = myObstacle;
@@ -210,6 +211,7 @@ void addOpponentObstacle(){
     myObstacle.size = 0.25;
     myObstacle.isRectangle = 0;
     myObstacle.moving = 1;
+    myObstacle.obstacleID = 0;
     if(myForce.obstacleNumber == 0){
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
         myForce.obstacleList[0] = myObstacle;
@@ -242,7 +244,7 @@ void updateOpponentObstacle(){
     pthread_mutex_unlock(&lockFilteredOpponent);
 }
 
-void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving){
+void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving, int obstacleID){
     obstacle myObstacle;
     myObstacle.isRectangle = 1;
     myObstacle.x1 = x1;
@@ -251,6 +253,7 @@ void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t mo
     myObstacle.y2 = y2;
     myObstacle.isRectangle = 1;
     myObstacle.moving = moving;
+    myObstacle.obstacleID = obstacleID;
     if(myForce.obstacleNumber == 0){
         myForce.obstacleList = (obstacle*) malloc(sizeof(obstacle));
         myForce.obstacleList[0] = myObstacle;
@@ -282,10 +285,10 @@ void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t mo
     fprintf(stderr,"Obstacle added, at the end, size of list is %d now\n", myForce.obstacleNumber);
 }
 
-void removeMovingObstacles(){
-    printf("remove moving obstacles \n");
+void removeObstacle(int obstacleID){
+    printf("remove obstacle #%d \n",obstacleID);
     int j = 0;
-    while (j < myForce.movingNumber) {
+    while (myForce.obstacleList[j].obstacleID != obstacleID) {
         for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
             myForce.obstacleList[k] = myForce.obstacleList[k+1];
         }
@@ -311,11 +314,17 @@ void printObstacleLists(){
         fprintf(stderr,"index of moving is %d\n",myForce.movingIndexes[i]);
     }
 }
+struct timeval startOfArrival, now;
 
 void computeForceVector(){
+
+    double nowTime = now.tv_sec + now.tv_usec/1000000;
     
+    double distanceFromDest = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
+    double k_mult_att;
     
     float k_att_xy = 0.5;
+    k_att_xy = k_att_xy * (1+ 1/(0.2+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta
@@ -323,7 +332,7 @@ void computeForceVector(){
     pthread_mutex_lock(&lockFilteredPosition); 
     double f_att_x = -destination_set*k_att_xy * (*myFilteredPos.x- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (*myFilteredPos.y - *destination.y);
-    double distanceFromDest = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
+    
     double theta = *myFilteredPos.theta;
     double desiredTheta = *destination.theta;
     uint8_t sign_f_rep_x;
@@ -345,10 +354,18 @@ void computeForceVector(){
     
 
     if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.005 && fabs(error) < 0.2){
-        myControllerState = STOPPED;
+        if(startOfArrival.tv_sec == 0 && startOfArrival.tv_usec == 0){
+            gettimeofday(&startOfArrival,NULL);
+        }
+        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.5){
+            arrivedAtDestination = 1;
+        }
+        //myControllerState = STOPPED;
+        
     }
     else{
-        myControllerState = MOVING;
+        startOfArrival.tv_sec = 0;
+        startOfArrival.tv_usec = 0;
     }
     pthread_mutex_unlock(&lockFilteredPosition); 
     pthread_mutex_unlock(&lockDestination);
@@ -414,7 +431,9 @@ void computeForceVector(){
             else sign_f_rep_y = 1;
             if(tempoObstacle->moving) k_reduc_repul = 1;
             else{
-                if(distanceFromDest < 0.15) k_reduc_repul = 0.3;
+                if(distanceFromDest < 0.15){
+                    k_reduc_repul = 0.3; 
+                } 
                 else k_reduc_repul = 1;
             } 
             f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
@@ -452,10 +471,17 @@ void myPotentialFieldController(){
 }
 
 void initializeObstacles(){
-    addRectangleObstacle(0,0,2,0,0); //Mur du bas
-    addRectangleObstacle(0,0,0,3,0); //Mur de gauche
-    addRectangleObstacle(2,0,2,3,0); //Mur de droite
-    addRectangleObstacle(0,3,2,3,0); //Mur du haut
-    addRectangleObstacle(0,1.05,0.145,3-1.05,0); //jardinières gauche
-    addRectangleObstacle(2,1.05,2-0.145,3-1.05,0); //jardinières droite
+    addRectangleObstacle(0,0,2,0,0,1); //Mur du bas
+    addRectangleObstacle(0,0,0,3,0,2); //Mur de gauche
+    addRectangleObstacle(2,0,2,3,0,3); //Mur de droite
+    addRectangleObstacle(0,3,2,3,0,4); //Mur du haut
+    addRectangleObstacle(0,1.05,0.145,3-1.05,0,5); //jardinières gauche
+    addRectangleObstacle(2,1.05,2-0.145,3-1.05,0,6); //jardinières droite
+    addRoundObstacles(0.5,1.50,0.125,11); //Zone plantes f1
+    addRoundObstacles(0.7,1,0.125,12); //Zone plantes f2
+    addRoundObstacles(0.5,2,0.125,13); //Zone plantes f3
+    addRoundObstacles(1.3,1,0.125,14); //Zone plantes f4
+    addRoundObstacles(1.3,2,0.125,15);  //Zone plantes f5
+    addRoundObstacles(1.5,1.5,0.125,16); //Zone plantes f6
+
 }

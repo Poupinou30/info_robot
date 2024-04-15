@@ -14,11 +14,33 @@ uint8_t actuator_reception;
 int done = 0;
 uint8_t done1 = 0, done2 = 0, done3 = 0;
 
-void manageGrabbing(){
+void manageGrabbing(*plantZone bestPlantZone){
+    
+    pthread_mutex_lock(&filteredPositionLock);
+    if(*myFilteredPos.y < bestPlantZone.posY) {
+        *destination.x = bestPlantZone.targetPositionLowX;
+        *destination.y = bestPlantZone.targetPositionLowY;
+        *destination.theta = 0;
+    }
+    else{
+        *destination.x = bestPlantZone.targetPositionHighX;
+        *destination.y = bestPlantZone.targetPositionHighY;
+        *destination.theta = 180;
+    }
+
+    pthread_mutex_unlock(&filteredPositionLock);
+
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     char receivedData[255];
     switch (myGrabState)
     {
+    case MOVE_FRONT_PLANTS:
+        if(!arrivedAtDestination) myControllerState = MOVING;
+        else{
+            myGrabState = GRAB_PLANTS_INIT;
+            myControllerState = STOPPED;
+        } 
+        break;
     case CALIB_FORK:
         switch (myActuatorsState)
         {
@@ -41,7 +63,7 @@ void manageGrabbing(){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 actuator_reception = 0;
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = GRAB_PLANTS_INIT;
+                myGrabState = FINISHED;
                 receivedData[0] = '\0';
                 sleep(3);                
             } 

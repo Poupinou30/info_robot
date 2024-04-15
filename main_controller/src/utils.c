@@ -443,3 +443,37 @@ void generateLog(){
 void writeLog(){
     fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y);
 }
+
+uint8_t checkStartSwitch(){
+    return gpioRead(25);
+}
+
+plantZone* computeBestPlantsZone(){
+    plantZone* bestPlantZone = plantZones[0];
+    for (int i = 0; i < 6; i++) {
+        if(plantZones[i].numberOfPlants > numberOfPlants){ // il est instancié où ce numberOfPlants ? :/
+            bestPlantZone = &plantZones[i];
+        }
+    }
+    return bestPlantZone;
+}
+
+endZone* computeBestEndZone(){
+    endZone* bestEndZone = EndZones[0];
+    pthread_mutex_lock(&filteredPositionLock);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&filteredPositionLock);
+
+    smallestDistance = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY)
+
+    for (int i = 0; i < 6; i++) {
+        newDistance = computeEuclidianDistance(x, y, EndZones[i]->posX, EndZones[i]->posY)
+        if(newdistance < smallestDistance){
+           bestPlantZone = &plantZones[i];
+        }
+    }
+    return bestPlantZone;
+}
+
+

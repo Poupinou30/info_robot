@@ -18,6 +18,8 @@
 #define timeDelay 100 //ms
 #define makeLog 1
 
+#define matchDuration 90 //seconds
+
 
 
 extern float* positionReceived;
@@ -37,6 +39,7 @@ typedef struct obstacle{
     uint8_t moving;
     uint8_t isRectangle;
     float x1,x2,y1,y2;
+    int obstacleID;
 } obstacle;
 
 
@@ -89,25 +92,25 @@ void resetRepulsiveField(int x1,int y1, int x2, int y2);
 void computeTotalField(uint8_t mode, int x1, int y1, int x2, int y2);
 void print2DArray(int m, int n, double** arr);
 void makeHeatmap();
-void addRoundObstacle(double posX, double posY, double size, uint8_t moving);
+void addRoundObstacle(double posX, double posY, double size, uint8_t moving, int obstacleID);
 void printObstacleLists();
-void removeMovingObstacles();
+void removeObstacle(int obstacleID);
 void computeForceVector();
 void myPotentialFieldController();
 void* updateKalman(void* args);
 void defineInitialPosition();
 position closestPoint(position rect[2], position pos);
-void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving);
+void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving, int obstacleID);
 void convertsSpeedToRobotFrame(double v_x, double v_y, double omega, double* output_speed);
 void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2);
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
 void initializeObstacles();
 void initializeMainController();
-void addOpponentObstacle();
+void addOpponentObstacle(int obstacleID);
 void updateOpponentObstacle();
-typedef enum{MOVING,STOPPED} movingState;
 
-int initializeUART();
+
+
 void resetOdometry();
 void myOdometry();
 
@@ -121,6 +124,7 @@ void I2C_send(char* data,char* received, int I2C_handle);
 int i2c_handle_front;
 int i2c_handle_rear;
 void initializeLaunchGPIO();
+int initializeUART();
 //FIN COMMUNICATION
 
 //Communication LIDAR
@@ -145,8 +149,8 @@ int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag)
 
 
 //STRATEGY
-typedef enum {CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
-void manageGrabbing();
+typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
+void manageGrabbing(*plantZone bestPlantZone);
 extern grabbingState myGrabState;
 typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
 extern actuationState myActuatorsState;
@@ -209,3 +213,46 @@ extern position myFilteredOpponent;
 
 //KALMAN
 void defineOpponentPosition(float posX, float posY);
+
+//STATES & STRATEGY
+typedef enum{MOVING,STOPPED} movingState;
+typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE, GAME_OVER} supremeState;
+typedef enum {PLANTS_ACTION, PLANTS_POTS_ACTION, SOLAR_PANELS_ACTION} actionChoice
+uint8_t arrivedAtDestination;
+
+struct timeval startOfMatch;
+supremeState mySupremeState;
+actionChoice myActionChoice;
+
+void mainStrategy();
+void pointsStrategy();
+void returnToBaseStrategy();
+void waitingStrategy();
+uint8_t checkStartSwitch();
+
+//ELEMENTS DE JEU
+typedef struct EndZone{
+    int zoneID;
+    float posX;
+    float posY;
+} endZone;
+
+endZone* EndZones;
+void initializeEndZones();
+StartZone* computeBestEndZone();
+
+typedef struct plantZone{
+    int numberOfPlants;
+    int zoneID;
+    float posX;
+    float posY;
+    float targetPositionLowX;
+    float targetPositionLowY;
+    float targetPositionUpX;
+    float targetPositionUpY;
+} plantZone;
+
+plantZone* plantZones;
+void initializePlantZones();
+plantZone* computeBestPlantsZone();
+
