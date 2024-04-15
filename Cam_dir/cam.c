@@ -37,16 +37,21 @@ int main(){
         if(path[0] =='['){
             int count=0;
             char *token = strtok(path, "[], \n");
-            while(token!=NULL || count< 3){
+            printf("token: %s\n, %d", token);
+            while(token!=NULL && count< 3){
                 errno = 0;
                 coordinates[num_sublists][count] = strtof(token, NULL);
-                if(coordinates[num_sublists][count] == 0.0 && errno != 0){
+                if(coordinates[num_sublists][count] == 0.0000 && errno != 0){
                     perror("strtof");
                 }
                 token = strtok(NULL, "[], \n");
                 count++;
             }
-            num_sublists++;
+            if(count== 3){
+                num_sublists++;
+            }
+            
+            printf("%d", num_sublists);
             if(num_sublists >= 6){
                 printf("chelou ça");
                 break;

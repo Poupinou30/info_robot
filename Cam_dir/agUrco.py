@@ -72,6 +72,8 @@ def data_cam():
 				print("bas gauche : " +str(tag_corners[3]))
 				print("bas droite : " +str(tag_corners[2]))
 				"""
+				
+				
 				cm_per_pixel= markerSizeInM*200/30
 				
 				h_px= int(rect_height/cm_per_pixel)
@@ -83,6 +85,9 @@ def data_cam():
 				#cv2.polylines(mask, [np.int32(tag_corners)], isClosed=True, color=(0,0,255), thickness=4)
 				cv2.rectangle(mask, top_left_corner, bottom_right_corner, color=(0,0,255), thickness=4)
 				output = cv2.add(frame, mask)
+				
+				
+				
 				#print(tag_corners)
 			#print("les coords des pots de travers: " + str(coord_trav) + " \n")
 			#print(" les tailles des listes: toutes les plantes : " + str(len(coordinate)) + " et juste les plantes de travers : " + str(len(coord_trav) )+ " \n")
@@ -142,7 +147,11 @@ def data_cam():
 
 if __name__ == "__main__":
 	coordinates= data_cam()
-	print(coordinates)
+	
+	#print(coordinates)
+	for coord in coordinates: 
+		coord_string = "[" + ", ".join(map(str, coord)) + "]" 
+		print(coord_string)
 	
 	#for coord in coordinates:
 	#	coord_string = " ".join(map(str, coord))
