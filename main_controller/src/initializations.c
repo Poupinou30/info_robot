@@ -55,3 +55,31 @@ void initializePlantZones(){
     plantZones[5].targetPositionUpY = plantZones[5].posY + 0.3;
 
 }
+
+
+void initializeEndZones(){
+    endZones = (endZone*)malloc(sizeof(endZone)*6);
+    endZones[0].zoneID = 1;
+    endZones[0].posX =  0.225;
+    endZones[0].posY =  0.225;
+
+    endZones[1].zoneID = 2;
+    endZones[1].posX = 1;
+    endZones[1].posY = 2.775;
+
+    endZones[2].zoneID = 3;
+    endZones[2].posX = 1.775;
+    endZones[2].posY = 0.225;
+
+    endZones[3].zoneID = 4;
+    endZones[3].posX = 0.225;
+    endZones[3].posY = 2.775;
+
+    endZones[4].zoneID = 5;
+    endZones[4].posX = 1;
+    endZones[4].posY = 0.225;
+
+    endZones[5].zoneID = 6;
+    endZones[5].posX = 1.775;
+    endZones[5].posY = 2.775;
+}
