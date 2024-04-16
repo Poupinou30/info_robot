@@ -461,7 +461,7 @@ float xStart;
 float yStart;
 
 void myPotentialFieldController(){
-    double outputSpeed[3]
+    double outputSpeed[3];
     if(myControllerState == MOVING && destination_set == 1){
         switch (myMoveType)
         {
@@ -479,15 +479,15 @@ void myPotentialFieldController(){
 
                 }
                 else{
-                    if(destinationSet == 0){
+                    if(destination_set == 0){
                         xStart = *myFilteredPos.x;
                         yStart = *myFilteredPos.y;
-                        destinationSet = 1;
+                        destination_set = 1;
                         arrivedAtDestination = 0;
                     }
                     else{
                         if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.25){
-                            destinationSet = 0;
+                            destination_set = 0;
                             arrivedAtDestination = 1;
                             myControllerState = STOPPED;
                         }
@@ -536,11 +536,11 @@ void initializeObstacles(){
     addRectangleObstacle(0,3,2,3,0,4); //Mur du haut
     addRectangleObstacle(0,1.05,0.145,3-1.05,0,5); //jardinières gauche
     addRectangleObstacle(2,1.05,2-0.145,3-1.05,0,6); //jardinières droite
-    addRoundObstacles(0.5,1.50,0.125,11); //Zone plantes f1
-    addRoundObstacles(0.7,1,0.125,12); //Zone plantes f2
-    addRoundObstacles(0.5,2,0.125,13); //Zone plantes f3
-    addRoundObstacles(1.3,1,0.125,14); //Zone plantes f4
-    addRoundObstacles(1.3,2,0.125,15);  //Zone plantes f5
-    addRoundObstacles(1.5,1.5,0.125,16); //Zone plantes f6
+    addRoundObstacle(0.5,1.50,0.125,0,11); //Zone plantes f1
+    addRoundObstacle(0.7,1,0.125,0,12); //Zone plantes f2
+    addRoundObstacle(0.5,2,0.125,0,13); //Zone plantes f3
+    addRoundObstacle(1.3,1,0.125,0,14); //Zone plantes f4
+    addRoundObstacle(1.3,2,0.125,0,15);  //Zone plantes f5
+    addRoundObstacle(1.5,1.5,0.125,0,16); //Zone plantes f6
 
 }

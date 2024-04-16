@@ -14,7 +14,7 @@ uint8_t actuator_reception;
 int done = 0;
 uint8_t done1 = 0, done2 = 0, done3 = 0;
 
-void manageGrabbing(*plantZone bestPlantZone){
+void manageGrabbing(plantZone* bestPlantZone){
     
     
 
@@ -23,9 +23,9 @@ void manageGrabbing(*plantZone bestPlantZone){
     switch (myGrabState)
     {
     case MOVE_FRONT_PLANTS:
-        if(destinationSet){
+        if(destination_set){
             definePlantsDestination(bestPlantZone);
-            destinationSet = 1;
+            destination_set = 1;
         }
         
         myMoveType = DISPLACEMENT_MOVE;
@@ -92,18 +92,18 @@ void manageGrabbing(*plantZone bestPlantZone){
         break;
 
     case GRAB_PLANTS_MOVE:
-        if(destinationSet == 0){
+        if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
-            destinationSet = 1;
+            destination_set = 1;
             arrivedAtDestination = 0;
         }
-        else if (destinationSet == 1 && arrivedAtDestination == 0){
+        else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_PLANTS_MOVE;
         }
         else{
             myGrabState = GRAB_PLANTS_CLOSE;
-            destinationSet = 0;
+            destination_set = 0;
         }
         break;
 
@@ -183,18 +183,18 @@ void manageGrabbing(*plantZone bestPlantZone){
         break;
 
     case UNSTACK_POTS_MOVE:
-        if(destinationSet == 0){
+        if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
-            destinationSet = 1;
+            destination_set = 1;
             arrivedAtDestination = 0;
         }
-        else if (destinationSet == 1 && arrivedAtDestination == 0){
+        else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = UNSTACK_POTS_MOVE;
         }
         else{
             myGrabState = UNSTACK_POT_TAKE;
-            destinationSet = 0;
+            destination_set = 0;
         }
         break;
 
@@ -226,18 +226,18 @@ void manageGrabbing(*plantZone bestPlantZone){
         break;
 
     case UNSTACK_POT_POSITIONING:
-        if(destinationSet == 0){
+        if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = UNSTACK_MOVE;
-            destinationSet = 1;
+            destination_set = 1;
             arrivedAtDestination = 0;
         }
-        else if (destinationSet == 1 && arrivedAtDestination == 0){
+        else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = UNSTACK_POT_POSITIONING;
         }
         else{
             myGrabState = UNSTACK_POT_DROP;
-            destinationSet = 0;
+            destination_set = 0;
         }
         break;
 

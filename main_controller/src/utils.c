@@ -449,7 +449,8 @@ uint8_t checkStartSwitch(){
 }
 
 plantZone* computeBestPlantsZone(){
-    plantZone* bestPlantZone = plantZones[0];
+    plantZone* bestPlantZone = &plantZones[0];
+    int numberOfPlants = 0;
     for (int i = 0; i < 6; i++) {
         if(plantZones[i].numberOfPlants > numberOfPlants){ // il est instancié où ce numberOfPlants ? :/
             bestPlantZone = &plantZones[i];
@@ -459,21 +460,21 @@ plantZone* computeBestPlantsZone(){
 }
 
 endZone* computeBestEndZone(){
-    endZone* bestEndZone = EndZones[0];
-    pthread_mutex_lock(&filteredPositionLock);
+    endZone* bestEndZone = &EndZones[0];
+    pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
-    pthread_mutex_unlock(&filteredPositionLock);
+    pthread_mutex_unlock(&lockFilteredPosition);
 
     float smallestDistance = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     float newDistance = 0;
     for (int i = 0; i < 6; i++) {
-        newDistance = computeEuclidianDistance(x, y, EndZones[i]->posX, EndZones[i]->posY);
-        if(newdistance < smallestDistance){
-           bestPlantZone = &plantZones[i];
+        newDistance = computeEuclidianDistance(x, y, EndZones[i].posX, EndZones[i].posY);
+        if(newDistance < smallestDistance){
+           bestEndZone = &EndZones[i];
         }
     }
-    return bestPlantZone;
+    return bestEndZone;
 }
 
 
