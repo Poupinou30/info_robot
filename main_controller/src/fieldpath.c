@@ -326,7 +326,7 @@ void computeForceVector(){
     double k_mult_att;
     
     float k_att_xy = 0.5;
-    k_att_xy = k_att_xy * (1+ 1/(0.2+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_xy = k_att_xy * (1+ 1/(0.6+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta
@@ -351,6 +351,12 @@ void computeForceVector(){
     else if(error>180){
         error-=360;
     }
+    if(measuredSpeedX < 0.1 && measuredSpeedY < 0.1 && fabs(error) > 2 && (*myFilteredPos.x > 0.15 || *myFilteredPos.x <1.85 || *myFilteredPos.y > 0.15 || *myFilteredPos.y <2.85)){
+        f_att_x = 0;
+        f_att_y = 0;
+        k_att_theta = 0.8;
+    }
+    
 
     //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
     
@@ -536,11 +542,11 @@ void initializeObstacles(){
     addRectangleObstacle(0,3,2,3,0,4); //Mur du haut
     addRectangleObstacle(0,1.05,0.145,3-1.05,0,5); //jardinières gauche
     addRectangleObstacle(2,1.05,2-0.145,3-1.05,0,6); //jardinières droite
-    addRoundObstacle(0.5,1.50,0.125,0,11); //Zone plantes f1
+    /*addRoundObstacle(0.5,1.50,0.125,0,11); //Zone plantes f1
     addRoundObstacle(0.7,1,0.125,0,12); //Zone plantes f2
     addRoundObstacle(0.5,2,0.125,0,13); //Zone plantes f3
     addRoundObstacle(1.3,1,0.125,0,14); //Zone plantes f4
     addRoundObstacle(1.3,2,0.125,0,15);  //Zone plantes f5
-    addRoundObstacle(1.5,1.5,0.125,0,16); //Zone plantes f6
+    addRoundObstacle(1.5,1.5,0.125,0,16); //Zone plantes f6*/
 
 }

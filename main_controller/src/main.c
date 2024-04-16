@@ -91,7 +91,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int main(){
+int mainWithStrategy(){
     initializeMainController();
 
     int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
@@ -115,6 +115,8 @@ int main(){
     gettimeofday(&lastExecutionTime, NULL);
     double elapsedTime = 0;
 
+    nextionStart = 1; //NE DOIT PAS RESTER!!!
+
     while (1)
     {
         gettimeofday(&currentTime, NULL);
@@ -124,11 +126,12 @@ int main(){
         if (currentElapsedTime >= 30)
         {
             if(makeLog) writeLog();
+            
             mainStrategy();
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
-            sendFilteredPos(pipefdCL[1]);
+            if(mySupremeState != WAITING_FOR_START) sendFilteredPos(pipefdCL[1]);
             elapsedTime += currentElapsedTime;
             if (elapsedTime >= 1000)
             {
@@ -173,14 +176,14 @@ int main(){
 
 }
 
-int mainDINGUERIE(){
+int main(){
     //initialisation
     initializeMainController();
     printObstacleLists();
     pthread_mutex_lock(&lockDestination);
-    *destination.x = 1.7824;
-    *destination.y = 2.275;
-    *destination.theta = 180;
+    *destination.x = 1.5;
+    *destination.y = 0.5;
+    *destination.theta = 0;
     destination_set = 1;
     pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
@@ -232,10 +235,15 @@ int mainDINGUERIE(){
         if (currentElapsedTime >= 30)
         {
             if(makeLog) writeLog();
+            printf("1");
             myPotentialFieldController();
+             printf("2");
             myOdometry();
+             printf("3");
             updateKalman(NULL);
+             printf("4");
             sendFilteredPos(pipefdCL[1]);
+             printf("5");
             elapsedTime += currentElapsedTime;
             if (elapsedTime >= 1000)
             {
@@ -266,7 +274,7 @@ int mainDINGUERIE(){
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
             pthread_mutex_lock(&lidarFlagLock);
-            if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && filteredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -475,6 +483,7 @@ int mainPATTERN(){
 
 void initializeMainController(){
     //Initialisation GPIO et interfaces
+    gpioTerminate();
     gpioInitialise();
     initializeObstacles();
     spi_handle_front = initializeSPI(0);
@@ -519,7 +528,7 @@ void initializeMainController(){
     *myOdometryPos.theta = 0;
     addOpponentObstacle();
     //Initialisation PID
-    tunePID(30,15,i2c_handle_front,i2c_handle_rear);
+    tunePID(60,15,i2c_handle_front,i2c_handle_rear);
 }
 
 int mainFINAL(){

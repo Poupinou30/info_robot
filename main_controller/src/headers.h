@@ -221,7 +221,7 @@ extern double measuredSpeedY;
 extern double measuredSpeedOmega;
 extern double measuredSpeedX;
 struct timeval lidarAcquisitionTime;
-pthread_t lidarTimeLock;
+pthread_mutex_t lidarTimeLock;
 uint8_t lidarAcquisitionFlag;
 pthread_mutex_t lidarFlagLock;
 
@@ -289,3 +289,5 @@ movingSubState myMovingSubState;
 void actionStrategy();
 
 uint8_t nextionStart;
+
+double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;

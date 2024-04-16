@@ -42,16 +42,16 @@ double H[11][8] = {
 };
 
 double Q[8][8] = {
-    {0.05, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0.05, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0.05, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0.05, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0.05, 0, 0, 0},
+    {0.005, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0.005, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0.01, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0.01, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0.01, 0, 0, 0},
     {0, 0, 0, 0, 0, 1, 0, 0},
     {0, 0, 0, 0, 0, 0, 1, 0},
-    {0, 0, 0, 0, 0, 0, 0, 1}
+    {0, 0, 0, 0, 0, 0, 0, 0.05}
 }; // Bruit de processus
-double R[11] = {0.3, 0.3, 1,0.7, 0.7, 2, 0.5, 0.5, 0.001, 0.001,0.5}; // Bruit de mesure pour chaque variable d'état
+double R[11] = {0.5, 0.5, 1,0.7, 0.7, 2, 0.5, 0.5, 0.001, 0.001,0.005}; // Bruit de mesure pour chaque variable d'état
 double oldTheta;
 double meanTheta = 0;
 uint8_t thetaForcedFlag = 0;
@@ -156,6 +156,10 @@ void* updateKalman(void* args) {
     *(myFilteredOpponent.x) = x[3];
     *(myFilteredOpponent.y) = x[4];
     pthread_mutex_unlock(&lockFilteredOpponent);
+    //printf("filteredOMega = %f et realOmega = %f \n",x[7],measuredSpeedOmega);
+    filteredSpeedX = x[5];
+    filteredSpeedY = x[6];
+    filteredSpeedOmega = x[7];
 
     return NULL;
 }

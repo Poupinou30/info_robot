@@ -10,7 +10,11 @@ double l_y = 0.175;
 double l_x = 0.21;
 
 double v_max = 0.4;
-double omega_max = 18;
+double omega_max_running = 200
+
+
+;
+double omega_max_fixed = 200;
 
 void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2) {
     int16_t num1 = (data[0] << 8) | data[1]; // Récupère le premier nombre
@@ -36,6 +40,11 @@ double degToRad(double deg) {
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
     //Speed limitation
+    double omega_max;
+    if(v_x  == 0 && v_y == 0){
+        omega_max = omega_max_fixed;
+    }
+    else omega_max = omega_max_running;
     struct timeval currentTime;
     gettimeofday(&currentTime,NULL);
     pthread_mutex_lock(&lidarTimeLock);
@@ -46,7 +55,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     pthread_mutex_lock(&lockFilteredPosition);
     double distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
 
-    if(lidarElapsedTime > 500) v_max = 0.15;
+    if(lidarElapsedTime > 500) v_max = 0.3;
     else if (distanceFromOpponent<0.7){
         v_max = 0.5*distanceFromOpponent/0.7;
     }
@@ -95,7 +104,7 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
 
     measuredSpeedX = *v_x;
     measuredSpeedY = *v_y;
-    measuredSpeedOmega = *omega * 180 / M_PI;
+    measuredSpeedOmega = *omega;
 
 }
 
@@ -152,16 +161,10 @@ uint8_t UART_receive(int UART_handle, char* received){
         if (bytesRead > 0) {
         strcat(received,tempoChar);
         fprintf(stderr,"%d received bytes : '%s' \n",bytesRead,tempoChar);
-        //printf("Message received (uart send)= '%s'\n",received);
-        //if(te[bytesRead -1]== "\0") waitingForReception = 0;
-        //printf("received '%s'\n",received);
-        //printf("bytesRead = %d lastchar = %c \n",bytesRead,(tempoChar[bytesRead-1]));
         if(tempoChar[bytesRead-1] == '>') return 1;
 
     }
     //printf("received: '%s' \n",received);
-    
-    
     return 0;}
 
 void initializeLaunchGPIO(){
@@ -255,6 +258,7 @@ void* executeProgram(void* arg){
     fprintf(stderr,"Lidar program correctly launched \n");
     return NULL;*/
 void handle_sigsegv(int sig) {
+    gpioTerminate();
     fprintf(stderr, "Erreur de segmentation capturée, terminaison du programme.\n");
     if (child_pid > 0) {
         killpg(getpgid(child_pid), SIGINT);
