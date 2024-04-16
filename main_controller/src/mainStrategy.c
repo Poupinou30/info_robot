@@ -38,14 +38,10 @@ void waitingStrategy(){
 
 void pointsStrategy(){
     gettimeoftheday(&now, NULL);
-    if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - 10){
-    /*faut encore prendre en compte le temps pris pour rentrer à la base la plus proche
-        -> faut une fonction pour déterminer quelle base est la plus proche parmis celles accessibles (en prennant en compte l'adversaire)
-    TimeNeededToGetHome = distToClosestBase*maxSpeed*SafetyFactor 
+    endZone* bestEndZone = computeBestEndZone();
+    float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
+    float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
     if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - 10 - TimeNeededToGetHome){
-        mySupremeState = RETURN_TO_BASE;
-    }
-    */ 
         mySupremeState = RETURN_TO_BASE;
     }
     else{
@@ -56,10 +52,7 @@ void pointsStrategy(){
         else{
             myActionChoice = SOLAR_PANELS_ACTION;
         }
-
         actionStrategy();
-        
-    
     }
 };
 
@@ -84,3 +77,35 @@ void actionStrategy(){
 void returnToBaseStrategy(){
     //TODO
 };
+
+void definePlantsDestination(plantZone* bestPlantZone){
+    pthread_mutex_lock(&filteredPositionLock);
+    if(*myFilteredPos.y < bestPlantZone.posY) {
+        *destination.x = bestPlantZone.targetPositionLowX;
+        *destination.y = bestPlantZone.targetPositionLowY;
+        *destination.theta = 0;
+    }
+    else{
+        *destination.x = bestPlantZone.targetPositionHighX;
+        *destination.y = bestPlantZone.targetPositionHighY;
+        *destination.theta = 180;
+    }
+
+    pthread_mutex_unlock(&filteredPositionLock);
+};
+
+void definePotsDestination(potZone* bestPotZone){
+    pthread_mutex_lock(&filteredPositionLock);
+    if(*myFilteredPos.y < bestPotZone.posY) {
+        *destination.x = bestPotZone.targetPositionLowX;
+        *destination.y = bestPotZone.targetPositionLowY;
+        *destination.theta = 0;
+    }
+    else{
+        *destination.x = bestPotZone.targetPositionHighX;
+        *destination.y = bestPotZone.targetPositionHighY;
+        *destination.theta = 180;
+    }
+
+    pthread_mutex_unlock(&filteredPositionLock);
+}

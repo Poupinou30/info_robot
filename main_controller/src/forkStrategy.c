@@ -16,29 +16,24 @@ uint8_t done1 = 0, done2 = 0, done3 = 0;
 
 void manageGrabbing(*plantZone bestPlantZone){
     
-    pthread_mutex_lock(&filteredPositionLock);
-    if(*myFilteredPos.y < bestPlantZone.posY) {
-        *destination.x = bestPlantZone.targetPositionLowX;
-        *destination.y = bestPlantZone.targetPositionLowY;
-        *destination.theta = 0;
-    }
-    else{
-        *destination.x = bestPlantZone.targetPositionHighX;
-        *destination.y = bestPlantZone.targetPositionHighY;
-        *destination.theta = 180;
-    }
-
-    pthread_mutex_unlock(&filteredPositionLock);
+    
 
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     char receivedData[255];
     switch (myGrabState)
     {
     case MOVE_FRONT_PLANTS:
+        if(destinationSet){
+            definePlantsDestination(bestPlantZone);
+            destinationSet = 1;
+        }
+        
+        myMoveType = DISPLACEMENT_MOVE;
         if(!arrivedAtDestination) myControllerState = MOVING;
         else{
             myGrabState = GRAB_PLANTS_INIT;
             myControllerState = STOPPED;
+            arrivedAtDestination = 0;
         } 
         break;
     case CALIB_FORK:
@@ -97,8 +92,19 @@ void manageGrabbing(*plantZone bestPlantZone){
         break;
 
     case GRAB_PLANTS_MOVE:
-        // Move forward to grab the plants
-        myGrabState = GRAB_PLANTS_CLOSE;
+        if(destinationSet == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = GO_FORWARD_PLANTS;
+            destinationSet = 1;
+            arrivedAtDestination = 0;
+        }
+        else if (destinationSet == 1 && arrivedAtDestination == 0){
+            myGrabState = GRAB_PLANTS_MOVE;
+        }
+        else{
+            myGrabState = GRAB_PLANTS_CLOSE;
+            destinationSet = 0;
+        }
         break;
 
     case GRAB_PLANTS_CLOSE:
@@ -166,10 +172,30 @@ void manageGrabbing(*plantZone bestPlantZone){
         
         break;
 
+    case MOVE_FRONT_POTS:
+        myMoveType = DISPLACEMENT_MOVE;
+        if(!arrivedAtDestination) myControllerState = MOVING;
+        else{
+            myGrabState = UNSTACK_POTS_MOVE;
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
+        } 
+        break;
+
     case UNSTACK_POTS_MOVE:
-        sleep(3);
-        printf("dans unstack move\n");
-        myGrabState = UNSTACK_POT_TAKE;
+        if(destinationSet == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = GO_FORWARD_POTS;
+            destinationSet = 1;
+            arrivedAtDestination = 0;
+        }
+        else if (destinationSet == 1 && arrivedAtDestination == 0){
+            myGrabState = UNSTACK_POTS_MOVE;
+        }
+        else{
+            myGrabState = UNSTACK_POT_TAKE;
+            destinationSet = 0;
+        }
         break;
 
 
@@ -200,8 +226,19 @@ void manageGrabbing(*plantZone bestPlantZone){
         break;
 
     case UNSTACK_POT_POSITIONING:
-        
-        myGrabState = UNSTACK_POT_DROP;
+        if(destinationSet == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = UNSTACK_MOVE;
+            destinationSet = 1;
+            arrivedAtDestination = 0;
+        }
+        else if (destinationSet == 1 && arrivedAtDestination == 0){
+            myGrabState = UNSTACK_POT_POSITIONING;
+        }
+        else{
+            myGrabState = UNSTACK_POT_DROP;
+            destinationSet = 0;
+        }
         break;
 
     case UNSTACK_POT_DROP:

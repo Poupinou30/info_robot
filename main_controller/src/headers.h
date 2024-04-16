@@ -149,7 +149,7 @@ int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag)
 
 
 //STRATEGY
-typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
+typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
 void manageGrabbing(*plantZone bestPlantZone);
 extern grabbingState myGrabState;
 typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
@@ -255,4 +255,14 @@ typedef struct plantZone{
 plantZone* plantZones;
 void initializePlantZones();
 plantZone* computeBestPlantsZone();
+typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
+moveType myMoveType;
 
+void definePotsDestination(potZone* bestPotZone);
+void definePlantsDestination(plantZone* bestPlantZone);
+
+typedef enum{BLUE, YELLOW} teamColor;
+teamColor myTeamColor;
+
+typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE} movingSubState;
+movingSubState myMovingSubState;

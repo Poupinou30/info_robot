@@ -465,10 +465,10 @@ endZone* computeBestEndZone(){
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&filteredPositionLock);
 
-    smallestDistance = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY)
-
+    float smallestDistance = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
+    float newDistance = 0;
     for (int i = 0; i < 6; i++) {
-        newDistance = computeEuclidianDistance(x, y, EndZones[i]->posX, EndZones[i]->posY)
+        newDistance = computeEuclidianDistance(x, y, EndZones[i]->posX, EndZones[i]->posY);
         if(newdistance < smallestDistance){
            bestPlantZone = &plantZones[i];
         }

@@ -3,6 +3,8 @@
 #define HEADERS
 #endif
 
+#define GRAB_SPEED 0.2
+
 float fixActionDistance = 0.3;
 float mobileActionDistance = 0.4;
 
@@ -455,15 +457,72 @@ void computeForceVector(){
     //Calcul de la force de attraction totale
 }
 
+float xStart;
+float yStart;
+
 void myPotentialFieldController(){
+    double outputSpeed[3]
     if(myControllerState == MOVING && destination_set == 1){
-    double outputSpeed[3];
-    computeForceVector();
-    convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
-    //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
-    if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear);
-    processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
+        switch (myMoveType)
+        {
+        case GRABBING_MOVE:
+            switch (myMovingSubState)
+            {
+            case GO_FORWARD_PLANTS:
+                pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destinationSet == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        destinationSet = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.25){
+                            destinationSet = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = GRAB_SPEED;
+                    outputSpeed[2] = 0;
+                }
+                pthread_mutex_unlock(&lockFilteredOpponent);
+                pthread_mutex_unlock(&lockFilteredPosition);
+                break;
+            
+            case (GO_FORWARD_POTS):
+                break;
+                
+            default:
+                break;
+            }
+            
+            
+            break;
+        case DISPLACEMENT_MOVE:
+            convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+            computeForceVector();
+            break;
+        default:
+            break;
+        };
+        //computeForceVector();
+        //convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+        //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
+        //if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear); UTILE OU PAS? ON REMETTAIS JAMAIS LES PID DE BASE!!
+        processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
     }
+
     else{
         computeForceVector();
         processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
