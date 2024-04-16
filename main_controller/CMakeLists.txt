@@ -9,7 +9,7 @@ find_package(pigpio REQUIRED)
 #add_compile_options(-g)
 
 
-add_executable(main_controller main.c
+add_executable(main_controller src/main.c
         src/variables.c
         src/fieldpath.c
         src/headers.h
@@ -21,8 +21,8 @@ add_executable(main_controller main.c
         src/forkControl.c
         src/forkStrategy.c
         src/mainStrategy.c
-        src/initializations.C
-        src/UART.C
+        src/initializations.c
+        src/UART.c
         src/lidarManagement.c
         )
 

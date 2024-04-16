@@ -123,275 +123,383 @@ main_controller/fast:
 	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/build
 .PHONY : main_controller/fast
 
-controller.o: controller.c.o
+src/UART.o: src/UART.c.o
 
-.PHONY : controller.o
-
-# target to build an object file
-controller.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/controller.c.o
-.PHONY : controller.c.o
-
-controller.i: controller.c.i
-
-.PHONY : controller.i
-
-# target to preprocess a source file
-controller.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/controller.c.i
-.PHONY : controller.c.i
-
-controller.s: controller.c.s
-
-.PHONY : controller.s
-
-# target to generate assembly for a file
-controller.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/controller.c.s
-.PHONY : controller.c.s
-
-feedbackOdometry.o: feedbackOdometry.c.o
-
-.PHONY : feedbackOdometry.o
+.PHONY : src/UART.o
 
 # target to build an object file
-feedbackOdometry.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/feedbackOdometry.c.o
-.PHONY : feedbackOdometry.c.o
+src/UART.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/UART.c.o
+.PHONY : src/UART.c.o
 
-feedbackOdometry.i: feedbackOdometry.c.i
+src/UART.i: src/UART.c.i
 
-.PHONY : feedbackOdometry.i
+.PHONY : src/UART.i
 
 # target to preprocess a source file
-feedbackOdometry.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/feedbackOdometry.c.i
-.PHONY : feedbackOdometry.c.i
+src/UART.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/UART.c.i
+.PHONY : src/UART.c.i
 
-feedbackOdometry.s: feedbackOdometry.c.s
+src/UART.s: src/UART.c.s
 
-.PHONY : feedbackOdometry.s
+.PHONY : src/UART.s
 
 # target to generate assembly for a file
-feedbackOdometry.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/feedbackOdometry.c.s
-.PHONY : feedbackOdometry.c.s
+src/UART.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/UART.c.s
+.PHONY : src/UART.c.s
 
-fieldpath.o: fieldpath.c.o
+src/controller.o: src/controller.c.o
 
-.PHONY : fieldpath.o
+.PHONY : src/controller.o
 
 # target to build an object file
-fieldpath.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/fieldpath.c.o
-.PHONY : fieldpath.c.o
+src/controller.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/controller.c.o
+.PHONY : src/controller.c.o
 
-fieldpath.i: fieldpath.c.i
+src/controller.i: src/controller.c.i
 
-.PHONY : fieldpath.i
+.PHONY : src/controller.i
 
 # target to preprocess a source file
-fieldpath.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/fieldpath.c.i
-.PHONY : fieldpath.c.i
+src/controller.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/controller.c.i
+.PHONY : src/controller.c.i
 
-fieldpath.s: fieldpath.c.s
+src/controller.s: src/controller.c.s
 
-.PHONY : fieldpath.s
+.PHONY : src/controller.s
 
 # target to generate assembly for a file
-fieldpath.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/fieldpath.c.s
-.PHONY : fieldpath.c.s
+src/controller.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/controller.c.s
+.PHONY : src/controller.c.s
 
-forkControl.o: forkControl.c.o
+src/feedbackOdometry.o: src/feedbackOdometry.c.o
 
-.PHONY : forkControl.o
+.PHONY : src/feedbackOdometry.o
 
 # target to build an object file
-forkControl.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/forkControl.c.o
-.PHONY : forkControl.c.o
+src/feedbackOdometry.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/feedbackOdometry.c.o
+.PHONY : src/feedbackOdometry.c.o
 
-forkControl.i: forkControl.c.i
+src/feedbackOdometry.i: src/feedbackOdometry.c.i
 
-.PHONY : forkControl.i
+.PHONY : src/feedbackOdometry.i
 
 # target to preprocess a source file
-forkControl.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/forkControl.c.i
-.PHONY : forkControl.c.i
+src/feedbackOdometry.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/feedbackOdometry.c.i
+.PHONY : src/feedbackOdometry.c.i
 
-forkControl.s: forkControl.c.s
+src/feedbackOdometry.s: src/feedbackOdometry.c.s
 
-.PHONY : forkControl.s
+.PHONY : src/feedbackOdometry.s
 
 # target to generate assembly for a file
-forkControl.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/forkControl.c.s
-.PHONY : forkControl.c.s
+src/feedbackOdometry.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/feedbackOdometry.c.s
+.PHONY : src/feedbackOdometry.c.s
 
-kalman.o: kalman.c.o
+src/fieldpath.o: src/fieldpath.c.o
 
-.PHONY : kalman.o
+.PHONY : src/fieldpath.o
 
 # target to build an object file
-kalman.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/kalman.c.o
-.PHONY : kalman.c.o
+src/fieldpath.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/fieldpath.c.o
+.PHONY : src/fieldpath.c.o
 
-kalman.i: kalman.c.i
+src/fieldpath.i: src/fieldpath.c.i
 
-.PHONY : kalman.i
+.PHONY : src/fieldpath.i
 
 # target to preprocess a source file
-kalman.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/kalman.c.i
-.PHONY : kalman.c.i
+src/fieldpath.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/fieldpath.c.i
+.PHONY : src/fieldpath.c.i
 
-kalman.s: kalman.c.s
+src/fieldpath.s: src/fieldpath.c.s
 
-.PHONY : kalman.s
+.PHONY : src/fieldpath.s
 
 # target to generate assembly for a file
-kalman.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/kalman.c.s
-.PHONY : kalman.c.s
+src/fieldpath.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/fieldpath.c.s
+.PHONY : src/fieldpath.c.s
 
-main.o: main.c.o
+src/forkControl.o: src/forkControl.c.o
 
-.PHONY : main.o
+.PHONY : src/forkControl.o
 
 # target to build an object file
-main.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/main.c.o
-.PHONY : main.c.o
+src/forkControl.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/forkControl.c.o
+.PHONY : src/forkControl.c.o
 
-main.i: main.c.i
+src/forkControl.i: src/forkControl.c.i
 
-.PHONY : main.i
+.PHONY : src/forkControl.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/main.c.i
-.PHONY : main.c.i
+src/forkControl.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/forkControl.c.i
+.PHONY : src/forkControl.c.i
 
-main.s: main.c.s
+src/forkControl.s: src/forkControl.c.s
 
-.PHONY : main.s
+.PHONY : src/forkControl.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/main.c.s
-.PHONY : main.c.s
+src/forkControl.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/forkControl.c.s
+.PHONY : src/forkControl.c.s
 
-spi_com.o: spi_com.c.o
+src/forkStrategy.o: src/forkStrategy.c.o
 
-.PHONY : spi_com.o
+.PHONY : src/forkStrategy.o
 
 # target to build an object file
-spi_com.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/spi_com.c.o
-.PHONY : spi_com.c.o
+src/forkStrategy.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/forkStrategy.c.o
+.PHONY : src/forkStrategy.c.o
 
-spi_com.i: spi_com.c.i
+src/forkStrategy.i: src/forkStrategy.c.i
 
-.PHONY : spi_com.i
+.PHONY : src/forkStrategy.i
 
 # target to preprocess a source file
-spi_com.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/spi_com.c.i
-.PHONY : spi_com.c.i
+src/forkStrategy.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/forkStrategy.c.i
+.PHONY : src/forkStrategy.c.i
 
-spi_com.s: spi_com.c.s
+src/forkStrategy.s: src/forkStrategy.c.s
 
-.PHONY : spi_com.s
+.PHONY : src/forkStrategy.s
 
 # target to generate assembly for a file
-spi_com.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/spi_com.c.s
-.PHONY : spi_com.c.s
+src/forkStrategy.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/forkStrategy.c.s
+.PHONY : src/forkStrategy.c.s
 
-strategy.o: strategy.c.o
+src/initializations.o: src/initializations.c.o
 
-.PHONY : strategy.o
+.PHONY : src/initializations.o
 
 # target to build an object file
-strategy.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/strategy.c.o
-.PHONY : strategy.c.o
+src/initializations.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/initializations.c.o
+.PHONY : src/initializations.c.o
 
-strategy.i: strategy.c.i
+src/initializations.i: src/initializations.c.i
 
-.PHONY : strategy.i
+.PHONY : src/initializations.i
 
 # target to preprocess a source file
-strategy.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/strategy.c.i
-.PHONY : strategy.c.i
+src/initializations.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/initializations.c.i
+.PHONY : src/initializations.c.i
 
-strategy.s: strategy.c.s
+src/initializations.s: src/initializations.c.s
 
-.PHONY : strategy.s
+.PHONY : src/initializations.s
 
 # target to generate assembly for a file
-strategy.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/strategy.c.s
-.PHONY : strategy.c.s
+src/initializations.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/initializations.c.s
+.PHONY : src/initializations.c.s
 
-utils.o: utils.c.o
+src/kalman.o: src/kalman.c.o
 
-.PHONY : utils.o
+.PHONY : src/kalman.o
 
 # target to build an object file
-utils.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/utils.c.o
-.PHONY : utils.c.o
+src/kalman.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/kalman.c.o
+.PHONY : src/kalman.c.o
 
-utils.i: utils.c.i
+src/kalman.i: src/kalman.c.i
 
-.PHONY : utils.i
+.PHONY : src/kalman.i
 
 # target to preprocess a source file
-utils.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/utils.c.i
-.PHONY : utils.c.i
+src/kalman.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/kalman.c.i
+.PHONY : src/kalman.c.i
 
-utils.s: utils.c.s
+src/kalman.s: src/kalman.c.s
 
-.PHONY : utils.s
+.PHONY : src/kalman.s
 
 # target to generate assembly for a file
-utils.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/utils.c.s
-.PHONY : utils.c.s
+src/kalman.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/kalman.c.s
+.PHONY : src/kalman.c.s
 
-variables.o: variables.c.o
+src/lidarManagement.o: src/lidarManagement.c.o
 
-.PHONY : variables.o
+.PHONY : src/lidarManagement.o
 
 # target to build an object file
-variables.c.o:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/variables.c.o
-.PHONY : variables.c.o
+src/lidarManagement.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/lidarManagement.c.o
+.PHONY : src/lidarManagement.c.o
 
-variables.i: variables.c.i
+src/lidarManagement.i: src/lidarManagement.c.i
 
-.PHONY : variables.i
+.PHONY : src/lidarManagement.i
 
 # target to preprocess a source file
-variables.c.i:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/variables.c.i
-.PHONY : variables.c.i
+src/lidarManagement.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/lidarManagement.c.i
+.PHONY : src/lidarManagement.c.i
 
-variables.s: variables.c.s
+src/lidarManagement.s: src/lidarManagement.c.s
 
-.PHONY : variables.s
+.PHONY : src/lidarManagement.s
 
 # target to generate assembly for a file
-variables.c.s:
-	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/variables.c.s
-.PHONY : variables.c.s
+src/lidarManagement.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/lidarManagement.c.s
+.PHONY : src/lidarManagement.c.s
+
+src/main.o: src/main.c.o
+
+.PHONY : src/main.o
+
+# target to build an object file
+src/main.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/main.c.o
+.PHONY : src/main.c.o
+
+src/main.i: src/main.c.i
+
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/main.c.i
+.PHONY : src/main.c.i
+
+src/main.s: src/main.c.s
+
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/main.c.s
+.PHONY : src/main.c.s
+
+src/mainStrategy.o: src/mainStrategy.c.o
+
+.PHONY : src/mainStrategy.o
+
+# target to build an object file
+src/mainStrategy.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/mainStrategy.c.o
+.PHONY : src/mainStrategy.c.o
+
+src/mainStrategy.i: src/mainStrategy.c.i
+
+.PHONY : src/mainStrategy.i
+
+# target to preprocess a source file
+src/mainStrategy.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/mainStrategy.c.i
+.PHONY : src/mainStrategy.c.i
+
+src/mainStrategy.s: src/mainStrategy.c.s
+
+.PHONY : src/mainStrategy.s
+
+# target to generate assembly for a file
+src/mainStrategy.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/mainStrategy.c.s
+.PHONY : src/mainStrategy.c.s
+
+src/spi_com.o: src/spi_com.c.o
+
+.PHONY : src/spi_com.o
+
+# target to build an object file
+src/spi_com.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/spi_com.c.o
+.PHONY : src/spi_com.c.o
+
+src/spi_com.i: src/spi_com.c.i
+
+.PHONY : src/spi_com.i
+
+# target to preprocess a source file
+src/spi_com.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/spi_com.c.i
+.PHONY : src/spi_com.c.i
+
+src/spi_com.s: src/spi_com.c.s
+
+.PHONY : src/spi_com.s
+
+# target to generate assembly for a file
+src/spi_com.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/spi_com.c.s
+.PHONY : src/spi_com.c.s
+
+src/utils.o: src/utils.c.o
+
+.PHONY : src/utils.o
+
+# target to build an object file
+src/utils.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/utils.c.o
+.PHONY : src/utils.c.o
+
+src/utils.i: src/utils.c.i
+
+.PHONY : src/utils.i
+
+# target to preprocess a source file
+src/utils.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/utils.c.i
+.PHONY : src/utils.c.i
+
+src/utils.s: src/utils.c.s
+
+.PHONY : src/utils.s
+
+# target to generate assembly for a file
+src/utils.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/utils.c.s
+.PHONY : src/utils.c.s
+
+src/variables.o: src/variables.c.o
+
+.PHONY : src/variables.o
+
+# target to build an object file
+src/variables.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/variables.c.o
+.PHONY : src/variables.c.o
+
+src/variables.i: src/variables.c.i
+
+.PHONY : src/variables.i
+
+# target to preprocess a source file
+src/variables.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/variables.c.i
+.PHONY : src/variables.c.i
+
+src/variables.s: src/variables.c.s
+
+.PHONY : src/variables.s
+
+# target to generate assembly for a file
+src/variables.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/variables.c.s
+.PHONY : src/variables.c.s
 
 # Help Target
 help:
@@ -402,36 +510,48 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... main_controller"
 	@echo "... edit_cache"
-	@echo "... controller.o"
-	@echo "... controller.i"
-	@echo "... controller.s"
-	@echo "... feedbackOdometry.o"
-	@echo "... feedbackOdometry.i"
-	@echo "... feedbackOdometry.s"
-	@echo "... fieldpath.o"
-	@echo "... fieldpath.i"
-	@echo "... fieldpath.s"
-	@echo "... forkControl.o"
-	@echo "... forkControl.i"
-	@echo "... forkControl.s"
-	@echo "... kalman.o"
-	@echo "... kalman.i"
-	@echo "... kalman.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
-	@echo "... spi_com.o"
-	@echo "... spi_com.i"
-	@echo "... spi_com.s"
-	@echo "... strategy.o"
-	@echo "... strategy.i"
-	@echo "... strategy.s"
-	@echo "... utils.o"
-	@echo "... utils.i"
-	@echo "... utils.s"
-	@echo "... variables.o"
-	@echo "... variables.i"
-	@echo "... variables.s"
+	@echo "... src/UART.o"
+	@echo "... src/UART.i"
+	@echo "... src/UART.s"
+	@echo "... src/controller.o"
+	@echo "... src/controller.i"
+	@echo "... src/controller.s"
+	@echo "... src/feedbackOdometry.o"
+	@echo "... src/feedbackOdometry.i"
+	@echo "... src/feedbackOdometry.s"
+	@echo "... src/fieldpath.o"
+	@echo "... src/fieldpath.i"
+	@echo "... src/fieldpath.s"
+	@echo "... src/forkControl.o"
+	@echo "... src/forkControl.i"
+	@echo "... src/forkControl.s"
+	@echo "... src/forkStrategy.o"
+	@echo "... src/forkStrategy.i"
+	@echo "... src/forkStrategy.s"
+	@echo "... src/initializations.o"
+	@echo "... src/initializations.i"
+	@echo "... src/initializations.s"
+	@echo "... src/kalman.o"
+	@echo "... src/kalman.i"
+	@echo "... src/kalman.s"
+	@echo "... src/lidarManagement.o"
+	@echo "... src/lidarManagement.i"
+	@echo "... src/lidarManagement.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
+	@echo "... src/mainStrategy.o"
+	@echo "... src/mainStrategy.i"
+	@echo "... src/mainStrategy.s"
+	@echo "... src/spi_com.o"
+	@echo "... src/spi_com.i"
+	@echo "... src/spi_com.s"
+	@echo "... src/utils.o"
+	@echo "... src/utils.i"
+	@echo "... src/utils.s"
+	@echo "... src/variables.o"
+	@echo "... src/variables.i"
+	@echo "... src/variables.s"
 .PHONY : help
 
 

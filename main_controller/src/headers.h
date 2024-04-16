@@ -62,6 +62,36 @@ typedef struct field{
     double** attractiveForceY;
 } field;
 
+typedef struct plantZone{
+    int numberOfPlants;
+    int zoneID;
+    float posX;
+    float posY;
+    float targetPositionLowX;
+    float targetPositionLowY;
+    float targetPositionUpX;
+    float targetPositionUpY;
+} plantZone;
+
+typedef struct potZone{
+    int numberOfPots;
+    int zoneID;
+    float posX;
+    float posY;
+    float targetPositionLowX;
+    float targetPositionLowY;
+    float targetPositionUpX;
+    float targetPositionUpY;
+} potZone;
+
+typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
+typedef enum{BLUE, YELLOW} teamColor;
+typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE} movingSubState;
+
+typedef enum{MOVING,STOPPED} movingState;
+typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE, GAME_OVER} supremeState;
+typedef enum {PLANTS_ACTION, PLANTS_POTS_ACTION, SOLAR_PANELS_ACTION} actionChoice;
+
 void createArray(int16_t num1, int16_t num2, uint8_t* output);
 double degToRad(double deg);
 int initializeSPI(int channel);
@@ -106,7 +136,7 @@ void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2);
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega);
 void initializeObstacles();
 void initializeMainController();
-void addOpponentObstacle(int obstacleID);
+void addOpponentObstacle();
 void updateOpponentObstacle();
 
 
@@ -150,7 +180,7 @@ int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag)
 
 //STRATEGY
 typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
-void manageGrabbing(*plantZone bestPlantZone);
+void manageGrabbing(plantZone *bestPlantZone);
 extern grabbingState myGrabState;
 typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
 extern actuationState myActuatorsState;
@@ -215,9 +245,7 @@ extern position myFilteredOpponent;
 void defineOpponentPosition(float posX, float posY);
 
 //STATES & STRATEGY
-typedef enum{MOVING,STOPPED} movingState;
-typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE, GAME_OVER} supremeState;
-typedef enum {PLANTS_ACTION, PLANTS_POTS_ACTION, SOLAR_PANELS_ACTION} actionChoice
+
 uint8_t arrivedAtDestination;
 
 struct timeval startOfMatch;
@@ -239,30 +267,25 @@ typedef struct EndZone{
 
 endZone* EndZones;
 void initializeEndZones();
-StartZone* computeBestEndZone();
+endZone* computeBestEndZone();
 
-typedef struct plantZone{
-    int numberOfPlants;
-    int zoneID;
-    float posX;
-    float posY;
-    float targetPositionLowX;
-    float targetPositionLowY;
-    float targetPositionUpX;
-    float targetPositionUpY;
-} plantZone;
+
 
 plantZone* plantZones;
+
 void initializePlantZones();
 plantZone* computeBestPlantsZone();
-typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
+
 moveType myMoveType;
 
 void definePotsDestination(potZone* bestPotZone);
 void definePlantsDestination(plantZone* bestPlantZone);
 
-typedef enum{BLUE, YELLOW} teamColor;
 teamColor myTeamColor;
 
-typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE} movingSubState;
+
 movingSubState myMovingSubState;
+
+void actionStrategy();
+
+uint8_t nextionStart;
