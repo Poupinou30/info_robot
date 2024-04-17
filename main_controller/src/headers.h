@@ -317,3 +317,4 @@ void defineBestAction();
 
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
 uint8_t forksDeployed;
+uint8_t forksCalibrated;

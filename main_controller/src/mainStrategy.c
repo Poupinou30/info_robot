@@ -5,6 +5,7 @@
 
 struct timeval now;
 
+
 void mainStrategy(){
     switch (mySupremeState)
     {
@@ -30,7 +31,11 @@ plantZone* bestPlantZone;
 
 void waitingStrategy(){
     myControllerState = STOPPED;
-    if((checkStartSwitch()||nextionStart) && readyToGo){
+    if(!forksCalibrated){
+        myGrabState = CALIB_FORK;
+        manageGrabbing(NULL,NULL);
+    }
+    else if((checkStartSwitch()||nextionStart) && readyToGo){
         gettimeofday(&startOfMatch, NULL);
         mySupremeState = EARNING_POINTS;
         defineInitialPosition();

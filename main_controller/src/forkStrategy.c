@@ -57,7 +57,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = FINISHED;
                 receivedData[0] = '\0';
-                sleep(3);                
+                forksCalibrated = 1;           
             } 
             break;
         }
