@@ -300,13 +300,5 @@ jardiniere* computeBestJardiniere();
 void definePotsDestination(potZone* bestPotZone);
 void definePlantsDestination(plantZone* bestPlantZone);
 
-teamColor myTeamColor;
-
-
-movingSubState myMovingSubState;
-
-void actionStrategy();
-
-uint8_t nextionStart;
 
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
