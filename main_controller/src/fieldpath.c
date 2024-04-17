@@ -361,12 +361,16 @@ void computeForceVector(){
     double k_mult_att;
     
     float k_att_xy = 0.5;
+    float k_att_tang = 0.1;
     k_att_xy = k_att_xy * (1+ 1/(0.8+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
     pthread_mutex_lock(&lockFilteredPosition); 
+
+
+
     double f_att_x = -destination_set*k_att_xy * (*myFilteredPos.x- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (*myFilteredPos.y - *destination.y);
     
