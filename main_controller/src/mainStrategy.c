@@ -40,6 +40,8 @@ void waitingStrategy(){
 };
 
 void pointsStrategy(){
+
+    // check if it's time to leave
     float maxSpeed = 0.4;
     float SafetyFactor = 1.5;
     gettimeofday(&now, NULL);
@@ -52,39 +54,64 @@ void pointsStrategy(){
     float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
     if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - TimeNeededToGetHome){
         mySupremeState = RETURN_TO_BASE;
+        if(VERBOSE)
+            printf("Match ending, going to RETURN_TO_BASE mode\n");
+            printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
+            printf("TimeNeededToGetHome = %f\n", TimeNeededToGetHome);
     }
-    else{
-        bestPlantZone = computeBestPlantsZone();
-        if(bestPlantZone->numberOfPlants > 2){
-            myActionChoice = PLANTS_POTS_ACTION;
-        }
-        else{
-            myActionChoice = SOLAR_PANELS_ACTION;
+    else{ // let's earn some points
+        if(changeOfPlan){
+            defineBestAction();
+            changeOfPlan = 0;
+            /*todo: faut set changeOfPlan quand:
+            - on a fini une action
+            - l'adversaire arrive avant nous à notre target
+            - l'aversaire nous bloque le chemin trop longtemps
+            */
         }
         actionStrategy();
     }
 };
 
 void actionStrategy(){
+    // encore un peu éclaté, mais ça commence à ressembler à quelque chose
     switch (myActionChoice)
     {
     case PLANTS_ACTION:
-        //TODO
+        if(destination_set != 1){
+            definePlantsDestination(bestPlantZone);
+            destination_set = 1;
+        }
+        manageGrabbing(bestPlantZone);
+        //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
+        if(destination_set != 1){
+            definePlantsDestination(bestPlantZone);
+            destination_set = 1;
+        }
         manageGrabbing(bestPlantZone);
+        //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case SOLAR_PANELS_ACTION:
         //TODO
         break;
-    
     default:
         break;
     }
 };
 
 void returnToBaseStrategy(){
-    //TODO
+    defineEndZoneDestination(computeBestEndZone());
+};
+void defineBestAction(){
+    bestPlantZone = computeBestPlantsZone();
+    if(bestPlantZone->numberOfPlants > 2){
+        myActionChoice = PLANTS_POTS_ACTION;
+    }
+    else{
+        myActionChoice = SOLAR_PANELS_ACTION;
+    }
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){
@@ -99,22 +126,30 @@ void definePlantsDestination(plantZone* bestPlantZone){
         *destination.y = bestPlantZone->targetPositionUpY;
         *destination.theta = 180;
     }
-
     pthread_mutex_unlock(&lockFilteredPosition);
 };
 
 void definePotsDestination(potZone* bestPotZone){
     pthread_mutex_lock(&lockFilteredPosition);
-    if(*myFilteredPos.y < bestPotZone->posY) {
-        *destination.x = bestPotZone->targetPositionLowX;
-        *destination.y = bestPotZone->targetPositionLowY;
+    
+    *destination.x = bestPotZone->posX;
+    *destination.y = bestPotZone->posY;
+    if(*myFilteredPos.y < bestPlantZone->posY) {
+        *destination.theta = 180;
+    }else{
         *destination.theta = 0;
     }
-    else{
-        *destination.x = bestPotZone->targetPositionUpX;
-        *destination.y = bestPotZone->targetPositionUpY;
-        *destination.theta = 180;
-    }
-
     pthread_mutex_unlock(&lockFilteredPosition);
 }
+
+void defineEndZoneDestination(endZone* bestEndZone){
+    pthread_mutex_lock(&lockFilteredPosition);
+    *destination.x = bestEndZone->posX;
+    *destination.y = bestEndZone->posY;
+    if(*myFilteredPos.y < bestPlantZone->posY) {
+        *destination.theta = 180;
+    }else{
+        *destination.theta = 0;
+    }
+    pthread_mutex_unlock(&lockFilteredPosition);
+};

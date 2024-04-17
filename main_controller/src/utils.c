@@ -178,10 +178,6 @@ void initializeLaunchGPIO(){
 
 }
 
-
-
-
-
 double randomDouble(double min, double max) {
     double range = (max - min); 
     double div = RAND_MAX / range;
@@ -453,10 +449,18 @@ uint8_t checkStartSwitch(){
 }
 
 plantZone* computeBestPlantsZone(){
+
     plantZone* bestPlantZone = &plantZones[0];
     int numberOfPlants = 0;
+    float smallestDistance = 1000;
+
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+
     for (int i = 0; i < 6; i++) {
-        if(plantZones[i].numberOfPlants > numberOfPlants){ // il est instancié où ce numberOfPlants ? :/
+        if(plantZones[i].numberOfPlants >= numberOfPlants){
             bestPlantZone = &plantZones[i];
         }
     }
@@ -464,21 +468,21 @@ plantZone* computeBestPlantsZone(){
 }
 
 endZone* computeBestEndZone(){
-    endZone* bestEndZone = &EndZones[0];
+    endZone* bestEndZone = &EndZones[3*teamColor];
+    float smallestDistance = 1000;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
 
-    float smallestDistance = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
-    float newDistance = 0;
-    for (int i = 0; i < 6; i++) {
-        newDistance = computeEuclidianDistance(x, y, EndZones[i].posX, EndZones[i].posY);
-        if(newDistance < smallestDistance){
+    
+    for (int i = 0; i < 3; i++) {
+        if(computeEuclidianDistance(x, y, EndZones[3*teamColor+i].posX, EndZones[3*teamColor+i].posY) < smallestDistance){
            bestEndZone = &EndZones[i];
         }
     }
     return bestEndZone;
 }
+
 
 

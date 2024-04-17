@@ -476,15 +476,15 @@ float yStart;
 void myPotentialFieldController(){
     double outputSpeed[3];
     if(myControllerState == MOVING && destination_set == 1){
-        switch (myMoveType)
-        {
+        switch (myMoveType){
         case GRABBING_MOVE:
             switch (myMovingSubState)
             {
             case GO_FORWARD_PLANTS:
                 pthread_mutex_lock(&lockFilteredOpponent);
                 pthread_mutex_lock(&lockFilteredPosition);
-                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ 
+                    //S'arrête si il est arrivé ou qu'il est bloqué par l'adversaire
                 
                     outputSpeed[0] = 0;
                     outputSpeed[1] = 0;
@@ -513,9 +513,179 @@ void myPotentialFieldController(){
                 pthread_mutex_unlock(&lockFilteredPosition);
                 break;
             
+            // à partir d'ici c'est simon qui les a fait, si ça fait nimporte quoi c'est ma faute
             case (GO_FORWARD_POTS):
-                break;
+                pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
                 
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destination_set == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        destination_set = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.16){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = 0
+                    outputSpeed[1] = GRAB_SPEED;
+                    outputSpeed[2] = 0;
+                }
+                pthread_mutex_unlock(&lockFilteredOpponent);
+                pthread_mutex_unlock(&lockFilteredPosition);
+                break;
+            
+            case (UNSTACK_MOVE):
+                pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destination_set == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        destination_set = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.175){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = - 0.405 * GRAB_SPEED; 
+                    outputSpeed[1] = - 0.914 * GRAB_SPEED;
+                    outputSpeed[2] = 0;
+                }
+            case (Y_Align_Pots):
+                pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destination_set == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        destination_set = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.0904){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = 0; 
+                    outputSpeed[1] = GRAB_SPEED;
+                    outputSpeed[2] = 0;
+
+            case (X_Align_Pots):
+                pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destination_set == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        destination_set = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.0708){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = GRAB_SPEED; 
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+                }
+            case (GET_ALL_POTS):
+                pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destination_set == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        destination_set = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.0708){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = 0; 
+                    outputSpeed[1] = GRAB_SPEED;
+                    outputSpeed[2] = 0;
+
+            case (GET_BACK_JARDINIERE):
+                pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destination_set == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        destination_set = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.16){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = 0; 
+                    outputSpeed[1] = - GRAB_SPEED;
+                    outputSpeed[2] = 0;
+
             default:
                 break;
             }

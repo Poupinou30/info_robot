@@ -20,12 +20,12 @@
 
 #define matchDuration 90 //seconds
 
-
-
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
 extern pthread_mutex_t lockRefreshCounter;
 
+
+// PlayingField
 typedef struct position{
     float *x;
     float *y;
@@ -74,19 +74,44 @@ typedef struct plantZone{
 } plantZone;
 
 typedef struct potZone{
-    int numberOfPots;
     int zoneID;
     float posX;
     float posY;
-    float targetPositionLowX;
-    float targetPositionLowY;
-    float targetPositionUpX;
-    float targetPositionUpY;
+    int numberOfPots;
 } potZone;
+
+typedef struct jardiniere{
+    int zoneID;
+    float posX;
+    float posY;
+    int numberOfPlants;
+} jardiniere;
+
+typedef struct solarpanel{
+    int panelID;
+    float posX;
+    float posY;
+    int state;
+} solarpanel;
+
+
+typedef struct EndZone{
+    int zoneID;
+    float posX;
+    float posY;
+    int numberOfPlants;
+} endZone;
+
+
+plantZone* plantZones;
+potZone* PotZones;
+jardiniere* Jardinieres;
+solarpanel* SolarPanels;
+endZone* EndZones;
 
 typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
 typedef enum{BLUE, YELLOW} teamColor;
-typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE} movingSubState;
+typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE, Y_Align_Pots, X_Align_Pots,GET_ALL_POTS,GET_BACK_JARDINIERE} movingSubState;
 
 typedef enum{MOVING,STOPPED} movingState;
 typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE, GAME_OVER} supremeState;
@@ -178,15 +203,6 @@ int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag)
 //END ACTUATORS
 
 
-//STRATEGY
-typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
-void manageGrabbing(plantZone *bestPlantZone);
-extern grabbingState myGrabState;
-typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
-extern actuationState myActuatorsState;
-//END STRATEGY
-
-
 extern position myPos;
 extern field myField;
 extern pid_t child_pid;
@@ -209,6 +225,7 @@ extern pthread_mutex_t lockPosition;
 extern pthread_mutex_t lockOpponentPosition;
 extern pthread_mutex_t lockDestination;
 extern uint8_t destination_set;
+extern uint8_t pressForward;
 extern position myOdometryPos;
 
 //Moteurs - odometry
@@ -244,39 +261,41 @@ extern position myFilteredOpponent;
 //KALMAN
 void defineOpponentPosition(float posX, float posY);
 
-//STATES & STRATEGY
-
-uint8_t arrivedAtDestination;
-
-struct timeval startOfMatch;
-supremeState mySupremeState;
-actionChoice myActionChoice;
+// STRATEGY
 
 void mainStrategy();
+void waitingStrategy();
 void pointsStrategy();
 void returnToBaseStrategy();
-void waitingStrategy();
+void actionStrategy();
+void manageGrabbing(plantZone *bestPlantZone);
 uint8_t checkStartSwitch();
 
-//ELEMENTS DE JEU
-typedef struct EndZone{
-    int zoneID;
-    float posX;
-    float posY;
-} endZone;
+typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,ALIGN_POTS_MOVE,LIFT_POTS,GRAB_ALL_POTS,DROP_PLANTS, DROP_ALL,MOVE_BACK_JARDINIERE,FINISHED } grabbingState;
+extern grabbingState myGrabState;
+typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
+extern actuationState myActuatorsState;
+typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE} supremeState;
+supremeState mySupremeState;
+actionChoice myActionChoice;
+movingSubState myMovingSubState;
+moveType myMoveType;
+uint8_t arrivedAtDestination;
+uint8_t changeOfPlan;
+teamColor myTeamColor;
 
-endZone* EndZones;
+struct timeval startOfMatch;
+uint8_t nextionStart;
+
+// fonctions de Jeu
+void initializePlantZones();
+void initializePotZones();
+void initializeJardinieres();
 void initializeEndZones();
 endZone* computeBestEndZone();
-
-
-
-plantZone* plantZones;
-
-void initializePlantZones();
 plantZone* computeBestPlantsZone();
-
-moveType myMoveType;
+potZone* computeBestPotsZone();
+jardiniere* computeBestJardiniere();
 
 void definePotsDestination(potZone* bestPotZone);
 void definePlantsDestination(plantZone* bestPlantZone);
