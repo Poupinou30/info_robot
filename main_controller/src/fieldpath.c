@@ -485,8 +485,8 @@ void computeForceVector(){
             myClosestRobotPoint = closestPointBetweenRectangles(robotCorners,tempoRectangle);
             distance = computeEuclidianDistance(*myClosestObstaclePoint.x, *myClosestObstaclePoint.y, *myClosestRobotPoint.x, *myClosestRobotPoint.y); //Calcul la distance
             pthread_mutex_unlock(&lockFilteredPosition);
-            tempoX = *myClosestPoint.x; //Calcule la position en x
-            tempoY = *myClosestPoint.y; //Calcule la position en y
+            tempoX = *myClosestObstaclePoint.x; //Calcule la position en x
+            tempoY = *myClosestObstaclePoint.y; //Calcule la position en y
             free(myClosestPoint.x);
             free(myClosestPoint.y);
         }
