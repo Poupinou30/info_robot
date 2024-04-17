@@ -296,11 +296,13 @@ uint8_t nextionStart;
 void initializePlantZones();
 void initializePotZones();
 void initializeJardinieres();
+void initializeSolarPanels();
 void initializeEndZones();
-endZone* computeBestEndZone();
 plantZone* computeBestPlantsZone();
 potZone* computeBestPotsZone();
+endZone* computeBestDropZone();
 jardiniere* computeBestJardiniere();
+endZone* computeBestEndZone();
 
 void definePotsDestination(potZone* bestPotZone);
 void definePlantsDestination(plantZone* bestPlantZone);

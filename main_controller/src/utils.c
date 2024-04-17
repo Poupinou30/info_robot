@@ -451,32 +451,95 @@ uint8_t checkStartSwitch(){
 plantZone* computeBestPlantsZone(){
 
     plantZone* bestPlantZone = &plantZones[0];
-    int numberOfPlants = 0;
-    float smallestDistance = 1000;
-
+    int numberOfPlants = bestPlantZone->numberOfPlants;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, plantZones[0].posX, plantZones[0].posY);
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 1; i < 6; i++) {
         if(plantZones[i].numberOfPlants > numberOfPlants){
             bestPlantZone = &plantZones[i];
+        }else if(plantZones[i].numberOfPlants = numberOfPlants){
+            if (computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY) < smallestDistance) {
+                bestPlantZone = &plantZones[i];
+            }
         }
     }
     return bestPlantZone;
 }
 
-endZone* computeBestEndZone(){
-    endZone* bestEndZone = &EndZones[3*myTeamColor];
-    float smallestDistance = 1000;
+potZone* computeBestPotsZone(){
+    potZone* bestPotZone = &potZones[0];
+    int numberOfPots = bestPotZone->numberOfPots;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, potZones[0].posX, potZones[0].posY);
 
+    for (int i = 1; i < 6; i++) {
+        if(potZones[i].numberOfPots > numberOfPots){
+            bestPotZone = &potZones[i];
+        }else if(potZones[i].numberOfPots = numberOfPots){
+            if (computeEuclidianDistance(x, y, potZones[i].posX, potZones[i].posY) < smallestDistance) {
+                bestPotZone = &potZones[i];
+            }
+        }
+    }
+    return bestPotZone;
+}
+
+endZone* computeBestDropZone(){
+    endZone* bestDropZone = &dropZones[3*myTeamColor];
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, dropZones[3*myTeamColor].posX, dropZones[3*myTeamColor].posY);
     
-    for (int i = 0; i < 3; i++) {
+
+    for (int i = 1; i < 3; i++) {
+        if(computeEuclidianDistance(x, y, dropZones[3*myTeamColor+i].posX, dropZones[3*myTeamColor+i].posY) < smallestDistance){
+            bestDropZone = &dropZones[i];
+        }
+    }
+    return bestDropZone;
+}
+
+jardiniere* computeBestJardiniere(){
+    jardiniere* bestJardiniere = &jardinieres[3*teamColor];
+    int number_of_plants = jardinieres[3*teamColor].numberOfPlants;
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
+
+    for (int i = 1; i < 3; i++) {
+        if(jardinieres[i].numberOfPlants < number_of_plants){
+            bestJardiniere = &jardinieres[i];
+        }else if (jardinieres[i].numberOfPlants = number_of_plants){
+            if(computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY) < smallestDistance){
+                bestJardiniere = &jardinieres[i];
+            }
+        }
+    }
+    return bestJardiniere;
+}
+
+
+
+endZone* computeBestEndZone(){
+    endZone* bestEndZone = &EndZones[3*myTeamColor];
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, EndZones[3*myTeamColor].posX, EndZones[3*myTeamColor].posY);
+        
+    for (int i = 1; i < 3; i++) {
         if(computeEuclidianDistance(x, y, EndZones[3*myTeamColor+i].posX, EndZones[3*myTeamColor+i].posY) < smallestDistance){
            bestEndZone = &EndZones[i];
         }
