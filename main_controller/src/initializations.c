@@ -134,36 +134,36 @@ void initializeJardinieres(){
 	5 (JJ2) = 138.75, 0.12
 
     */	
-    Jardinieres = (jardiniere*)malloc(sizeof(jardiniere)*6);
-    Jardinieres[0].zoneID = 0;
-    Jardinieres[0].posX = 0.12;
-    Jardinieres[0].posY = 0.7625;
-    Jardinieres[0].numberOfPlants = 0;
+    jardinieres = (jardiniere*)malloc(sizeof(jardiniere)*6);
+    jardinieres[0].zoneID = 0;
+    jardinieres[0].posX = 0.12;
+    jardinieres[0].posY = 0.7625;
+    jardinieres[0].numberOfPlants = 0;
 
-    Jardinieres[1].zoneID = 1;
-    Jardinieres[1].posX = 0.6125;
-    Jardinieres[1].posY = 0.12;
-    Jardinieres[1].numberOfPlants = 0;
+    jardinieres[1].zoneID = 1;
+    jardinieres[1].posX = 0.6125;
+    jardinieres[1].posY = 0.12;
+    jardinieres[1].numberOfPlants = 0;
 
-    Jardinieres[2].zoneID = 2;
-    Jardinieres[2].posX = 1.3875;
-    Jardinieres[2].posY = 2.88;
-    Jardinieres[2].numberOfPlants = 0;
+    jardinieres[2].zoneID = 2;
+    jardinieres[2].posX = 1.3875;
+    jardinieres[2].posY = 2.88;
+    jardinieres[2].numberOfPlants = 0;
 
-    Jardinieres[3].zoneID = 3;
-    Jardinieres[3].posX = 0.12;
-    Jardinieres[3].posY = 2.2375;
-    Jardinieres[3].numberOfPlants = 0;
+    jardinieres[3].zoneID = 3;
+    jardinieres[3].posX = 0.12;
+    jardinieres[3].posY = 2.2375;
+    jardinieres[3].numberOfPlants = 0;
 
-    Jardinieres[4].zoneID = 4;
-    Jardinieres[4].posX = 0.6125;
-    Jardinieres[4].posY = 2.88;
-    Jardinieres[4].numberOfPlants = 0;
+    jardinieres[4].zoneID = 4;
+    jardinieres[4].posX = 0.6125;
+    jardinieres[4].posY = 2.88;
+    jardinieres[4].numberOfPlants = 0;
 
-    Jardinieres[5].zoneID = 5;
-    Jardinieres[5].posX = 1.3875;
-    Jardinieres[5].posY = 0.12;
-    Jardinieres[5].numberOfPlants = 0;
+    jardinieres[5].zoneID = 5;
+    jardinieres[5].posX = 1.3875;
+    jardinieres[5].posY = 0.12;
+    jardinieres[5].numberOfPlants = 0;
     
 }
 
