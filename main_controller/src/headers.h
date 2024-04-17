@@ -301,6 +301,7 @@ plantZone* computeBestPlantsZone();
 potZone* computeBestPotsZone();
 endZone* computeBestDropZone();
 jardiniere* computeBestJardiniere();
+solarpanel* computeBestSolarPanel();
 endZone* computeBestEndZone();
 
 void definePotsDestination(potZone* bestPotZone);

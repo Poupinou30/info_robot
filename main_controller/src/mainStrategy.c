@@ -104,6 +104,7 @@ void actionStrategy(){
 void returnToBaseStrategy(){
     defineEndZoneDestination(computeBestEndZone());
 };
+
 void defineBestAction(){
     bestPlantZone = computeBestPlantsZone();
     if(bestPlantZone->numberOfPlants > 2){
