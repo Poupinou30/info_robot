@@ -140,6 +140,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
         
     case GRAB_PLANTS_END:
+        bestPlantZone->numberOfPlants = 0;
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:

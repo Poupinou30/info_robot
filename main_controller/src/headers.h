@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #define _Pi 3.1415927
+#define DEG2RAD     (_Pi/180)
 #ifndef MAIN_CONTROLLER_HEADERS_H
 #define MAIN_CONTROLLER_HEADERS_H
 
@@ -112,7 +113,7 @@ plantZone* plantZones;
 potZone* PotZones;
 jardiniere* Jardinieres;
 solarpanel* SolarPanels;
-endZone* EndZones;
+endZone* endZones;
 
 typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
 typedef enum{BLUE, YELLOW} teamColor;
