@@ -44,10 +44,10 @@ void pointsStrategy(){
     float SafetyFactor = 1.5;
     gettimeofday(&now, NULL);
     endZone* bestEndZone = computeBestEndZone();
-    fprintf(stderr,"locking 48\n"); pthread_mutex_lock(&lockFilteredPosition);
+    pthread_mutex_lock(&lockFilteredPosition);
     double x = *myFilteredPos.x;
     double y = *myFilteredPos.y;
-    fprintf(stderr,"unlocking 48\n");pthread_mutex_unlock(&lockFilteredPosition);
+    pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
     if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - TimeNeededToGetHome){
@@ -88,7 +88,7 @@ void returnToBaseStrategy(){
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){
-    fprintf(stderr,"locking 49\n"); pthread_mutex_lock(&lockFilteredPosition);
+    pthread_mutex_lock(&lockFilteredPosition);
     if(*myFilteredPos.y < bestPlantZone->posY) {
         *destination.x = bestPlantZone->targetPositionLowX;
         *destination.y = bestPlantZone->targetPositionLowY;
@@ -100,11 +100,11 @@ void definePlantsDestination(plantZone* bestPlantZone){
         *destination.theta = 180;
     }
 
-    fprintf(stderr,"unlocking 49\n");pthread_mutex_unlock(&lockFilteredPosition);
+    pthread_mutex_unlock(&lockFilteredPosition);
 };
 
 void definePotsDestination(potZone* bestPotZone){
-    fprintf(stderr,"locking 50\n"); pthread_mutex_lock(&lockFilteredPosition);
+    pthread_mutex_lock(&lockFilteredPosition);
     if(*myFilteredPos.y < bestPotZone->posY) {
         *destination.x = bestPotZone->targetPositionLowX;
         *destination.y = bestPotZone->targetPositionLowY;
@@ -116,5 +116,5 @@ void definePotsDestination(potZone* bestPotZone){
         *destination.theta = 180;
     }
 
-    fprintf(stderr,"unlocking 50\n");pthread_mutex_unlock(&lockFilteredPosition);
+    pthread_mutex_unlock(&lockFilteredPosition);
 }
