@@ -460,7 +460,7 @@ plantZone* computeBestPlantsZone(){
     pthread_mutex_unlock(&lockFilteredPosition);
 
     for (int i = 0; i < 6; i++) {
-        if(plantZones[i].numberOfPlants >= numberOfPlants){
+        if(plantZones[i].numberOfPlants > numberOfPlants){
             bestPlantZone = &plantZones[i];
         }
     }
