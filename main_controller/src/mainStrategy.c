@@ -67,7 +67,9 @@ void pointsStrategy(){
     }
     
     else{ // let's earn some points
+        fprintf(stderr,"check10.1\n");
         if(changeOfPlan){
+            fprintf(stderr,"check10.2\n");
             defineBestAction();
             changeOfPlan = 0;
             fprintf(stderr,"check5\n");
@@ -77,6 +79,7 @@ void pointsStrategy(){
             - l'aversaire nous bloque le chemin trop longtemps
             */
         }
+        fprintf(stderr,"check10.3\n");
         actionStrategy();
     }
 };
