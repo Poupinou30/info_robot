@@ -476,7 +476,8 @@ float yStart;
 void myPotentialFieldController(){
     double outputSpeed[3];
     if(myControllerState == MOVING && destination_set == 1){
-        switch (myMoveType){
+        switch (myMoveType)
+        {
         case GRABBING_MOVE:
             switch (myMovingSubState)
             {
@@ -538,7 +539,7 @@ void myPotentialFieldController(){
                             myControllerState = STOPPED;
                         }
                     }
-                    outputSpeed[0] = 0
+                    outputSpeed[0] = 0;
                     outputSpeed[1] = GRAB_SPEED;
                     outputSpeed[2] = 0;
                 }
@@ -601,6 +602,7 @@ void myPotentialFieldController(){
                     outputSpeed[0] = 0; 
                     outputSpeed[1] = GRAB_SPEED;
                     outputSpeed[2] = 0;
+                }
 
             case (X_Align_Pots):
                 pthread_mutex_lock(&lockFilteredOpponent);
@@ -657,7 +659,7 @@ void myPotentialFieldController(){
                     outputSpeed[0] = 0; 
                     outputSpeed[1] = GRAB_SPEED;
                     outputSpeed[2] = 0;
-
+                }
             case (GET_BACK_JARDINIERE):
                 pthread_mutex_lock(&lockFilteredOpponent);
                 pthread_mutex_lock(&lockFilteredPosition);
@@ -666,8 +668,8 @@ void myPotentialFieldController(){
                     outputSpeed[0] = 0;
                     outputSpeed[1] = 0;
                     outputSpeed[2] = 0;
-
                 }
+                
                 else{
                     if(destination_set == 0){
                         xStart = *myFilteredPos.x;
@@ -686,25 +688,21 @@ void myPotentialFieldController(){
                     outputSpeed[1] = - GRAB_SPEED;
                     outputSpeed[2] = 0;
 
-            default:
+                }
                 break;
             }
-            
-            
-            break;
-        case DISPLACEMENT_MOVE:
+        case (DISPLACEMENT_MOVE):
             convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
             computeForceVector();
             break;
-        default:
-            break;
-        };
+        
         //computeForceVector();
         //convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
         //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
         //if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear); UTILE OU PAS? ON REMETTAIS JAMAIS LES PID DE BASE!!
         processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
-    }
+    }}
+    
 
     else{
         computeForceVector();

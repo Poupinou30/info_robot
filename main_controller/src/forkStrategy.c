@@ -14,7 +14,7 @@ uint8_t actuator_reception;
 int done = 0;
 uint8_t done1 = 0, done2 = 0, done3 = 0;
 
-void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZone en argument? je vois pas où tu l'utilises
+void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi tu passes bestPlantZone en argument? je vois pas où tu l'utilises
 
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     char receivedData[255];
