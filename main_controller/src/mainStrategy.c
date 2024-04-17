@@ -56,7 +56,9 @@ void pointsStrategy(){
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     fprintf(stderr,"check3\n");
     float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
+    fprintf(stderr,"check10\n");
     if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - TimeNeededToGetHome){
+        fprintf(stderr,"check11\n");
         mySupremeState = RETURN_TO_BASE;
         if(VERBOSE)
             printf("Match ending, going to RETURN_TO_BASE mode\n");
@@ -112,6 +114,7 @@ void returnToBaseStrategy(){
 };
 
 void defineBestAction(){
+    fprintf(stderr,"check6\n");
     bestPlantZone = computeBestPlantsZone();
     if(bestPlantZone->numberOfPlants > 2){
         myActionChoice = PLANTS_POTS_ACTION;
@@ -119,6 +122,7 @@ void defineBestAction(){
     else{
         myActionChoice = SOLAR_PANELS_ACTION;
     }
+    fprintf(stderr,"check7\n");
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){
