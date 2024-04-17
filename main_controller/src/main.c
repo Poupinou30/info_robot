@@ -142,6 +142,7 @@ int main(){
                     //printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
                     printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
                     printf("myStates: mySupremeState = %d, myActionChoice = %d \n ",mySupremeState, myActionChoice);
+                    printf("myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
                 }
 
                 elapsedTime = 0;
