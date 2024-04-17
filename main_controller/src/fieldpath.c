@@ -522,10 +522,7 @@ void computeForceVector(){
         free(robotLowerCorner.y);
         free(robotUpperCorner.x);
         free(robotUpperCorner.y);
-        free(myClosestObstaclePoint.x);
-        free(myClosestObstaclePoint.y);
-        free(myClosestRobotPoint.x);
-        free(myClosestRobotPoint.y);
+        
         
         if(distance < actionDistance){
             pthread_mutex_lock(&lockFilteredPosition);
@@ -551,6 +548,10 @@ void computeForceVector(){
     free(tempoPoint1.y);
     free(tempoPoint2.x);
     free(tempoPoint2.y);
+    free(myClosestObstaclePoint.x);
+    free(myClosestObstaclePoint.y);
+    free(myClosestRobotPoint.x);
+    free(myClosestRobotPoint.y);
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
     //printf("f_repul_x = %lf f_repul_y = %lf \n",f_repul_x,f_repul_y);

@@ -9,7 +9,7 @@ double radius = 0.03;
 double l_y = 0.175;
 double l_x = 0.21;
 
-double v_max = 0.4;
+double v_max = 0.2;
 double omega_max_running = 200
 
 
@@ -509,13 +509,13 @@ endZone* computeBestDropZone(){
 }
 
 jardiniere* computeBestJardiniere(){
-    jardiniere* bestJardiniere = &jardinieres[3*teamColor];
-    int number_of_plants = jardinieres[3*teamColor].numberOfPlants;
+    jardiniere* bestJardiniere = &jardinieres[3*myTeamColor];
+    int number_of_plants = jardinieres[3*myTeamColor].numberOfPlants;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
+    float smallestDistance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor].posX, jardinieres[3*myTeamColor].posY);
 
     for (int i = 1; i < 3; i++) {
         if(jardinieres[i].numberOfPlants < number_of_plants){
@@ -530,18 +530,18 @@ jardiniere* computeBestJardiniere(){
 }
 
 solarpanel* computeBestSolarPanel(){
-    solarpanel* bestSolarPanel = &solarpanels[0];
+    solarpanel* bestSolarPanel = &solarPanels[0];
     int state = bestSolarPanel->state;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, solarpanels[0].posX, solarpanels[0].posY);
+    float smallestDistance = computeEuclidianDistance(x, y, solarPanels[0].posX, solarPanels[0].posY);
 
     for (int i = 1; i < 9; i++) {
-        if(solarpanels[i].state = myTeamColor){
-            if(computeEuclidianDistance(x, y, solarpanels[i].posX, solarpanels[i].posY) < smallestDistance){
-                bestSolarPanel = &solarpanels[i];
+        if(solarPanels[i].state = myTeamColor){
+            if(computeEuclidianDistance(x, y, solarPanels[i].posX, solarPanels[i].posY) < smallestDistance){
+                bestSolarPanel = &solarPanels[i];
             }
         }
     }
