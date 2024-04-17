@@ -1,0 +1,2 @@
+path planning tangentiel
+adapter rayon repulsion en fonction des fourches et prendre en compte l'orientation du robot 

@@ -87,35 +87,35 @@ void initializePotZones(){
 
 
     */
-    PotZones = (potZone*)malloc(sizeof(potZone)*6);
+    potZone *potZones = (potZone*)malloc(sizeof(potZone)*6);
     potZones[0].zoneID = 0;
-    potZones[0].posX = 0. 6125
-    potZones[0].posY = 0.4305
+    potZones[0].posX = 0.6125;
+    potZones[0].posY = 0.4305;
     potZones[0].numberOfPots = 6;
 
     potZones[1].zoneID = 1;
-    potZones[1].posX = 0.6125
-    potZones[1].posY = 2.5695    
+    potZones[1].posX = 0.6125;
+    potZones[1].posY = 2.5695 ;   
     potZones[1].numberOfPots = 6;
 
     potZones[2].zoneID = 2;
-    potZones[2].posX = 1.3875
-    potZones[2].posY = 0.4305
+    potZones[2].posX = 1.3875;
+    potZones[2].posY = 0.4305;
     potZones[2].numberOfPots = 6;
 
     potZones[3].zoneID = 3;
-    potZones[3].posX = 1.3875
-    potZones[3].posY = 2.5695
-    potZones[3].numberfPots = 6;
+    potZones[3].posX = 1.3875;
+    potZones[3].posY = 2.5695;
+    potZones[3].numberOfPots = 6;
 
     potZones[4].zoneID = 4;
-    potZones[4].posX = 1.5695
-    potZones[4].posY = 1
+    potZones[4].posX = 1.5695;
+    potZones[4].posY = 1;
     potZones[4].numberOfPots = 6;
 
     potZones[5].zoneID = 5;
-    potZones[5].posX = 1.5695
-    potZones[5].posY = 2
+    potZones[5].posX = 1.5695;
+    potZones[5].posY = 2;
     potZones[5].numberOfPots = 6;
 }
 void initializeJardinieres(){
@@ -184,7 +184,7 @@ void initializeSolarPanels(){
 
     */
 
-    SolarPanels = (solarpanel*)malloc(sizeof(solarpanel)*9);
+    solarpanel *solarPanels = (solarpanel*)malloc(sizeof(solarpanel)*9);
     solarPanels[0].panelID = 0;
     solarPanels[0].posX = 1.7824;
     solarPanels[0].posY = 0.275;
@@ -249,7 +249,7 @@ void initializeEndZones(){
 
     */
 
-    EndZones = (endZone*)malloc(sizeof(endZone)*6);
+    endZone *endZones = (endZone*)malloc(sizeof(endZone)*6);
     endZones[0].zoneID = 0;
     endZones[0].posX =  0.225;
     endZones[0].posY =  0.225;

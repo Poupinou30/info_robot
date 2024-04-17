@@ -468,7 +468,7 @@ plantZone* computeBestPlantsZone(){
 }
 
 endZone* computeBestEndZone(){
-    endZone* bestEndZone = &EndZones[3*teamColor];
+    endZone* bestEndZone = &EndZones[3*myTeamColor];
     float smallestDistance = 1000;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
@@ -477,7 +477,7 @@ endZone* computeBestEndZone(){
 
     
     for (int i = 0; i < 3; i++) {
-        if(computeEuclidianDistance(x, y, EndZones[3*teamColor+i].posX, EndZones[3*teamColor+i].posY) < smallestDistance){
+        if(computeEuclidianDistance(x, y, EndZones[3*myTeamColor+i].posX, EndZones[3*myTeamColor+i].posY) < smallestDistance){
            bestEndZone = &EndZones[i];
         }
     }

@@ -273,14 +273,13 @@ void waitingStrategy();
 void pointsStrategy();
 void returnToBaseStrategy();
 void actionStrategy();
-void manageGrabbing(plantZone *bestPlantZone);
+void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone);
 uint8_t checkStartSwitch();
 
 typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,ALIGN_POTS_MOVE,LIFT_POTS,GRAB_ALL_POTS,DROP_PLANTS, DROP_ALL,MOVE_BACK_JARDINIERE,FINISHED } grabbingState;
 extern grabbingState myGrabState;
 typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
 extern actuationState myActuatorsState;
-typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE} supremeState;
 supremeState mySupremeState;
 actionChoice myActionChoice;
 movingSubState myMovingSubState;

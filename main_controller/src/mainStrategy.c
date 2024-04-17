@@ -82,7 +82,7 @@ void actionStrategy(){
             definePlantsDestination(bestPlantZone);
             destination_set = 1;
         }
-        manageGrabbing(bestPlantZone);
+        manageGrabbing(bestPlantZone, NULL);//CHANGER  NULL PAR BESTPOTZONE
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
@@ -90,7 +90,7 @@ void actionStrategy(){
             definePlantsDestination(bestPlantZone);
             destination_set = 1;
         }
-        manageGrabbing(bestPlantZone);
+        manageGrabbing(bestPlantZone, NULL); //REMPLACER NULL PAR BESTPOTZONE
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case SOLAR_PANELS_ACTION:
