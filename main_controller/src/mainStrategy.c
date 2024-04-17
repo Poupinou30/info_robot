@@ -44,7 +44,7 @@ void pointsStrategy(){
     float SafetyFactor = 1.5;
     gettimeofday(&now, NULL);
     endZone* bestEndZone = computeBestEndZone();
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 48\n"); pthread_mutex_lock(&lockFilteredPosition);
     double x = *myFilteredPos.x;
     double y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
@@ -88,7 +88,7 @@ void returnToBaseStrategy(){
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 49\n"); pthread_mutex_lock(&lockFilteredPosition);
     if(*myFilteredPos.y < bestPlantZone->posY) {
         *destination.x = bestPlantZone->targetPositionLowX;
         *destination.y = bestPlantZone->targetPositionLowY;
@@ -104,7 +104,7 @@ void definePlantsDestination(plantZone* bestPlantZone){
 };
 
 void definePotsDestination(potZone* bestPotZone){
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 50\n"); pthread_mutex_lock(&lockFilteredPosition);
     if(*myFilteredPos.y < bestPotZone->posY) {
         *destination.x = bestPotZone->targetPositionLowX;
         *destination.y = bestPotZone->targetPositionLowY;

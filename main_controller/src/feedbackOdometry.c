@@ -36,7 +36,7 @@ void myOdometry(){
     printf("d ");
     computeSpeedFromOdometry(wheelSpeeds,&v_x_r,&v_y_r,&omega_r);
 printf("e ");
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 33\n"); pthread_mutex_lock(&lockFilteredPosition);
     v_x_f = v_x_r*cos(degToRad(*myFilteredPos.theta)) - v_y_r*sin(degToRad(*myFilteredPos.theta));
     v_y_f = v_x_r*sin(degToRad(*myFilteredPos.theta)) + v_y_r*cos(degToRad(*myFilteredPos.theta));
     pthread_mutex_unlock(&lockFilteredPosition);
@@ -58,8 +58,8 @@ printf("e ");
 
 void resetOdometry(){
     //printf("odometry resetted \n");
-    pthread_mutex_lock(&lockFilteredPosition);
-    pthread_mutex_lock(&lockPosition);
+    fprintf(stderr,"locking 2\n"); pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 3\n"); pthread_mutex_lock(&lockPosition);
     *myOdometryPos.x = (0*(*myFilteredPos.x)+*myPos.x*4)/4;
     *myOdometryPos.y = (0*(*myFilteredPos.y)+*myPos.y*4)/4;
     /*if(lidarAcquisitionFlag)*/ *myOdometryPos.theta = (0*(*myFilteredPos.theta)+*myPos.theta);

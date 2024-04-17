@@ -240,7 +240,7 @@ void addOpponentObstacle(){
 }
 
 void updateOpponentObstacle(){
-    pthread_mutex_lock(&lockFilteredOpponent);
+    fprintf(stderr,"locking 4\n"); pthread_mutex_lock(&lockFilteredOpponent);
     myForce.obstacleList[myForce.movingIndexes[0]].posX = *myFilteredOpponent.x;
     myForce.obstacleList[myForce.movingIndexes[0]].posY = *myFilteredOpponent.y;
     pthread_mutex_unlock(&lockFilteredOpponent);
@@ -330,8 +330,8 @@ void computeForceVector(){
     float k_att_theta = /*0.3*/ 0.3;
     float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta
-    pthread_mutex_lock(&lockDestination);
-    pthread_mutex_lock(&lockFilteredPosition); 
+    fprintf(stderr,"locking 5\n"); pthread_mutex_lock(&lockDestination);
+    fprintf(stderr,"locking 6\n"); pthread_mutex_lock(&lockFilteredPosition); 
     double f_att_x = -destination_set*k_att_xy * (*myFilteredPos.x- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (*myFilteredPos.y - *destination.y);
     
@@ -413,7 +413,7 @@ void computeForceVector(){
             *tempoPoint2.y = tempoObstacle->y2;
             tempoRectangle[0] = tempoPoint1;
             tempoRectangle[1] = tempoPoint2;
-            pthread_mutex_lock(&lockFilteredPosition);
+            fprintf(stderr,"locking 7\n"); pthread_mutex_lock(&lockFilteredPosition);
             myClosestPoint = closestPoint(tempoRectangle,myFilteredPos);
             distance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
             pthread_mutex_unlock(&lockFilteredPosition);
@@ -425,14 +425,14 @@ void computeForceVector(){
         else{
             tempoX = tempoObstacle->posX; //Calcule la position en x
             tempoY = tempoObstacle->posY; //Calcule la position en y
-            pthread_mutex_lock(&lockFilteredPosition);
+            fprintf(stderr,"locking 8\n"); pthread_mutex_lock(&lockFilteredPosition);
             distance = fabs(computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size); //Calcule la distance
             pthread_mutex_unlock(&lockFilteredPosition);
         }
         //printf("distance = %f and actionDistance = %f \n",distance,actionDistance);
         
         if(distance < actionDistance){
-            pthread_mutex_lock(&lockFilteredPosition);
+            fprintf(stderr,"locking 9\n"); pthread_mutex_lock(&lockFilteredPosition);
             if(*myFilteredPos.x > tempoX) sign_f_rep_x = -1;
             else sign_f_rep_x = 1;
             if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
@@ -475,8 +475,8 @@ void myPotentialFieldController(){
             switch (myMovingSubState)
             {
             case GO_FORWARD_PLANTS:
-                pthread_mutex_lock(&lockFilteredOpponent);
-                pthread_mutex_lock(&lockFilteredPosition);
+                fprintf(stderr,"locking 10\n"); pthread_mutex_lock(&lockFilteredOpponent);
+                fprintf(stderr,"locking 11\n"); pthread_mutex_lock(&lockFilteredPosition);
                 if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
                 
                     outputSpeed[0] = 0;

@@ -47,12 +47,12 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     else omega_max = omega_max_running;
     struct timeval currentTime;
     gettimeofday(&currentTime,NULL);
-    pthread_mutex_lock(&lidarTimeLock);
+    fprintf(stderr,"locking 51\n"); pthread_mutex_lock(&lidarTimeLock);
     double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
     lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
     pthread_mutex_unlock(&lidarTimeLock);
-    pthread_mutex_lock(&lockFilteredOpponent);
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 52\n"); pthread_mutex_lock(&lockFilteredOpponent);
+    fprintf(stderr,"locking 63\n"); pthread_mutex_lock(&lockFilteredPosition);
     double distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
 
     if(lidarElapsedTime > 500) v_max = 0.3;
@@ -358,7 +358,7 @@ void* receptionPipe(void* pipefdvoid){
             read(pipefd[0], buffer, 5*sizeof(float));
 
             //OPPONENT
-            pthread_mutex_lock(&lockOpponentPosition);
+            fprintf(stderr,"locking 60\n"); pthread_mutex_lock(&lockOpponentPosition);
             *myOpponent.x = buffer[3]; //A SORTIR DE LA CONDITION WALLAH
             *myOpponent.y = buffer[4];
             pthread_mutex_unlock(&lockOpponentPosition);
@@ -366,10 +366,10 @@ void* receptionPipe(void* pipefdvoid){
             //printf("conditions: %d %d %d %d %d %d\n",buffer[0] > 0 , buffer[1] > 0 , buffer[0] < 2 , buffer[1]< 3 , (computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.40),first);
             if((buffer[0] > 0 && buffer[1] > 0 && buffer[0] < 2 && buffer[1]< 3 && computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.40 && fabs(*myFilteredPos.theta - buffer[2])<30)||(first && buffer[0] > 0.01 && buffer[1] > 0.01 && buffer[0] < 2 && buffer[1]< 3) ){
             first = 0;
-            pthread_mutex_lock(&lockPosition);
+            fprintf(stderr,"locking 61\n"); pthread_mutex_lock(&lockPosition);
             
             if(*myPos.x != buffer[0] && *myPos.y != buffer[1] && *myPos.theta != buffer[2]){
-                pthread_mutex_lock(&lidarTimeLock);
+                fprintf(stderr,"locking 62\n"); pthread_mutex_lock(&lidarTimeLock);
                 gettimeofday(&lidarAcquisitionTime,NULL);
                 pthread_mutex_unlock(&lidarTimeLock);
             }
@@ -387,7 +387,7 @@ void* receptionPipe(void* pipefdvoid){
             }
             
             
-            pthread_mutex_lock(&lockRefreshCounter);
+            fprintf(stderr,"locking 53\n"); pthread_mutex_lock(&lockRefreshCounter);
             
             refreshCounter ++;
             readyToGo = 1;
@@ -465,7 +465,7 @@ plantZone* computeBestPlantsZone(){
 
 endZone* computeBestEndZone(){
     endZone* bestEndZone = &EndZones[0];
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking \n"); pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);

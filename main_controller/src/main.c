@@ -153,7 +153,7 @@ int mainWithStrategy(){
             //ON EST ARRIVE A DESTINATION?
             //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
 
-            pthread_mutex_lock(&lidarTimeLock);
+            fprintf(stderr,"locking 38\n"); pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
             lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
             pthread_mutex_unlock(&lidarTimeLock);
@@ -162,7 +162,7 @@ int mainWithStrategy(){
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
-            pthread_mutex_lock(&lidarFlagLock);
+            fprintf(stderr,"locking 39\n"); pthread_mutex_lock(&lidarFlagLock);
             if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
@@ -180,7 +180,7 @@ int main(){
     //initialisation
     initializeMainController();
     printObstacleLists();
-    pthread_mutex_lock(&lockDestination);
+    fprintf(stderr,"locking 40\n"); pthread_mutex_lock(&lockDestination);
     *destination.x = 1.5;
     *destination.y = 0.5;
     *destination.theta = 0;
@@ -264,7 +264,7 @@ int main(){
             //ON EST ARRIVE A DESTINATION?
             //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
 
-            pthread_mutex_lock(&lidarTimeLock);
+            fprintf(stderr,"locking 41\n"); pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
             lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
             pthread_mutex_unlock(&lidarTimeLock);
@@ -273,7 +273,7 @@ int main(){
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
-            pthread_mutex_lock(&lidarFlagLock);
+            fprintf(stderr,"locking 42\n"); pthread_mutex_lock(&lidarFlagLock);
             if(((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && filteredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
@@ -545,7 +545,7 @@ int mainFINAL(){
     double endValue = 0;
     double nowValue = 0;
     double endValuePrint = 0;
-    pthread_mutex_lock(&lockDestination);
+    fprintf(stderr,"locking 43\n"); pthread_mutex_lock(&lockDestination);
     *destination.x = 1.00;
     *destination.y = 2.00;
     *destination.theta = 18;
@@ -607,9 +607,9 @@ int mainFINAL(){
         nowValue = now.tv_sec*1000+now.tv_usec/1000;
         if(nowValue - endValuePrint > 100){
             if(VERBOSE) fprintf(stderr,"début while\n");
-            pthread_mutex_lock(&lockPosition);
-            pthread_mutex_lock(&lockFilteredPosition);
-            pthread_mutex_lock(&lockOpponentPosition);
+            fprintf(stderr,"locking 44\n"); pthread_mutex_lock(&lockPosition);
+            fprintf(stderr,"locking 45\n"); pthread_mutex_lock(&lockFilteredPosition);
+            fprintf(stderr,"locking 46\n"); pthread_mutex_lock(&lockOpponentPosition);
             fprintf(stderr,"X = %f \n",*(myPos.x));
             fprintf(stderr,"Y = %f \n",*(myPos.y));
             fprintf(stderr,"Theta = %f \n",*(myPos.theta));
@@ -632,7 +632,7 @@ int mainFINAL(){
 
             //fprintf(stderr,"refreshed %d times \n",refreshCounter);
 
-            pthread_mutex_lock(&lockRefreshCounter);
+            fprintf(stderr,"locking 47\n"); pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter = 0;
             pthread_mutex_unlock(&lockRefreshCounter);
             if(VERBOSE) fprintf(stderr,"Après lockrefresh\n");

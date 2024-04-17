@@ -59,8 +59,8 @@ uint8_t thetaForcedFlag = 0;
 // Fonction de mise à jour du filtre de Kalman
 void* updateKalman(void* args) {
     double y;
-    pthread_mutex_lock(&lockPosition);
-    pthread_mutex_lock(&lockFilteredOpponent);
+    fprintf(stderr,"locking 30\n"); pthread_mutex_lock(&lockPosition);
+    fprintf(stderr,"locking 31\n"); pthread_mutex_lock(&lockFilteredOpponent);
     double measurements[8] = {*(myPos.x), *(myPos.y), *(myPos.theta), *(myOpponent.x), *(myOpponent.y), measuredSpeedX, measuredSpeedY, measuredSpeedOmega}; // Obtention des mesures
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockPosition);
@@ -68,7 +68,7 @@ void* updateKalman(void* args) {
 
     struct timeval currentTime;
     gettimeofday(&currentTime,NULL);
-    pthread_mutex_lock(&lidarTimeLock);
+    fprintf(stderr,"locking 32\n"); pthread_mutex_lock(&lidarTimeLock);
     double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
     lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
     pthread_mutex_unlock(&lidarTimeLock);
@@ -78,7 +78,7 @@ void* updateKalman(void* args) {
     double secondSensorMeasurement[3] = {*myOdometryPos.x, *myOdometryPos.y, *myOdometryPos.theta}; // Remplacez par les vraies valeurs
 
     // Combinaison des mesures des deux capteurs
-    pthread_mutex_lock(&lidarTimeLock);
+    fprintf(stderr,"locking 32\n"); pthread_mutex_lock(&lidarTimeLock);
     if(lidarElapsedTime < 150){
         for(int i = 0; i < 3; i++){
             measurementsCombined[i] = measurements[i];
@@ -142,7 +142,7 @@ void* updateKalman(void* args) {
     }
 
     // Mise à jour de la position filtrée
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 35\n"); pthread_mutex_lock(&lockFilteredPosition);
     *(myFilteredPos.x) = x[0];
     *(myFilteredPos.y) = x[1];
     double filteredTheta = x[2];
@@ -152,7 +152,7 @@ void* updateKalman(void* args) {
     pthread_mutex_unlock(&lockFilteredPosition);
 
     // Mise à jour de la position de l'opposant filtrée
-    pthread_mutex_lock(&lockFilteredOpponent);
+    fprintf(stderr,"locking 36\n"); pthread_mutex_lock(&lockFilteredOpponent);
     *(myFilteredOpponent.x) = x[3];
     *(myFilteredOpponent.y) = x[4];
     pthread_mutex_unlock(&lockFilteredOpponent);
@@ -167,7 +167,7 @@ void* updateKalman(void* args) {
 
 void defineInitialPosition(){
     x[0] = *myPos.x; x[1] = *myPos.y; x[2] = *myPos.theta; x[3] = -1; x[4] = -1; x[5] = 0; x[6] = 0;
-    pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"locking 37\n"); pthread_mutex_lock(&lockFilteredPosition);
     *(myFilteredPos.x) = x[0];
     *(myFilteredPos.y) = x[1];
     *(myFilteredPos.theta) = x[2];
