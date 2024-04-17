@@ -112,7 +112,7 @@ typedef struct EndZone{
 plantZone* plantZones;
 potZone* potZones;
 jardiniere* jardinieres;
-solarpanel* solarPanels;
+solarpanel* SolarPanels;
 endZone* endZones;
 endZone* dropZones;
 
@@ -287,7 +287,7 @@ actionChoice myActionChoice;
 movingSubState myMovingSubState;
 moveType myMoveType;
 uint8_t arrivedAtDestination;
-uint8_t changeOfPlan;
+extern uint8_t changeOfPlan;
 teamColor myTeamColor;
 
 struct timeval startOfMatch;
