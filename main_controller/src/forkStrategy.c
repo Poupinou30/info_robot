@@ -132,8 +132,7 @@ void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZo
                 myGrabState = GRAB_PLANTS_END;
                 done1 = 0; done2 = 0; done3 = 0;
                 receivedData[0] = '\0';
-                actuator_reception = 0;
-                
+                actuator_reception = 0;    
             } 
             break;
         }

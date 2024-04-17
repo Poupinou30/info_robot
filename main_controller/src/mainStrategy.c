@@ -74,6 +74,7 @@ void pointsStrategy(){
 };
 
 void actionStrategy(){
+    // encore un peu éclaté, mais ça commence à ressembler à quelque chose
     switch (myActionChoice)
     {
     case PLANTS_ACTION:
@@ -82,6 +83,7 @@ void actionStrategy(){
             destination_set = 1;
         }
         manageGrabbing(bestPlantZone);
+        //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
         if(destination_set != 1){

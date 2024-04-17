@@ -74,15 +74,40 @@ typedef struct plantZone{
 } plantZone;
 
 typedef struct potZone{
-    int numberOfPots;
     int zoneID;
     float posX;
     float posY;
-    float targetPositionLowX;
-    float targetPositionLowY;
-    float targetPositionUpX;
-    float targetPositionUpY;
+    int numberOfPots;
 } potZone;
+
+typedef struct jardiniere{
+    int zoneID;
+    float posX;
+    float posY;
+    int numberOfPlants;
+} jardiniere;
+
+typedef struct solarpanel{
+    int panelID;
+    float posX;
+    float posY;
+    int state;
+} solarpanel;
+
+
+typedef struct EndZone{
+    int zoneID;
+    float posX;
+    float posY;
+    int numberOfPlants;
+} endZone;
+
+
+plantZone* plantZones;
+potZone* PotZones;
+jardiniere* Jardinieres;
+solarpanel* SolarPanels;
+endZone* EndZones;
 
 typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
 typedef enum{BLUE, YELLOW} teamColor;
@@ -262,21 +287,15 @@ teamColor myTeamColor;
 struct timeval startOfMatch;
 uint8_t nextionStart;
 
-//ELEMENTS DE JEU
-typedef struct EndZone{
-    int zoneID;
-    float posX;
-    float posY;
-} endZone;
-
-
-
-endZone* EndZones;
-plantZone* plantZones;
-void initializeEndZones();
+// fonctions de Jeu
 void initializePlantZones();
+void initializePotZones();
+void initializeJardinieres();
+void initializeEndZones();
 endZone* computeBestEndZone();
 plantZone* computeBestPlantsZone();
+potZone* computeBestPotsZone();
+jardiniere* computeBestJardiniere();
 
 void definePotsDestination(potZone* bestPotZone);
 void definePlantsDestination(plantZone* bestPlantZone);
