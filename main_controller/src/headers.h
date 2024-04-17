@@ -112,7 +112,7 @@ typedef struct EndZone{
 plantZone* plantZones;
 potZone* potZones;
 jardiniere* jardinieres;
-solarpanel* SolarPanels;
+solarpanel* solarPanels;
 endZone* endZones;
 endZone* dropZones;
 

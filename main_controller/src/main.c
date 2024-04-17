@@ -89,7 +89,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int mainWithStrategy(){
+int main(){
     initializeMainController();
 
     int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
@@ -174,7 +174,7 @@ int mainWithStrategy(){
 
 }
 
-int main(){
+int mainDINGUERIE(){
     //initialisation
     initializeMainController();
     printObstacleLists();

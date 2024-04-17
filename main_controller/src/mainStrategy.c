@@ -40,17 +40,21 @@ void waitingStrategy(){
 };
 
 void pointsStrategy(){
-
     // check if it's time to leave
     float maxSpeed = 0.4;
+    fprintf(stderr,"check1\n");
     float SafetyFactor = 1.5;
     gettimeofday(&now, NULL);
+    fprintf(stderr,"check1.5\n");
     endZone* bestEndZone = computeBestEndZone();
+    fprintf(stderr,"check1.6\n");
     pthread_mutex_lock(&lockFilteredPosition);
+    fprintf(stderr,"check2\n");
     double x = *myFilteredPos.x;
     double y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
+    fprintf(stderr,"check3\n");
     float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
     if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - TimeNeededToGetHome){
         mySupremeState = RETURN_TO_BASE;
@@ -59,10 +63,12 @@ void pointsStrategy(){
             printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
             printf("TimeNeededToGetHome = %f\n", TimeNeededToGetHome);
     }
+    
     else{ // let's earn some points
         if(changeOfPlan){
             defineBestAction();
             changeOfPlan = 0;
+            fprintf(stderr,"check5\n");
             /*todo: faut set changeOfPlan quand:
             - on a fini une action
             - l'adversaire arrive avant nous à notre target
