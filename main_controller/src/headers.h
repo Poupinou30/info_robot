@@ -20,12 +20,12 @@
 
 #define matchDuration 90 //seconds
 
-
-
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
 extern pthread_mutex_t lockRefreshCounter;
 
+
+// PlayingField
 typedef struct position{
     float *x;
     float *y;
@@ -178,15 +178,6 @@ int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag)
 //END ACTUATORS
 
 
-//STRATEGY
-typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
-void manageGrabbing(plantZone *bestPlantZone);
-extern grabbingState myGrabState;
-typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
-extern actuationState myActuatorsState;
-//END STRATEGY
-
-
 extern position myPos;
 extern field myField;
 extern pid_t child_pid;
@@ -209,6 +200,7 @@ extern pthread_mutex_t lockPosition;
 extern pthread_mutex_t lockOpponentPosition;
 extern pthread_mutex_t lockDestination;
 extern uint8_t destination_set;
+extern uint8_t pressForward;
 extern position myOdometryPos;
 
 //Moteurs - odometry
@@ -244,19 +236,31 @@ extern position myFilteredOpponent;
 //KALMAN
 void defineOpponentPosition(float posX, float posY);
 
-//STATES & STRATEGY
-
-uint8_t arrivedAtDestination;
-
-struct timeval startOfMatch;
-supremeState mySupremeState;
-actionChoice myActionChoice;
+// STRATEGY
 
 void mainStrategy();
+void waitingStrategy();
 void pointsStrategy();
 void returnToBaseStrategy();
-void waitingStrategy();
+void actionStrategy();
+void manageGrabbing(plantZone *bestPlantZone);
 uint8_t checkStartSwitch();
+
+typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,LIFT_POTS,DROP_PLANTS, DROP_ALL, FINISHED } grabbingState;
+extern grabbingState myGrabState;
+typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
+extern actuationState myActuatorsState;
+typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE} supremeState;
+supremeState mySupremeState;
+actionChoice myActionChoice;
+movingSubState myMovingSubState;
+moveType myMoveType;
+uint8_t arrivedAtDestination;
+uint8_t changeOfPlan;
+teamColor myTeamColor;
+
+struct timeval startOfMatch;
+uint8_t nextionStart;
 
 //ELEMENTS DE JEU
 typedef struct EndZone{
@@ -265,27 +269,15 @@ typedef struct EndZone{
     float posY;
 } endZone;
 
+
+
 endZone* EndZones;
-void initializeEndZones();
-endZone* computeBestEndZone();
-
-
-
 plantZone* plantZones;
-
+void initializeEndZones();
 void initializePlantZones();
+endZone* computeBestEndZone();
 plantZone* computeBestPlantsZone();
-
-moveType myMoveType;
 
 void definePotsDestination(potZone* bestPotZone);
 void definePlantsDestination(plantZone* bestPlantZone);
 
-teamColor myTeamColor;
-
-
-movingSubState myMovingSubState;
-
-void actionStrategy();
-
-uint8_t nextionStart;

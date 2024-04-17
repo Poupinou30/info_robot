@@ -40,7 +40,6 @@ int mainFORKS(){
     myGrabState = CALIB_FORK;
     myActuatorsState = SENDING_INSTRUCTION;
     while(myGrabState != FINISHED){
-        
         //manageGrabbing();
     }
 }
@@ -57,7 +56,6 @@ int mainPatternOdometryOld(){
 
     while(1){
         
-
         gettimeofday(&now, NULL);
         double currentTime = now.tv_sec*1000+now.tv_usec/1000;
         if (currentTime - nowValue >= 3000) {
@@ -223,24 +221,21 @@ int mainDINGUERIE(){
     gettimeofday(&lastExecutionTime, NULL);
     double elapsedTime = 0;
 
-    while (1)
-    {
+    while (1){
         gettimeofday(&currentTime, NULL);
         double currentElapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
         currentElapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
 
-        if (currentElapsedTime >= 30)
-        {
+        if (currentElapsedTime >= 30){
+
             if(makeLog) writeLog();
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
             sendFilteredPos(pipefdCL[1]);
             elapsedTime += currentElapsedTime;
-            if (elapsedTime >= 1000)
-            {
-                
-                
+
+            if (elapsedTime >= 1000){
                 if(VERBOSE){
                     printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
                     printf("opponent x = %f y = %f \n",*myFilteredOpponent.x,*myFilteredOpponent.y);
@@ -248,13 +243,8 @@ int mainDINGUERIE(){
                     //printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
                     printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
                 }
-
                 elapsedTime = 0;
             }
-
-            gettimeofday(&lastExecutionTime, NULL);
-            //ON EST ARRIVE A DESTINATION?
-            //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
 
             pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
@@ -265,6 +255,9 @@ int mainDINGUERIE(){
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
+            // faut une fonction qui check si l'ennemi change le status d'une zone de pots, de plantes, etc
+            // faut une fonction qui change 
+
             pthread_mutex_lock(&lidarFlagLock);
             if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
@@ -274,6 +267,14 @@ int mainDINGUERIE(){
                 lidarAcquisitionFlag = 0;
             }
             pthread_mutex_unlock(&lidarFlagLock);
+
+            // Updatestrategy :)
+            mainStrategy();
+
+
+            gettimeofday(&lastExecutionTime, NULL);
+            //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
+
         }
     }
 

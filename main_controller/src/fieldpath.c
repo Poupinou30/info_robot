@@ -482,6 +482,7 @@ void myPotentialFieldController(){
                     if(destination_set == 0){
                         xStart = *myFilteredPos.x;
                         yStart = *myFilteredPos.y;
+                        // on set pas de destination là nn?
                         destination_set = 1;
                         arrivedAtDestination = 0;
                     }
@@ -493,7 +494,7 @@ void myPotentialFieldController(){
                         }
                     }
                     outputSpeed[0] = 0;
-                    outputSpeed[1] = GRAB_SPEED;
+                    outputSpeed[1] = GRAB_SPEED; // faut pas le mettre en positif ou négatif selon la direction?
                     outputSpeed[2] = 0;
                 }
                 pthread_mutex_unlock(&lockFilteredOpponent);
@@ -501,7 +502,39 @@ void myPotentialFieldController(){
                 break;
             
             case (GO_FORWARD_POTS):
+               pthread_mutex_lock(&lockFilteredOpponent);
+                pthread_mutex_lock(&lockFilteredPosition);
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ //S'arrête si il est arrivé ou qu'il est 
+                
+                    outputSpeed[0] = 0;
+                    outputSpeed[1] = 0;
+                    outputSpeed[2] = 0;
+
+                }
+                else{
+                    if(destination_set == 0){
+                        xStart = *myFilteredPos.x;
+                        yStart = *myFilteredPos.y;
+                        // on set pas de destination là nn?
+                        destination_set = 1;
+                        arrivedAtDestination = 0;
+                    }
+                    else{
+                        if(computeEuclidianDistance(xStart,yStart,*myFilteredPos.x,*myFilteredPos.y) > 0.16){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }
+                    }
+                    outputSpeed[0] = 0.405 * GRAB_SPEED; // dans le repère du robot, ça doit etre en négatif
+                    outputSpeed[1] = 0.914 * GRAB_SPEED; // dans le repère du robot, ça doit etre en négatif
+                    outputSpeed[2] = 0;
+                }
+                pthread_mutex_unlock(&lockFilteredOpponent);
+                pthread_mutex_unlock(&lockFilteredPosition);
                 break;
+            
+            case 
                 
             default:
                 break;

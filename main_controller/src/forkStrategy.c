@@ -14,20 +14,17 @@ uint8_t actuator_reception;
 int done = 0;
 uint8_t done1 = 0, done2 = 0, done3 = 0;
 
-void manageGrabbing(plantZone* bestPlantZone){
-    
-    
+void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZone en argument? je vois pas où tu l'utilises
 
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     char receivedData[255];
     switch (myGrabState)
     {
     case MOVE_FRONT_PLANTS:
-        if(destination_set){
+        if(destination_set != 1){
             definePlantsDestination(bestPlantZone);
             destination_set = 1;
         }
-        
         myMoveType = DISPLACEMENT_MOVE;
         if(!arrivedAtDestination) myControllerState = MOVING;
         else{
@@ -92,18 +89,24 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case GRAB_PLANTS_MOVE:
-        if(destination_set == 0){
+        /*
+        on mettrait pas des pressForward à la place des destination_set pour faire la dif entre quand tu as un objectif en potentialField 
+        et quand tu fais un move hardcodé, comme ça actionStrategy nous recherche pas une nouvelle destination ?
+        */   
+        if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
             destination_set = 1;
             arrivedAtDestination = 0;
         }
-        else if (destination_set == 1 && arrivedAtDestination == 0){
+        else if (pressForward == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_PLANTS_MOVE;
+            
         }
         else{
             myGrabState = GRAB_PLANTS_CLOSE;
             destination_set = 0;
+            // arrivedAtDestination = 0; // jsp si il faut le mettre, en fct de comment tu le gères pour l'instant
         }
         break;
 
@@ -136,9 +139,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         }
         
         break;
-
-
-
+        
     case GRAB_PLANTS_END:
         switch (myActuatorsState)
         {
@@ -161,7 +162,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = UNSTACK_POTS_MOVE;
+                myGrabState = UNSTACK_POTS_MOVE; // changer pour un MOVE_FRONT_POTS vu qu'on doit tenir en compte les move types
                 done1 = 0; done2 = 0; done3 = 0;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
@@ -173,6 +174,10 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case MOVE_FRONT_POTS:
+        if(destination_set != 1){
+            definePotsDestination(bestPotZone);
+            destination_set = 1;
+        }
         myMoveType = DISPLACEMENT_MOVE;
         if(!arrivedAtDestination) myControllerState = MOVING;
         else{
@@ -182,15 +187,17 @@ void manageGrabbing(plantZone* bestPlantZone){
         } 
         break;
 
-    case UNSTACK_POTS_MOVE:
-        if(destination_set == 0){
+    case UNSTACK_POTS_MOVE: // ça c'est de front vers captured sur le ppt
+        if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
+            //
             destination_set = 1;
             arrivedAtDestination = 0;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = UNSTACK_POTS_MOVE;
+            
         }
         else{
             myGrabState = UNSTACK_POT_TAKE;
@@ -199,7 +206,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
 
-    case UNSTACK_POT_TAKE:
+    case UNSTACK_POT_TAKE: // captured vers unstacked sur le ppt
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
