@@ -110,10 +110,11 @@ typedef struct EndZone{
 
 
 plantZone* plantZones;
-potZone* PotZones;
-jardiniere* Jardinieres;
+potZone* potZones;
+jardiniere* jardinieres;
 solarpanel* SolarPanels;
 endZone* endZones;
+endZone* dropZones;
 
 typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
 typedef enum{BLUE, YELLOW} teamColor;
