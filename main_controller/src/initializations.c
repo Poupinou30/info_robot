@@ -249,7 +249,7 @@ void initializeEndZones(){
 
     */
 
-    endZone *endZones = (endZone*)malloc(sizeof(endZone)*6);
+    endZones = (endZone*)malloc(sizeof(endZone)*6);
     endZones[0].zoneID = 0;
     endZones[0].posX =  0.225;
     endZones[0].posY =  0.225;

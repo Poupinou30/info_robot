@@ -532,16 +532,16 @@ jardiniere* computeBestJardiniere(){
 
 
 endZone* computeBestEndZone(){
-    endZone* bestEndZone = &EndZones[3*myTeamColor];
+    endZone* bestEndZone = &endZones[3*myTeamColor];
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, EndZones[3*myTeamColor].posX, EndZones[3*myTeamColor].posY);
+    float smallestDistance = computeEuclidianDistance(x, y, endZones[3*myTeamColor].posX, endZones[3*myTeamColor].posY);
         
     for (int i = 1; i < 3; i++) {
-        if(computeEuclidianDistance(x, y, EndZones[3*myTeamColor+i].posX, EndZones[3*myTeamColor+i].posY) < smallestDistance){
-           bestEndZone = &EndZones[i];
+        if(computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY) < smallestDistance){
+           bestEndZone = &endZones[i];
         }
     }
     return bestEndZone;

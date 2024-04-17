@@ -113,7 +113,7 @@ plantZone* plantZones;
 potZone* PotZones;
 jardiniere* Jardinieres;
 solarpanel* SolarPanels;
-endZone* EndZones;
+endZone* endZones;
 
 typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
 typedef enum{BLUE, YELLOW} teamColor;
