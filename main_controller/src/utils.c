@@ -50,7 +50,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     fprintf(stderr,"locking 51\n"); pthread_mutex_lock(&lidarTimeLock);
     double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
     lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
-    pthread_mutex_unlock(&lidarTimeLock);
+    fprintf(stderr,"unlocking 51\n");pthread_mutex_unlock(&lidarTimeLock);
     fprintf(stderr,"locking 52\n"); pthread_mutex_lock(&lockFilteredOpponent);
     fprintf(stderr,"locking 63\n"); pthread_mutex_lock(&lockFilteredPosition);
     double distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
@@ -60,8 +60,8 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
         v_max = 0.5*distanceFromOpponent/0.7;
     }
     else v_max = 0.5;
-    pthread_mutex_unlock(&lockFilteredOpponent);
-    pthread_mutex_unlock(&lockFilteredPosition);
+    fprintf(stderr,"unlocking 52\n");pthread_mutex_unlock(&lockFilteredOpponent);
+    fprintf(stderr,"unlocking 63\n");pthread_mutex_unlock(&lockFilteredPosition);
 
     if (fabs(omega) > omega_max) {
         omega = (omega > 0 ? omega_max : -omega_max);
@@ -392,7 +392,7 @@ void* receptionPipe(void* pipefdvoid){
             refreshCounter ++;
             readyToGo = 1;
 
-            pthread_mutex_unlock(&lockRefreshCounter);
+            fprintf(stderr,"unlocking 53\n");pthread_mutex_unlock(&lockRefreshCounter);
             
             /*if(kalmanLaunched){
                 pthread_join(computeKalmanThread,NULL);

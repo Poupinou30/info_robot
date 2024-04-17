@@ -156,7 +156,7 @@ int mainWithStrategy(){
             fprintf(stderr,"locking 38\n"); pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
             lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
-            pthread_mutex_unlock(&lidarTimeLock);
+            fprintf(stderr,"unlocking 38\n");pthread_mutex_unlock(&lidarTimeLock);
             //printf("conditions = %d %d %d %d \n",measuredSpeedX < 0.03 , measuredSpeedY < 0.03 , measuredSpeedOmega < 0.1 , lidarElapsedTime < 200);
             //printf("time elapsed = %lf \n",lidarElapsedTime);
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
@@ -170,7 +170,7 @@ int mainWithStrategy(){
             else{
                 lidarAcquisitionFlag = 0;
             }
-            pthread_mutex_unlock(&lidarFlagLock);
+            fprintf(stderr,"unlocking 39\n"); pthread_mutex_unlock(&lidarFlagLock);
         }
     }
 
@@ -185,7 +185,7 @@ int main(){
     *destination.y = 0.5;
     *destination.theta = 0;
     destination_set = 1;
-    pthread_mutex_unlock(&lockDestination);
+    fprintf(stderr,"unlocking 40\n");pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 180;
@@ -217,6 +217,7 @@ int main(){
         sleep(1);
     }
     fprintf(stderr,"Position acquired \n");
+    fprintf(stderr,"position filtrée x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
     //IF POSITION ACQUIRED, DEFINE ODOMETRY AND FILTER REFERENCES
     defineInitialPosition();
     resetOdometry();
@@ -235,14 +236,16 @@ int main(){
         if (currentElapsedTime >= 30)
         {
             if(makeLog) writeLog();
+            updateKalman(NULL);
+            sendFilteredPos(pipefdCL[1]);
             printf("1");
             myPotentialFieldController();
              printf("2");
             myOdometry();
              printf("3");
-            updateKalman(NULL);
+            
              printf("4");
-            sendFilteredPos(pipefdCL[1]);
+            
              printf("5");
             elapsedTime += currentElapsedTime;
             if (elapsedTime >= 1000)
@@ -267,7 +270,7 @@ int main(){
             fprintf(stderr,"locking 41\n"); pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
             lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
-            pthread_mutex_unlock(&lidarTimeLock);
+            fprintf(stderr,"unlocking 41\n");pthread_mutex_unlock(&lidarTimeLock);
             //printf("conditions = %d %d %d %d \n",measuredSpeedX < 0.03 , measuredSpeedY < 0.03 , measuredSpeedOmega < 0.1 , lidarElapsedTime < 200);
             //printf("time elapsed = %lf \n",lidarElapsedTime);
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
@@ -281,7 +284,7 @@ int main(){
             else{
                 lidarAcquisitionFlag = 0;
             }
-            pthread_mutex_unlock(&lidarFlagLock);
+            fprintf(stderr,"unlocking 42\n");pthread_mutex_unlock(&lidarFlagLock);
         }
     }
 
@@ -550,7 +553,7 @@ int mainFINAL(){
     *destination.y = 2.00;
     *destination.theta = 18;
     destination_set = 0;
-    pthread_mutex_unlock(&lockDestination);
+    fprintf(stderr,"unlocking 43\n");pthread_mutex_unlock(&lockDestination);
     *myPos.x = 0;
     *myPos.y = 0;
     *myPos.theta = 0;
@@ -618,9 +621,9 @@ int mainFINAL(){
             fprintf(stderr,"filtered Theta = %f \n",*(myFilteredPos.theta));
             fprintf(stderr,"X opponent = %f \n",*(myOpponent.x));
             fprintf(stderr,"Y opponent= %f \n",*(myOpponent.y));
-            pthread_mutex_unlock(&lockPosition);
-            pthread_mutex_unlock(&lockFilteredPosition);
-            pthread_mutex_unlock(&lockOpponentPosition);
+            fprintf(stderr,"unlocking 44\n");pthread_mutex_unlock(&lockPosition);
+            fprintf(stderr,"unlocking 45\n");pthread_mutex_unlock(&lockFilteredPosition);
+            fprintf(stderr,"unlocking 46\n");pthread_mutex_unlock(&lockOpponentPosition);
             if(VERBOSE) fprintf(stderr,"Avant force vector\n");
             computeForceVector();
             fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
@@ -634,7 +637,7 @@ int mainFINAL(){
 
             fprintf(stderr,"locking 47\n"); pthread_mutex_lock(&lockRefreshCounter);
             refreshCounter = 0;
-            pthread_mutex_unlock(&lockRefreshCounter);
+            fprintf(stderr,"unlocking 47\n");pthread_mutex_unlock(&lockRefreshCounter);
             if(VERBOSE) fprintf(stderr,"Après lockrefresh\n");
             gettimeofday(&endPrint, NULL);
             endValuePrint = endPrint.tv_sec*1000+endPrint.tv_usec/1000;

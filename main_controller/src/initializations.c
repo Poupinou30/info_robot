@@ -58,28 +58,28 @@ void initializePlantZones(){
 
 
 void initializeEndZones(){
-    endZones = (endZone*)malloc(sizeof(endZone)*6);
-    endZones[0].zoneID = 1;
-    endZones[0].posX =  0.225;
-    endZones[0].posY =  0.225;
+    EndZones = (endZone*)malloc(sizeof(endZone)*6);
+    EndZones[0].zoneID = 1;
+    EndZones[0].posX =  0.225;
+    EndZones[0].posY =  0.225;
 
-    endZones[1].zoneID = 2;
-    endZones[1].posX = 1;
-    endZones[1].posY = 2.775;
+    EndZones[1].zoneID = 2;
+    EndZones[1].posX = 1;
+    EndZones[1].posY = 2.775;
 
-    endZones[2].zoneID = 3;
-    endZones[2].posX = 1.775;
-    endZones[2].posY = 0.225;
+    EndZones[2].zoneID = 3;
+    EndZones[2].posX = 1.775;
+    EndZones[2].posY = 0.225;
 
-    endZones[3].zoneID = 4;
-    endZones[3].posX = 0.225;
-    endZones[3].posY = 2.775;
+    EndZones[3].zoneID = 4;
+    EndZones[3].posX = 0.225;
+    EndZones[3].posY = 2.775;
 
-    endZones[4].zoneID = 5;
-    endZones[4].posX = 1;
-    endZones[4].posY = 0.225;
+    EndZones[4].zoneID = 5;
+    EndZones[4].posX = 1;
+    EndZones[4].posY = 0.225;
 
-    endZones[5].zoneID = 6;
-    endZones[5].posX = 1.775;
-    endZones[5].posY = 2.775;
+    EndZones[5].zoneID = 6;
+    EndZones[5].posX = 1.775;
+    EndZones[5].posY = 2.775;
 }

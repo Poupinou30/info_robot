@@ -47,7 +47,7 @@ void pointsStrategy(){
     fprintf(stderr,"locking 48\n"); pthread_mutex_lock(&lockFilteredPosition);
     double x = *myFilteredPos.x;
     double y = *myFilteredPos.y;
-    pthread_mutex_unlock(&lockFilteredPosition);
+    fprintf(stderr,"unlocking 48\n");pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
     if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - TimeNeededToGetHome){
@@ -100,7 +100,7 @@ void definePlantsDestination(plantZone* bestPlantZone){
         *destination.theta = 180;
     }
 
-    pthread_mutex_unlock(&lockFilteredPosition);
+    fprintf(stderr,"unlocking 49\n");pthread_mutex_unlock(&lockFilteredPosition);
 };
 
 void definePotsDestination(potZone* bestPotZone){
@@ -116,5 +116,5 @@ void definePotsDestination(potZone* bestPotZone){
         *destination.theta = 180;
     }
 
-    pthread_mutex_unlock(&lockFilteredPosition);
+    fprintf(stderr,"unlocking 50\n");pthread_mutex_unlock(&lockFilteredPosition);
 }

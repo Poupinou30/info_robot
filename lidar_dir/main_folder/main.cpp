@@ -27,7 +27,7 @@ beaconAbsolutePos beaconRefPosition[3];
 lidarPos calibPos;
 pthread_mutex_t filteredPositionLock;
 
-int startPosition = 1;
+int startPosition = 6;
 typedef enum{BLUE, YELLOW} TEAM_COLOR;
 TEAM_COLOR myColor;
 
@@ -372,7 +372,7 @@ void* beacon_data(void* argument){
 
                     //printf("Angle horlogique = %f %f %f \n" ,angle_horlogique0, angle_horlogique1, angle_horlogique2);
 
-                    //printf("angle horlogique = %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f \n dx = %f et dy = %f \n",angle_horlogique,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot,dx,dy);
+                    printf("angle horlogique = %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f \n dx = %f et dy = %f \n",angle_horlogique0,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
                     //printf("Position actuelle = %f %f %f \n",filteredPos.x,filteredPos.y,filteredPos.theta);
 
 

@@ -243,7 +243,7 @@ void updateOpponentObstacle(){
     fprintf(stderr,"locking 4\n"); pthread_mutex_lock(&lockFilteredOpponent);
     myForce.obstacleList[myForce.movingIndexes[0]].posX = *myFilteredOpponent.x;
     myForce.obstacleList[myForce.movingIndexes[0]].posY = *myFilteredOpponent.y;
-    pthread_mutex_unlock(&lockFilteredOpponent);
+    fprintf(stderr,"unlocking 4\n");pthread_mutex_unlock(&lockFilteredOpponent);
 }
 
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving, int obstacleID){
@@ -375,8 +375,8 @@ void computeForceVector(){
         startOfArrival.tv_sec = 0;
         startOfArrival.tv_usec = 0;
     }
-    pthread_mutex_unlock(&lockFilteredPosition); 
-    pthread_mutex_unlock(&lockDestination);
+    fprintf(stderr,"unlocking 6\n");pthread_mutex_unlock(&lockFilteredPosition); 
+    fprintf(stderr,"unlocking 5\n");pthread_mutex_unlock(&lockDestination);
 
     // Ajustement de l'erreur pour tenir compte de la nature circulaire des angles
 
@@ -416,7 +416,7 @@ void computeForceVector(){
             fprintf(stderr,"locking 7\n"); pthread_mutex_lock(&lockFilteredPosition);
             myClosestPoint = closestPoint(tempoRectangle,myFilteredPos);
             distance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
-            pthread_mutex_unlock(&lockFilteredPosition);
+            fprintf(stderr,"unlocking 7\n");pthread_mutex_unlock(&lockFilteredPosition);
             tempoX = *myClosestPoint.x; //Calcule la position en x
             tempoY = *myClosestPoint.y; //Calcule la position en y
             free(myClosestPoint.x);
@@ -427,7 +427,7 @@ void computeForceVector(){
             tempoY = tempoObstacle->posY; //Calcule la position en y
             fprintf(stderr,"locking 8\n"); pthread_mutex_lock(&lockFilteredPosition);
             distance = fabs(computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size); //Calcule la distance
-            pthread_mutex_unlock(&lockFilteredPosition);
+            fprintf(stderr,"unlocking 8\n");pthread_mutex_unlock(&lockFilteredPosition);
         }
         //printf("distance = %f and actionDistance = %f \n",distance,actionDistance);
         
@@ -447,7 +447,7 @@ void computeForceVector(){
             f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
             f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
 
-            pthread_mutex_unlock(&lockFilteredPosition);
+            fprintf(stderr,"unlocking 9\n");pthread_mutex_unlock(&lockFilteredPosition);
 
         }
     }
@@ -502,8 +502,8 @@ void myPotentialFieldController(){
                     outputSpeed[1] = GRAB_SPEED;
                     outputSpeed[2] = 0;
                 }
-                pthread_mutex_unlock(&lockFilteredOpponent);
-                pthread_mutex_unlock(&lockFilteredPosition);
+                fprintf(stderr,"unlocking 10\n");pthread_mutex_unlock(&lockFilteredOpponent);
+                fprintf(stderr,"unlocking 11\n");pthread_mutex_unlock(&lockFilteredPosition);
                 break;
             
             case (GO_FORWARD_POTS):
