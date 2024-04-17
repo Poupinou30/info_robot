@@ -18,6 +18,40 @@ float computeRectangleDistance(double x1, double y1, double x2, double y2, doubl
     return sqrt(dx*dx + dy*dy);
 }
 
+position closestPointBetweenRectangles(position rectA[2], position rectB[2]) {
+    float minDistance = INFINITY;
+    position closestPoint;
+    closestPoint.x = (float*) malloc(sizeof(float));
+    closestPoint.y = (float*) malloc(sizeof(float));
+
+    // Définition des coins des rectangles
+    position cornersA[4] = {
+        {fmin(*rectA[0].x, *rectA[1].x), fmin(*rectA[0].y, *rectA[1].y)}, // Coin inférieur gauche A
+        {fmax(*rectA[0].x, *rectA[1].x), fmin(*rectA[0].y, *rectA[1].y)}, // Coin inférieur droit A
+        {fmin(*rectA[0].x, *rectA[1].x), fmax(*rectA[0].y, *rectA[1].y)}, // Coin supérieur gauche A
+        {fmax(*rectA[0].x, *rectA[1].x), fmax(*rectA[0].y, *rectA[1].y)}  // Coin supérieur droit A
+    };
+    position cornersB[4] = {
+        {fmin(*rectB[0].x, *rectB[1].x), fmin(*rectB[0].y, *rectB[1].y)}, // Coin inférieur gauche B
+        {fmax(*rectB[0].x, *rectB[1].x), fmin(*rectB[0].y, *rectB[1].y)}, // Coin inférieur droit B
+        {fmin(*rectB[0].x, *rectB[1].x), fmax(*rectB[0].y, *rectB[1].y)}, // Coin supérieur gauche B
+        {fmax(*rectB[0].x, *rectB[1].x), fmax(*rectB[0].y, *rectB[1].y)}  // Coin supérieur droit B
+    };
+
+    // Comparer chaque coin de A avec chaque coin de B pour trouver le point le plus proche
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            float distance = computeEuclidianDistance(*cornersA[i].x, *cornersA[i].y, *cornersB[j].x, *cornersB[j].y);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestPoint = cornersA[i]; // Ou cornersB[j], selon ce que vous voulez retourner
+            }
+        }
+    }
+
+    return closestPoint;
+}
+
 
 position closestPoint(position rect[2], position pos) {
     position closest;
@@ -405,7 +439,8 @@ void computeForceVector(){
     tempoPoint1.y = (float*) malloc(sizeof(float)*1);
     tempoPoint2.x = (float*) malloc(sizeof(float)*1);
     tempoPoint2.y = (float*) malloc(sizeof(float)*1);
-    position myClosestPoint;
+    position myClosestObstaclePoint;
+    position myClosestRobotPoint;
 
     obstacle *tempoObstacle;
     //Calcul de la force de répulsion totale
@@ -413,7 +448,32 @@ void computeForceVector(){
         tempoObstacle = &myForce.obstacleList[i];
         if(tempoObstacle -> moving) actionDistance = mobileActionDistance;
         else actionDistance = fixActionDistance;
+
+
+        position robotLowerCorner;
+        position robotUpperCorner;
+        robotLowerCorner.x = (float*) malloc(sizeof(float));
+        robotLowerCorner.y = (float*) malloc(sizeof(float));
+        robotUpperCorner.x = (float*) malloc(sizeof(float));
+        robotUpperCorner.y = (float*) malloc(sizeof(float));
+        pthread_mutex_lock(&lockFilteredPosition);
+        if(forksDeployed){
+        *robotLowerCorner.x = *myFilteredPos.x + (-robotLengthX/2 * cos(*myFilteredPos.theta*degToRad) + robotLengthYDeployed/2 * sin(*myFilteredPos.theta*degToRad));
+        *robotLowerCorner.y = *myFilteredPos.y + (-robotLengthX/2 * sin(*myFilteredPos.theta*degToRad) - robotLengthYDeployed/2 * cos(*myFilteredPos.theta*degToRad));
+        *robotUpperCorner.x = *myFilteredPos.x + (robotLengthX/2 * cos(*myFilteredPos.theta) - robotLengthYDeployed/2 * sin(*myFilteredPos.theta));
+        *robotUpperCorner.y = *myFilteredPos.y + (robotLengthX/2 * sin(*myFilteredPos.theta*degToRad) + robotLengthYDeployed/2 * cos(*myFilteredPos.theta*degToRad));
+        }
+        else{
+            *robotLowerCorner.x = *myFilteredPos.x + (-robotLengthX/2 * cos(*myFilteredPos.theta*degToRad) + robotLengthYUndeployed/2 * sin(*myFilteredPos.theta*degToRad));
+            *robotLowerCorner.y = *myFilteredPos.y + (-robotLengthX/2 * sin(*myFilteredPos.theta*degToRad) - robotLengthYUndeployed/2 * cos(*myFilteredPos.theta*degToRad));
+            *robotUpperCorner.x = *myFilteredPos.x + (robotLengthX/2 * cos(*myFilteredPos.theta*degToRad) - robotLengthYUndeployed/2 * sin(*myFilteredPos.theta*degToRad));
+            *robotUpperCorner.y = *myFilteredPos.y + (robotLengthX/2 * sin(*myFilteredPos.theta*degToRad) + robotLengthYUndeployed/2 * cos(*myFilteredPos.theta*degToRad));
+        }
+        position robotCorners[2] = {robotLowerCorner,robotUpperCorner};
+
+
         if(tempoObstacle->isRectangle){
+
             *tempoPoint1.x = tempoObstacle->x1;
             *tempoPoint1.y = tempoObstacle->y1;
             *tempoPoint2.x = tempoObstacle->x2;
@@ -421,8 +481,9 @@ void computeForceVector(){
             tempoRectangle[0] = tempoPoint1;
             tempoRectangle[1] = tempoPoint2;
             pthread_mutex_lock(&lockFilteredPosition);
-            myClosestPoint = closestPoint(tempoRectangle,myFilteredPos);
-            distance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
+            myClosestObstaclePoint = closestPointBetweenRectangles(tempoRectangle,robotCorners);
+            myClosestRobotPoint = closestPointBetweenRectangles(robotCorners,tempoRectangle);
+            distance = computeEuclidianDistance(*myClosestObstaclePoint.x, *myClosestObstaclePoint.y, *myClosestRobotPoint.x, *myClosestRobotPoint.y); //Calcul la distance
             pthread_mutex_unlock(&lockFilteredPosition);
             tempoX = *myClosestPoint.x; //Calcule la position en x
             tempoY = *myClosestPoint.y; //Calcule la position en y
@@ -432,11 +493,20 @@ void computeForceVector(){
         else{
             tempoX = tempoObstacle->posX; //Calcule la position en x
             tempoY = tempoObstacle->posY; //Calcule la position en y
+            pthread_mutex_unlock(&lockFilteredPosition);
+
+            myClosestRobotPoint = closestPoint(robotCorners,tempoX,tempoY);
+            
+            
             pthread_mutex_lock(&lockFilteredPosition);
-            distance = fabs(computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size); //Calcule la distance
+            distance = fabs(computeEuclidianDistance(tempoX,tempoY,myClosestRobotPoint.x,myClosestRobotPoint.y)-myForce.obstacleList[i].size); //Calcule la distance
             pthread_mutex_unlock(&lockFilteredPosition);
         }
         //printf("distance = %f and actionDistance = %f \n",distance,actionDistance);
+        free(robotLowerCorner.x);
+        free(robotLowerCorner.y);
+        free(robotUpperCorner.x);
+        free(robotUpperCorner.y);
         
         if(distance < actionDistance){
             pthread_mutex_lock(&lockFilteredPosition);

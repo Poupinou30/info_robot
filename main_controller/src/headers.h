@@ -13,6 +13,11 @@
 #ifndef MAIN_CONTROLLER_HEADERS_H
 #define MAIN_CONTROLLER_HEADERS_H
 
+#define robotLengthX 0.255
+#define robotLengthYUndeployed 0.240
+#define robotLengthYDeployed 0.340
+
+
 #endif //MAIN_CONTROLLER_HEADERS_H
 #define VERBOSE 1
 #define timeDelay 100 //ms
@@ -302,3 +307,4 @@ void definePlantsDestination(plantZone* bestPlantZone);
 
 
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
+uint8_t forksDeployed;
