@@ -163,7 +163,7 @@ int mainWithStrategy(){
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
             pthread_mutex_lock(&lidarFlagLock);
-            if(((pow(measuredSpeedX *measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5) < 0.4 && measuredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<1) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -238,8 +238,9 @@ int main(){
             if(makeLog) writeLog();
             updateKalman(NULL);
             sendFilteredPos(pipefdCL[1]);
-            myPotentialFieldController();
             myOdometry();
+            myPotentialFieldController();
+            
                         
             elapsedTime += currentElapsedTime;
             if (elapsedTime >= 1000)
@@ -271,7 +272,7 @@ int main(){
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
             pthread_mutex_lock(&lidarFlagLock);
-            if(((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && filteredSpeedOmega < 20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<1) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -338,21 +339,22 @@ int mainPatternOdometry(){
     while(1){
         gettimeofday(&now, NULL);
         currentTime = now.tv_sec*1000+now.tv_usec/1000;
-        if (currentTime - nowValue >= 50000 ) {
+        if (currentTime - nowValue >= 4000 ) {
             break;
         }
 
         gettimeofday(&endInst,NULL);
         double elapsedTime = endInst.tv_sec*1000+endInst.tv_usec/1000 - instValue;
         if (elapsedTime >= 30) {
+            updateKalman(NULL);
             myOdometry();
-            processInstructionNew(0.2,0.0,0,i2c_handle_front,i2c_handle_rear);
+            processInstructionNew(0.0,0.0,-180,i2c_handle_front,i2c_handle_rear);
             double wheelSpeed[4] = {motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR};
             
             computeSpeedFromOdometry(wheelSpeed,&vx,&vy,&omega);
             
             
-            if(*myOdometryPos.x > 1) break;
+            //if(*myOdometryPos.theta > 0.1 && *myOdometryPos.theta <1.5) break;
             instValue = endInst.tv_sec*1000+endInst.tv_usec/1000;
         }
 
