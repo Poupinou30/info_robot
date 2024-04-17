@@ -78,10 +78,10 @@ void actionStrategy(){
     {
     case PLANTS_ACTION:
         if(destination_set != 1){
-            definePotsDestination(bestPotZone);
+            definePlantsDestination(bestPlantZone);
             destination_set = 1;
         }
-        manageGrabbing(bestPlantZone)
+        manageGrabbing(bestPlantZone);
         break;
     case PLANTS_POTS_ACTION:
         if(destination_set != 1){

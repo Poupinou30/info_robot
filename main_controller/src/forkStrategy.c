@@ -206,7 +206,7 @@ void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZo
         break;
 
 
-    case UNSTACK_POT_TAKE: // captured vers unstacked sur le ppt
+    case UNSTACK_POT_TAKE: 
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -232,7 +232,7 @@ void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZo
         }
         break;
 
-    case UNSTACK_POT_POSITIONING:
+    case UNSTACK_POT_POSITIONING: // captured vers unstacked sur le ppt
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = UNSTACK_MOVE;
@@ -272,9 +272,51 @@ void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZo
         }
         break;
 
-    case GRAB_POTS_MOVE:
-        sleep(3);
-        myGrabState = LIFT_POTS;
+    case GRAB_POTS_MOVE: // unstacked vers 1st row sur le ppt
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = Y_Align_Pots;
+            destination_set = 1;
+            arrivedAtDestination = 0;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = GRAB_POTS_MOVE;
+        }
+        else{
+            myGrabState = ALIGN_POTS_MOVE;
+            destination_set = 0;
+        }
+
+    // faut ajouter la transistions ALIGN_POTS_MOVE (1st row vers aligned)
+    case ALIGN_POTS_MOVE: // 1st row vers aligned sur le ppt
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = X_Align_Pots;
+            destination_set = 1;
+            arrivedAtDestination = 0;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = ALIGN_POTS_MOVE;
+        }
+        else{
+            myGrabState = GRAB_ALL_POTS;
+            destination_set = 0;
+        }
+    // faut ajouter la transistions GRAB_ALL_POTS (aligned vers pots ready)
+    case GRAB_ALL_POTS:
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = GET_ALL_POTS;
+            destination_set = 1;
+            arrivedAtDestination = 0;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = GRAB_ALL_POTS;
+        }
+        else{
+            myGrabState = LIFT_POTS;
+            destination_set = 0;
+        }
 
     case LIFT_POTS:
         switch (myActuatorsState)
@@ -290,7 +332,7 @@ void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZo
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = DROP_PLANTS;
+                myGrabState = DROP_PLANTS; // changer vers un Move_Front_jardiniere
                 receivedData[0] = '\0';
                 actuator_reception = 0;
                 done1 = 0; done2 = 0; done3 = 0;
@@ -298,6 +340,11 @@ void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZo
             break;
         }
         break;
+
+    // ajouter le Move_Front_jardiniere (aller jusqu'en jardiniere)
+    /*
+    case MOVE_FRONT_JARDINIERE:
+    */
 
     case DROP_PLANTS:
         switch (myActuatorsState)
@@ -346,7 +393,24 @@ void manageGrabbing(plantZone* bestPlantZone){ // pourquoi tu passes bestPlantZo
             break;
         }
         break;
+    // ajouter le MOVE_BACK_JARDINIERE (marche arrière pour faire tomber les plantes)
+    case MOVE_BACK_JARDINIERE:
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = GET_BACK_JARDINIERE;
+            destination_set = 1;
+            arrivedAtDestination = 0;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = MOVE_BACK_JARDINIERE;
+        }
+        else{
+            myGrabState = LIFT_POTS;
+            destination_set = 0;
+        }
+        
 
+    
     case FINISHED:
         break;
 
