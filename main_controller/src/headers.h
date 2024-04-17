@@ -307,6 +307,11 @@ endZone* computeBestEndZone();
 
 void definePotsDestination(potZone* bestPotZone);
 void definePlantsDestination(plantZone* bestPlantZone);
+void defineEndZoneDestination(endZone* bestEndZone);
+
+void defineBestAction();
+
+
 
 
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
