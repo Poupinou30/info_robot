@@ -118,6 +118,7 @@ void defineBestAction(){
     bestPlantZone = computeBestPlantsZone();
     if(bestPlantZone->numberOfPlants > 2){
         myActionChoice = PLANTS_POTS_ACTION;
+        myGrabState = MOVE_FRONT_PLANTS;
     }
     else{
         myActionChoice = SOLAR_PANELS_ACTION;

@@ -24,6 +24,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set != 1){
             definePlantsDestination(bestPlantZone);
             destination_set = 1;
+            
         }
         myMoveType = DISPLACEMENT_MOVE;
         if(!arrivedAtDestination) myControllerState = MOVING;
