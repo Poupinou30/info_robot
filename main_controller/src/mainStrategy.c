@@ -5,6 +5,7 @@
 
 struct timeval now;
 
+
 void mainStrategy(){
     switch (mySupremeState)
     {
@@ -30,7 +31,11 @@ plantZone* bestPlantZone;
 
 void waitingStrategy(){
     myControllerState = STOPPED;
-    if((checkStartSwitch()||nextionStart) && readyToGo){
+    if(!forksCalibrated){
+        myGrabState = CALIB_FORK;
+        manageGrabbing(NULL,NULL);
+    }
+    else if((checkStartSwitch()||nextionStart) && readyToGo){
         gettimeofday(&startOfMatch, NULL);
         mySupremeState = EARNING_POINTS;
         defineInitialPosition();
@@ -42,23 +47,23 @@ void waitingStrategy(){
 void pointsStrategy(){
     // check if it's time to leave
     float maxSpeed = 0.4;
-    fprintf(stderr,"check1\n");
+    //fprintf(stderr,"check1\n");
     float SafetyFactor = 1.5;
     gettimeofday(&now, NULL);
-    fprintf(stderr,"check1.5\n");
+    //fprintf(stderr,"check1.5\n");
     endZone* bestEndZone = computeBestEndZone();
-    fprintf(stderr,"check1.6\n");
+    //fprintf(stderr,"check1.6\n");
     pthread_mutex_lock(&lockFilteredPosition);
-    fprintf(stderr,"check2\n");
+    //fprintf(stderr,"check2\n");
     double x = *myFilteredPos.x;
     double y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
-    fprintf(stderr,"check3\n");
+    //fprintf(stderr,"check3\n");
     float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
-    fprintf(stderr,"check10\n");
+    //fprintf(stderr,"check10\n");
     if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - TimeNeededToGetHome){
-        fprintf(stderr,"check11\n");
+        //fprintf(stderr,"check11\n");
         mySupremeState = RETURN_TO_BASE;
         if(VERBOSE)
             printf("Match ending, going to RETURN_TO_BASE mode\n");
@@ -67,16 +72,19 @@ void pointsStrategy(){
     }
     
     else{ // let's earn some points
+        //fprintf(stderr,"check10.1\n");
         if(changeOfPlan){
+            //fprintf(stderr,"check10.2\n");
             defineBestAction();
             changeOfPlan = 0;
-            fprintf(stderr,"check5\n");
+            //fprintf(stderr,"check5\n");
             /*todo: faut set changeOfPlan quand:
             - on a fini une action
             - l'adversaire arrive avant nous à notre target
             - l'aversaire nous bloque le chemin trop longtemps
             */
         }
+        //fprintf(stderr,"check10.3\n");
         actionStrategy();
     }
 };
@@ -114,7 +122,7 @@ void returnToBaseStrategy(){
 };
 
 void defineBestAction(){
-    fprintf(stderr,"check6\n");
+    //fprintf(stderr,"check6\n");
     bestPlantZone = computeBestPlantsZone();
     if(bestPlantZone->numberOfPlants > 2){
         myActionChoice = PLANTS_POTS_ACTION;
@@ -123,7 +131,7 @@ void defineBestAction(){
     else{
         myActionChoice = SOLAR_PANELS_ACTION;
     }
-    fprintf(stderr,"check7\n");
+    //fprintf(stderr,"check7\n");
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){

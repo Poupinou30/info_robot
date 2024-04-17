@@ -141,7 +141,8 @@ int main(){
                     //printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
                     //printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
                     printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
-                    printf("myStates: mySupremeState = %d, myActionChoice = %d \n ",mySupremeState, myActionChoice);
+                    printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
+                    printf("myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
                 }
 
                 elapsedTime = 0;
