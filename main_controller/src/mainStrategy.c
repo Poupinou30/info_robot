@@ -124,7 +124,9 @@ void returnToBaseStrategy(){
 void defineBestAction(){
     //fprintf(stderr,"check6\n");
     bestPlantZone = computeBestPlantsZone();
+    fprintf(stderr,"plant zone #%d \n",bestPlantZone->zoneID);
     if(bestPlantZone->numberOfPlants > 2){
+        fprintf(stderr,"action defined\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
     }

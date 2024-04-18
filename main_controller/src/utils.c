@@ -164,7 +164,7 @@ uint8_t UART_receive(int UART_handle, char* received){
         if(tempoChar[bytesRead-1] == '>') return 1;
 
     }
-    //printf("received: '%s' \n",received);
+    printf("received: '%s' \n",received);
     return 0;}
 
 void initializeLaunchGPIO(){
@@ -461,9 +461,12 @@ plantZone* computeBestPlantsZone(){
     for (int i = 1; i < 6; i++) {
         if(plantZones[i].numberOfPlants > numberOfPlants){
             bestPlantZone = &plantZones[i];
-        }else if(plantZones[i].numberOfPlants = numberOfPlants){
-            if (computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY) < smallestDistance) {
+        }else if(plantZones[i].numberOfPlants == numberOfPlants){
+            double distanceFromPlant = computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY);
+            if (distanceFromPlant < smallestDistance) {
+                fprintf(stderr,"Distance = %f and sma\n",computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY));
                 bestPlantZone = &plantZones[i];
+                smallestDistance = distanceFromPlant;
             }
         }
     }

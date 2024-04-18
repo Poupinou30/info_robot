@@ -68,8 +68,8 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         {
         case SENDING_INSTRUCTION:
             if(!done1) done1 = deployForks();
-            if(!done2) done2 = done1 && setLowerFork(65);
-            if(!done3) done3 = done2 && setUpperFork(0);
+            if(!done2 && !done1) done2 = done1 && setLowerFork(65);
+            if(!done1 && !done2 && !done3) done3 = done2 && setUpperFork(0);
             if(done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
         

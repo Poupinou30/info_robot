@@ -407,7 +407,7 @@ void computeForceVector(){
     //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
     
 
-    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.005 && fabs(error) < 0.2){
+    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.01 && fabs(error) < 1){
         if(startOfArrival.tv_sec == 0 && startOfArrival.tv_usec == 0){
             gettimeofday(&startOfArrival,NULL);
         }
@@ -783,6 +783,7 @@ void myPotentialFieldController(){
             }
         case (DISPLACEMENT_MOVE):
             convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+            processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
             computeForceVector();
             break;
         

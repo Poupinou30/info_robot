@@ -22,7 +22,7 @@ int spi_handle_front;
 int spi_handle_rear;
 
 
-int mainFORKS(){
+int main(){
     initializeMainController();
     printf("UART handle = %d \n",UART_handle);
     //char* myString = "test123";
@@ -37,7 +37,7 @@ int mainFORKS(){
     setLowerFork(10);
     sleep(4);
     retractForks();*/
-    myGrabState = CALIB_FORK;
+    myGrabState = GRAB_PLANTS_INIT;
     myActuatorsState = SENDING_INSTRUCTION;
     while(myGrabState != FINISHED){
         //manageGrabbing();
@@ -89,7 +89,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int main(){
+int mainWithStrategy(){
     initializeMainController();
 
     int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
