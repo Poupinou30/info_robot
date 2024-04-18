@@ -810,7 +810,7 @@ float opponentDistance;
 
 void myPotentialFieldController2(){
     double outputSpeed[3];
-    if(myControllerState == MOVING && destination_set == 1){ // pq destination set == 1 ?
+    if(myControllerState == MOVING /*&& destination_set == 1*/){ // pq destination set == 1 ?
         switch (myMoveType)
         {
         case GRABBING_MOVE:

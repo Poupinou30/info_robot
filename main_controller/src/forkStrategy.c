@@ -97,7 +97,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
-            myControllerState = MOVING; // voir si il faut pas le mettre ailleurs
+            myControllerState = MOVING;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_PLANTS_MOVE;
@@ -172,14 +172,14 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         
         break;
 
-    case MOVE_FRONT_POTS:
+    case MOVE_FRONT_POTS: // else
         if(destination_set != 1){
             definePotsDestination(bestPotZone);
             destination_set = 1;
+            myControllerState = MOVING;
+            myMoveType = DISPLACEMENT_MOVE;
         }
-        myMoveType = DISPLACEMENT_MOVE;
-        if(!arrivedAtDestination) myControllerState = MOVING; // 
-        else{
+        if(arrivedAtDestination){
             myGrabState = UNSTACK_POTS_MOVE;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
