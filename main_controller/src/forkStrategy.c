@@ -172,7 +172,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         
         break;
 
-    case MOVE_FRONT_POTS: // else
+    case MOVE_FRONT_POTS: // else *****
         if(destination_set != 1){
             definePotsDestination(bestPotZone);
             destination_set = 1;

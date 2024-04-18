@@ -782,24 +782,17 @@ void myPotentialFieldController(){
                 break;
             }
         case (DISPLACEMENT_MOVE):
-            convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
-            processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
             computeForceVector();
+            convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
             break;
-        
-        //computeForceVector();
-        //convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
-        //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
-        //if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear); UTILE OU PAS? ON REMETTAIS JAMAIS LES PID DE BASE!!
-        processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
+        }
     }
-    }
-    
-
     else{
-        computeForceVector();
-        processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
+        outputSpeed[0] = 0;
+        outputSpeed[1] = 0;
+        outputSpeed[2] = 0;
     }
+    processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
 }
 
 float myX;
@@ -810,8 +803,7 @@ float opponentDistance;
 
 void myPotentialFieldController2(){
     double outputSpeed[3];
-    if(myControllerState == MOVING /*&& destination_set == 1*/){ // pq destination set == 1 ?
-        switch (myMoveType)
+    if(myControllerState == MOVING /*&& destination_set == 1*/){ 
         {
         case GRABBING_MOVE:
 
@@ -931,23 +923,18 @@ void myPotentialFieldController2(){
                 }  
             }
 
-    case (DISPLACEMENT_MOVE):
-        convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
-        processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
-        computeForceVector();
-        break;
-    
-    //computeForceVector();
-    //convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
-    //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
-    //if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear); UTILE OU PAS? ON REMETTAIS JAMAIS LES PID DE BASE!!
-        processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
-    }
+        case (DISPLACEMENT_MOVE):
+            computeForceVector();
+            convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+            break;
+        }
     }
     else{
-        computeForceVector();
-        processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
+        outputSpeed[0] = 0;
+        outputSpeed[1] = 0;
+        outputSpeed[2] = 0;
     }
+    processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
 }
 
 void initializeObstacles(){
