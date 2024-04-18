@@ -574,7 +574,7 @@ void myPotentialFieldController(){
             case GO_FORWARD_PLANTS:
                 pthread_mutex_lock(&lockFilteredOpponent);
                 pthread_mutex_lock(&lockFilteredPosition);
-                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ 
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 /*|| arrivedAtDestination == 1*/){ 
                     //S'arrête si il est arrivé ou qu'il est bloqué par l'adversaire
                 
                     outputSpeed[0] = 0;
