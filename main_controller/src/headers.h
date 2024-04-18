@@ -9,10 +9,6 @@
 #include <pthread.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <stdbool.h>
-
 #define _Pi 3.1415927
 #define DEG2RAD     (_Pi/180)
 #ifndef MAIN_CONTROLLER_HEADERS_H
@@ -29,7 +25,6 @@
 #define makeLog 1
 
 #define matchDuration 90 //seconds
-#define NUM_CHARS 100 // for the nextion
 
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
@@ -323,50 +318,3 @@ void defineBestAction();
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
 uint8_t forksDeployed;
 uint8_t forksCalibrated;
-
-////////////////////////////////////
-//Nextion
-////////////////////////////////////
-
-extern int UART_handle_nextion;
-extern int UARTReception;
-
-// Serial input variables
-char start_char[1] = {'<'};
-char end_char[1] = {'>'};
-char receivedChars[NUM_CHARS];
-bool newData = false;
-
-char myTeam[10] = "";
-char myPage[25] = "";
-int startY;
-int startB;
-int go = 2;
-bool finish = false;
-
-typedef struct Node {
-    char* data;
-    struct Node* next;
-} Node;
-
-typedef struct Queue {
-    Node* front;
-    Node* rear;
-} Queue;
-
-Queue* q;
-
-struct timeval startInitialization, endQueue, now;
-
-int initializeUART_nextion();
-uint8_t UART_send(int UART_handle, char* data);
-uint8_t UART_send_commands(int UART_handle, char* data);
-uint8_t UART_receive(int UART_handle, char* received);
-uint8_t recvWithStartEndMarkers();
-void handleCommand(char *string);
-Queue* createQueue();
-void enqueue(Queue* q, const char* value);
-char* dequeue(Queue* q);
-void display(Queue* q);
-void map_coordinates(double x_meters, double y_meters, char* x_map, char* y_map, int player);
-void nextion_communication();
