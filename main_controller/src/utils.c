@@ -631,4 +631,56 @@ void computePoints(){
     }
 }
 
+float tempoOppX, tempoOppY;
+float oldOppX, oldOppY; 
+struct timeval lastCheckTime, currentTime;
 
+void missingPlants(){
+    pthread_mutex_lock(&lockFilteredOpponent);
+    tempoOppX = *myFilteredOpponent.x;
+    tempoOppY = *myFilteredOpponent.y;
+    pthread_mutex_unlock(&lockFilteredOpponent);
+
+    gettimeofday(&currentTime, NULL);
+    if ((currentTime - (lastCheckTime.tv_sec*1000 + lastCheckTime.tv_usec/1000) > 500)){
+        oldOppX = tempoOppX;
+        oldOppY = tempoOppY;
+        gettimeofday(&lastCheckTime, NULL);
+    }
+
+    for(int i, i++, i<6){
+        if (isInPlantZone(tempoOppX, tempoOppY, plantZones[i].posX, plantZones[i].posY) && plantZones[i].numberOfPlants != 0){
+            plantZones[i].numberOfPlants=0;
+        }else if(areOverlapping(plantZones[i].posX, plantZones[i].posY, tempoOppX, tempoOppY, radiusOpponent) && distance(tempoOppX, tempoOppY, oldOppX, oldOppY)<0.05 && plantZones[i].numberOfPlants != 0){
+            plantZones[i].numberOfPlants=0;
+        }
+    }
+}
+
+bool isInPlantZone(float x, float y, float xc, float yc) {
+    float distance_squared = (x - xc) * (x - xc) + (y - yc) * (y - yc);
+    float radius_squared = 0.125 * 0.125;
+    return distance_squared <= radius_squared;
+}
+
+float distance(float x1, float y1, float x2, float y2) {
+    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+// Fonction pour calculer la longueur d'empiètement entre deux cercles
+uint8_t areOverlapping(float xc, float yc, float x, float y, float r2, float *overlap) {
+    float d = distance(xc, yc, x, y);
+    if (d > 0.125 + r2 || d < fabs(0.125 - r2) || d == 0) {
+        return 0; // Pas d'intersection
+    }
+
+    float a = (0.125 * 0.125 - r2 * r2 + d * d) / (2 * d);
+    float overlapLength = 2*(0.125-a);
+
+    if (overlapLength > 0) {
+        *overlap = overlapLength;
+        return 1;
+    }
+
+    return 0;
+}

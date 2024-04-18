@@ -384,3 +384,12 @@ extern uint8_t score = 0;
 extern uint8_t cameraEnable = 0;
 uint8_t cameraConfirmation();
 void computePoints();
+
+// Opponent behavior 
+
+uint8_t radius_opponent;
+void missingPlants();
+void bool isInPlantZone(float x, float y, float xc, float yc);
+float distance(float x1, float y1, float x2, float y2);
+uint8_t areOverlapping(float xc, float yc, float x, float y, float r2, float *overlap);
+
