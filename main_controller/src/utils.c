@@ -567,5 +567,68 @@ endZone* computeBestEndZone(){
     return bestEndZone;
 }
 
+plantType* cameraConfirmation(){
+    plantType *plantType = (plantType*)malloc(sizeof(plantType)) 
+    for(int i = 1; i < numberPlants; i++){
+        if (plants[i].standing == 1){
+            if (plants[i].color == purple){
+                plantType.purple += 1;
+            }else{
+                plantType.white += 1; 
+            }
+        }
+    }
+    return plantType;
+}
+
+void computePoints(){
+    if(myActionChoice == PLANTS_ACTION){
+        if(myMovingSubState == CHECK_UP_JARD){
+            if(cameraConfirmation() != NULL){
+                plantType *plantType = cameraConfirmation();
+                score += 4*(plantType->purple + plantType->white);
+            }else{
+                score += 24;
+            }
+            return;
+
+        }else if(myMovingSubState == CHECK_UP_DROP){
+            if(cameraConfirmation() != NULL){
+                plantType *plantType = cameraConfirmation();
+                score += 3*(plantType->purple);
+            }else{
+                score += 6;
+            }
+            return;
+        }
+
+    }else if(myActionChoice == PLANTS_POTS_ACTION){
+        if(myMovingSubState == CHECK_UP_JARD){
+            if(cameraConfirmation() != NULL){
+                plantType *plantType = cameraConfirmation();
+                score += 5*(plantType->purple + plantType->white);
+            }else{
+                score += 30;
+            }
+            return;
+
+        }else if(myMovingSubState == CHECK_UP_DROP){
+            if(cameraConfirmation() != NULL){
+                plantType *plantType = cameraConfirmation();
+                score += 4*(plantType->purple + plantType->white);
+            }else{
+                score += 24;
+            }
+            return;
+        }
+        
+    }else if(myActionChoice == SOLAR_PANELS_ACTION){
+        score += 5;
+        return;
+    }else if(mySupremeState == GAME_OVER){
+        score += 10; 
+        return;
+    }
+}
 
 

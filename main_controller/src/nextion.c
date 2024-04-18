@@ -139,6 +139,7 @@ void handleCommand(char *string) {
     if (strcmp(receivedChars, "<start>") == 0){
         go = 1;
         enqueue(q, "tm0.en=1");
+        nextionStart = 1;
         printf("Go go gooo\n");
     }
     else if (strcmp(receivedChars, "<back>") == 0){
@@ -299,7 +300,7 @@ void nextion_communication(){
             enqueue(q, y_map_opp);
 
             // My score
-            sprintf(myScore, "score.val=%d", (int)score);  //!!! NAME OF VARIABLE SCORE TO BE CHANGE
+            sprintf(myScore, "score.val=%d", score);
             enqueue(q, myScore);
             
             gettimeofday(&endQueue, NULL);

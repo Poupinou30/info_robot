@@ -123,7 +123,7 @@ endZone* dropZones;
 
 typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
 typedef enum{BLUE, YELLOW} teamColor;
-typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE, Y_Align_Pots, X_Align_Pots,GET_ALL_POTS,GET_BACK_JARDINIERE} movingSubState;
+typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE, Y_Align_Pots, X_Align_Pots,GET_ALL_POTS,GET_BACK_JARDINIERE, CHECK_UP_JARD, CHECK_UP_DROP} movingSubState;
 
 typedef enum{MOVING,STOPPED} movingState;
 typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE, GAME_OVER} supremeState;
@@ -273,7 +273,9 @@ extern position myFilteredOpponent;
 //KALMAN
 void defineOpponentPosition(float posX, float posY);
 
+////////////////////////////////
 // STRATEGY
+///////////////////////////////
 
 void mainStrategy();
 void waitingStrategy();
@@ -370,3 +372,15 @@ char* dequeue(Queue* q);
 void display(Queue* q);
 void map_coordinates(double x_meters, double y_meters, char* x_map, char* y_map, int player);
 void nextion_communication();
+
+//Score
+
+typedef struct plantType {
+    uint8_t white;
+    uint8_t purple;
+} plantType;
+
+extern uint8_t score = 0;
+extern uint8_t cameraEnable = 0;
+uint8_t cameraConfirmation();
+void computePoints();
