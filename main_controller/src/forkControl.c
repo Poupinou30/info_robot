@@ -31,15 +31,23 @@ int setWheelSpeedCommandReceivedFlag = 0;
 int setGripperPositionCommandReceivedFlag = 0;
 
 int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag) {
-    printf("Dans checkCommand et expected = %s",expected);
+    printf("Dans checkCommand et expected = %s", expected);
     char expectedData[255];
     char withoutCrochet[20];
     sscanf(expected, "<%[^>]>", withoutCrochet);
     sprintf(expectedData, "<Command received : %s>", withoutCrochet);
-    printf("expected data = %s and buffer = %s \n",expectedData, buffer);
+    printf("expected data = %s and buffer = %s \n", expectedData, buffer);
+
+    // Recherche et suppression de "<stopped>" dans buffer
+    char* found = strstr(buffer, "<stopped>");
+    while (found != NULL) {
+        memmove(found, found + strlen("<stopped>"), strlen(found + strlen("<stopped>")) + 1);
+        found = strstr(buffer, "<stopped>");
+    }
+
     if (strcmp(expectedData, buffer) == 0) {
         printf("buffer erased\n");
-        buffer[0] = '\0'; // Erase the buffer
+        buffer[0] = '\0'; // Effacer le buffer
         *commandReceivedFlag = 1;
         return 1;
     }

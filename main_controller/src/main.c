@@ -37,10 +37,15 @@ int main(){
     setLowerFork(10);
     sleep(4);
     retractForks();*/
+    myGrabState = CALIB_FORK;
+    myActuatorsState = SENDING_INSTRUCTION;
+    while(myGrabState != FINISHED){
+        manageGrabbing(NULL,NULL);
+    }
     myGrabState = GRAB_PLANTS_INIT;
     myActuatorsState = SENDING_INSTRUCTION;
     while(myGrabState != FINISHED){
-        //manageGrabbing();
+        manageGrabbing(NULL,NULL);
     }
 }
 

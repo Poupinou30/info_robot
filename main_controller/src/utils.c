@@ -164,7 +164,7 @@ uint8_t UART_receive(int UART_handle, char* received){
         if(tempoChar[bytesRead-1] == '>') return 1;
 
     }
-    printf("received: '%s' \n",received);
+    //printf("received: '%s' \n",received);
     return 0;}
 
 void initializeLaunchGPIO(){
