@@ -87,8 +87,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
                 myGrabState = GRAB_PLANTS_MOVE;
                 done1=0; done2=0; done3 = 0;
                 receivedData[0] = '\0';
-                actuator_reception = 0;
-                
+                actuator_reception = 0;                
             } 
             break;
         }
@@ -98,9 +97,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
-            myControllerState = MOVING;
-            destination_set = 1;
-            arrivedAtDestination = 0;
+            myControllerState = MOVING; // voir si il faut pas le mettre ailleurs
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_PLANTS_MOVE;
@@ -109,7 +106,6 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         else{
             myGrabState = GRAB_PLANTS_CLOSE;
             destination_set = 0;
-            // arrivedAtDestination = 0; // jsp si il faut le mettre, en fct de comment tu le gères pour l'instant
         }
         break;
 
@@ -165,7 +161,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = UNSTACK_POTS_MOVE; // changer pour un MOVE_FRONT_POTS vu qu'on doit tenir en compte les move types
+                myGrabState = MOVE_FRONT_POTS;
                 done1 = 0; done2 = 0; done3 = 0;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
@@ -182,7 +178,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             destination_set = 1;
         }
         myMoveType = DISPLACEMENT_MOVE;
-        if(!arrivedAtDestination) myControllerState = MOVING;
+        if(!arrivedAtDestination) myControllerState = MOVING; // 
         else{
             myGrabState = UNSTACK_POTS_MOVE;
             myControllerState = STOPPED;

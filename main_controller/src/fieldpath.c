@@ -411,7 +411,7 @@ void computeForceVector(){
         if(startOfArrival.tv_sec == 0 && startOfArrival.tv_usec == 0){
             gettimeofday(&startOfArrival,NULL);
         }
-        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.2){
+        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.5){
             arrivedAtDestination = 1;
         }
         //myControllerState = STOPPED;
@@ -574,7 +574,7 @@ void myPotentialFieldController(){
             case GO_FORWARD_PLANTS:
                 pthread_mutex_lock(&lockFilteredOpponent);
                 pthread_mutex_lock(&lockFilteredPosition);
-                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 /*|| arrivedAtDestination == 1*/){ 
+                if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y) < 0.40 || arrivedAtDestination == 1){ 
                     //S'arrête si il est arrivé ou qu'il est bloqué par l'adversaire
                 
                     outputSpeed[0] = 0;
@@ -792,9 +792,158 @@ void myPotentialFieldController(){
         //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
         //if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear); UTILE OU PAS? ON REMETTAIS JAMAIS LES PID DE BASE!!
         processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
-    }}
+    }
+    }
     
 
+    else{
+        computeForceVector();
+        processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
+    }
+}
+
+float myX;
+float myY;
+float myXOpponent;
+float myYOpponent;
+float opponentDistance;
+
+void myPotentialFieldController2(){
+    double outputSpeed[3];
+    if(myControllerState == MOVING && destination_set == 1){ // pq destination set == 1 ?
+        switch (myMoveType)
+        {
+        case GRABBING_MOVE:
+
+            pthread_mutex_lock(&lockFilteredOpponent);
+            pthread_mutex_lock(&lockFilteredPosition);
+            myX = *myFilteredPos.x;
+            myY = *myFilteredPos.y;
+            myXOpponent = *myFilteredOpponent.x;
+            myYOpponent = *myFilteredOpponent.y;
+            pthread_mutex_unlock(&lockFilteredOpponent);
+            pthread_mutex_unlock(&lockFilteredPosition);
+
+            opponentDistance = computeEuclidianDistance(myX,myY,myXOpponent,myYOpponent);
+            if(opponentDistance < 0.40 /*|| arrivedAtDestination == 1*/){ 
+
+                //S'arrête si il est bloqué par l'adversaire
+                outputSpeed[0] = 0;
+                outputSpeed[1] = 0;
+                outputSpeed[2] = 0;
+
+            } else{
+                if(destination_set == 0){
+                    xStart = *myFilteredPos.x;
+                    yStart = *myFilteredPos.y;
+                    destination_set = 1;
+                    arrivedAtDestination = 0;   
+                }
+                switch (myMovingSubState)
+                {
+                case GO_FORWARD_PLANTS:
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.25){
+                        myControllerState = STOPPED;
+                        // destination_set = 0;
+                        arrivedAtDestination = 1;
+                    }else{
+                        outputSpeed[0] = 0;
+                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[2] = 0;
+                    }
+                    break;
+
+                case (GO_FORWARD_POTS):
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){
+                        destination_set = 0;
+                        arrivedAtDestination = 1;
+                        myControllerState = STOPPED;
+                    }else{
+                        outputSpeed[0] = 0;
+                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[2] = 0;
+                    }                
+                    break;
+                
+                case (UNSTACK_MOVE):
+                        if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.175){
+                            destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }else{
+                            outputSpeed[0] = - 0.405 * GRAB_SPEED; 
+                            outputSpeed[1] = - 0.914 * GRAB_SPEED;
+                            outputSpeed[2] = 0;
+                        }
+                    break;
+
+                case (Y_Align_Pots):
+                    
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0904){
+                        destination_set = 0;
+                        arrivedAtDestination = 1;
+                        myControllerState = STOPPED;
+                    }else{
+                        outputSpeed[0] = 0; 
+                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[2] = 0;
+                    }
+                    break;
+
+                case (X_Align_Pots):
+                        
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0708){
+                        destination_set = 0;
+                        arrivedAtDestination = 1;
+                        myControllerState = STOPPED;
+                    }else{
+                        outputSpeed[0] = GRAB_SPEED; 
+                        outputSpeed[1] = 0;
+                        outputSpeed[2] = 0;
+                    }
+                    break;
+                    
+                case (GET_ALL_POTS):
+            
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0708){
+                        destination_set = 0;
+                        arrivedAtDestination = 1;
+                        myControllerState = STOPPED;
+                    }else{
+                        outputSpeed[0] = 0; 
+                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[2] = 0;
+                    }
+                    break;
+                    
+                case (GET_BACK_JARDINIERE):
+                    
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){
+                        destination_set = 0;
+                        arrivedAtDestination = 1;
+                        myControllerState = STOPPED;
+                    }else{
+                        outputSpeed[0] = 0; 
+                        outputSpeed[1] = - GRAB_SPEED;
+                        outputSpeed[2] = 0;
+                    }
+                    break;
+                }  
+            }
+
+    case (DISPLACEMENT_MOVE):
+        convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+        processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
+        computeForceVector();
+        break;
+    
+    //computeForceVector();
+    //convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
+    //if(VERBOSE) printf("output speed is %lf %lf %lf \n",outputSpeed[0],outputSpeed[1],outputSpeed[2]);
+    //if(outputSpeed[0] < 0.1 && outputSpeed[1] < 0.1 && outputSpeed[3] < 5) tunePID(100,20,i2c_handle_front,i2c_handle_rear); UTILE OU PAS? ON REMETTAIS JAMAIS LES PID DE BASE!!
+        processInstructionNew(outputSpeed[0],outputSpeed[1],outputSpeed[2],i2c_handle_front,i2c_handle_rear);
+    }
+    }
     else{
         computeForceVector();
         processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
