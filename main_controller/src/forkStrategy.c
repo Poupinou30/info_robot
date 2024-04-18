@@ -102,10 +102,11 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
+            myControllerState = MOVING;
             destination_set = 1;
             arrivedAtDestination = 0;
         }
-        else if (pressForward == 1 && arrivedAtDestination == 0){
+        else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_PLANTS_MOVE;
             
         }

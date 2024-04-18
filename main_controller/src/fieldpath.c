@@ -411,7 +411,7 @@ void computeForceVector(){
         if(startOfArrival.tv_sec == 0 && startOfArrival.tv_usec == 0){
             gettimeofday(&startOfArrival,NULL);
         }
-        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.5){
+        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.2){
             arrivedAtDestination = 1;
         }
         //myControllerState = STOPPED;
