@@ -13,11 +13,12 @@ actuationState myActuatorsState;
 uint8_t actuator_reception;
 int done = 0;
 uint8_t done1 = 0, done2 = 0, done3 = 0;
+char receivedData[255];
 
 void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi tu passes bestPlantZone en argument? je vois pas où tu l'utilises
 
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
-    char receivedData[255];
+    
     switch (myGrabState)
     {
     case MOVE_FRONT_PLANTS:
@@ -46,7 +47,8 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             break;
         
         case WAITING_ACTUATORS:
-            //fprintf(stderr,"actuators reception = %d\n",actuator_reception);
+
+            
             //fprintf(stderr,"received message = %s \n",receivedData);
             if(!actuator_reception){
                 //printf("dans if actuator reception\n");
@@ -74,9 +76,12 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             break;
         
         case WAITING_ACTUATORS:
+        fprintf(stderr,"actuators reception = %d\n",actuator_reception);
+        fprintf(stderr,"received = %s\n",receivedData);
             if(!actuator_reception){
                 actuator_reception = UART_receive(UART_handle,receivedData);}
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                fprintf(stderr,"rentre dans le if de forkstrategy\n");
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_PLANTS_MOVE;
