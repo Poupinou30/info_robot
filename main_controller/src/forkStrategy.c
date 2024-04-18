@@ -24,7 +24,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set != 1){
             definePlantsDestination(bestPlantZone);
             destination_set = 1;
-            
+
         }
         myMoveType = DISPLACEMENT_MOVE;
         if(!arrivedAtDestination) myControllerState = MOVING;
@@ -90,10 +90,6 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case GRAB_PLANTS_MOVE:
-        /*
-        on mettrait pas des pressForward à la place des destination_set pour faire la dif entre quand tu as un objectif en potentialField 
-        et quand tu fais un move hardcodé, comme ça actionStrategy nous recherche pas une nouvelle destination ?
-        */   
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
@@ -141,7 +137,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
         
     case GRAB_PLANTS_END:
-        bestPlantZone->numberOfPlants = 0;
+        bestPlantZone->numberOfPlants = 0; 
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:

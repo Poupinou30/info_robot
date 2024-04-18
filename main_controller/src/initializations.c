@@ -14,7 +14,7 @@ void initializePlantZones(){
     
     */
     plantZones = (plantZone*)malloc(sizeof(plantZone)*6);
-    plantZones[0].zoneID = 1;
+    plantZones[0].zoneID = 0;
     plantZones[0].numberOfPlants = 6;
     plantZones[0].posX = 0.5;
     plantZones[0].posY = 1.5;
@@ -23,7 +23,7 @@ void initializePlantZones(){
     plantZones[0].targetPositionUpX = plantZones[0].posX;
     plantZones[0].targetPositionUpY = plantZones[0].posY + 0.39;
 
-    plantZones[1].zoneID = 2;
+    plantZones[1].zoneID = 1;
     plantZones[1].numberOfPlants = 6;
     plantZones[1].posX = 0.7;
     plantZones[1].posY = 1;
@@ -32,7 +32,7 @@ void initializePlantZones(){
     plantZones[1].targetPositionUpX = plantZones[1].posX;
     plantZones[1].targetPositionUpY = plantZones[1].posY + 0.39;
 
-    plantZones[2].zoneID = 3;
+    plantZones[2].zoneID = 2;
     plantZones[2].numberOfPlants = 6;
     plantZones[2].posX = 0.5;
     plantZones[2].posY = 2;
@@ -41,7 +41,7 @@ void initializePlantZones(){
     plantZones[2].targetPositionUpX = plantZones[2].posX;
     plantZones[2].targetPositionUpY = plantZones[2].posY + 0.39;  
 
-    plantZones[3].zoneID = 4;
+    plantZones[3].zoneID = 3;
     plantZones[3].numberOfPlants = 6;
     plantZones[3].posX = 1.3;
     plantZones[3].posY = 1;
@@ -50,7 +50,7 @@ void initializePlantZones(){
     plantZones[3].targetPositionUpX = plantZones[3].posX;
     plantZones[3].targetPositionUpY = plantZones[3].posY + 0.39;
 
-    plantZones[4].zoneID = 5;
+    plantZones[4].zoneID = 4;
     plantZones[4].numberOfPlants = 6;
     plantZones[4].posX = 1.3;
     plantZones[4].posY = 2;
@@ -59,7 +59,7 @@ void initializePlantZones(){
     plantZones[4].targetPositionUpX = plantZones[4].posX;
     plantZones[4].targetPositionUpY = plantZones[4].posY + 0.39;
 
-    plantZones[5].zoneID = 6;
+    plantZones[5].zoneID = 5;
     plantZones[5].numberOfPlants = 6;
     plantZones[5].posX = 1.5;
     plantZones[5].posY = 1.5;
