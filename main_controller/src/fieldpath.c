@@ -847,9 +847,10 @@ void myPotentialFieldController2(){
 
                 case (GO_FORWARD_POTS):
                     if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){
-                        destination_set = 0;
-                        arrivedAtDestination = 1;
                         myControllerState = STOPPED;
+                        // destination_set = 0;
+                        arrivedAtDestination = 1;
+                        
                     }else{
                         outputSpeed[0] = 0;
                         outputSpeed[1] = GRAB_SPEED;
