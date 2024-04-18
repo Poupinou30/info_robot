@@ -946,7 +946,7 @@ void myPotentialFieldController2(){
     }
     else{
         computeForceVector();
-        processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear);
+        processInstructionNew(0,0,0,i2c_handle_front,i2c_handle_rear); //VITESSE FRAME ROBOT EN ENTREE
     }
 }
 
