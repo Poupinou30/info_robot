@@ -495,13 +495,14 @@ void initializeMainController(){
     spi_handle_front = initializeSPI(0);
     spi_handle_rear = initializeSPI(1);
     UART_handle = initializeUART();
+    UART_handle_nextion = initializeUART_nextion();
     i2c_handle_front = I2C_initialize(0x40);
     i2c_handle_rear = I2C_initialize(0x41);
     initializeLaunchGPIO();
     if(makeLog) generateLog();
     mySupremeState = WAITING_FOR_START;
 
-
+    gettimeofday(&startInitialization, NULL);
 
     //Initialisation variables
     positionReceived = malloc(3*sizeof(float));
@@ -535,6 +536,10 @@ void initializeMainController(){
     addOpponentObstacle();
     //Initialisation PID
     tunePID(60,15,i2c_handle_front,i2c_handle_rear);
+
+    //Queue nextion for send commands
+    q = createQueue();
+    gettimeofday(&endQueue, NULL);
 }
 
 int mainFINAL(){
