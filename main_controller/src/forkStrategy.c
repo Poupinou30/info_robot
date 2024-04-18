@@ -175,7 +175,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case MOVE_FRONT_POTS: // else *****
-        if(destination_set != 1){
+        if(destination_set == 0){
             definePotsDestination(bestPotZone);
             destination_set = 1;
             myControllerState = MOVING;
@@ -192,7 +192,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
-            arrivedAtDestination = 0;
+            myControllerState = MOVING;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = UNSTACK_POTS_MOVE;
@@ -235,8 +235,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = UNSTACK_MOVE;
-            destination_set = 1;
-            arrivedAtDestination = 0;
+            myControllerState = MOVING;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = UNSTACK_POT_POSITIONING;
@@ -275,8 +274,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = Y_Align_Pots;
-            destination_set = 1;
-            arrivedAtDestination = 0;
+            myControllerState = MOVING;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_POTS_MOVE;
@@ -285,14 +283,14 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             myGrabState = ALIGN_POTS_MOVE;
             destination_set = 0;
         }
+        break;
 
     // faut ajouter la transistions ALIGN_POTS_MOVE (1st row vers aligned)
     case ALIGN_POTS_MOVE: // 1st row vers aligned sur le ppt
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = X_Align_Pots;
-            destination_set = 1;
-            arrivedAtDestination = 0;
+            myControllerState = MOVING;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = ALIGN_POTS_MOVE;
@@ -301,13 +299,14 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             myGrabState = GRAB_ALL_POTS;
             destination_set = 0;
         }
+        break;
+
     // faut ajouter la transistions GRAB_ALL_POTS (aligned vers pots ready)
     case GRAB_ALL_POTS:
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GET_ALL_POTS;
-            destination_set = 1;
-            arrivedAtDestination = 0;
+            myControllerState = MOVING;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_ALL_POTS;
@@ -316,6 +315,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             myGrabState = LIFT_POTS;
             destination_set = 0;
         }
+        break;
 
     case LIFT_POTS:
         switch (myActuatorsState)
@@ -386,19 +386,16 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = FINISHED;
                 receivedData[0] = '\0';
-                actuator_reception = 0;
-                
+                actuator_reception = 0;   
             } 
             break;
         }
         break;
-    // ajouter le MOVE_BACK_JARDINIERE (marche arrière pour faire tomber les plantes)
     case MOVE_BACK_JARDINIERE:
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GET_BACK_JARDINIERE;
-            destination_set = 1;
-            arrivedAtDestination = 0;
+            myControllerState = MOVING;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = MOVE_BACK_JARDINIERE;
