@@ -74,7 +74,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         case SENDING_INSTRUCTION:
             if(!done0) done0 = setGripperPosition(0);
             if(!done1&&done0) done1 = deployForks();
-            if(!done2 && done1) done2 = done1 && setLowerFork(65);
+            if(!done2 && done1) done2 = done1 && setLowerFork(69);
             if(!done3 && done2) done3 = done2 && setUpperFork(0);
             if(done0 && done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
@@ -249,7 +249,8 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         break;
 
     case UNSTACK_POT_POSITIONING: // captured vers unstacked sur le ppt
-        printf("unstackPotPositioning started\n");
+        printf("unstackPotPositioning started, destination_set = %d arrivedAtDestination = %d\n",destination_set,arrivedAtDestination);
+        
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = UNSTACK_MOVE;

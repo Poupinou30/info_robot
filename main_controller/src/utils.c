@@ -446,12 +446,12 @@ void generateLog(){
         printf("Erreur lors de l'ouverture du fichier\n");
         return 1;
     }
-    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos ; opponentFilteredPos ; measuredOmega ; filteredOmega\n");
+    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos ; opponentFilteredPos ; measuredOmega ; filteredOmega ; wheelSpeeds ; measuredSpeed ; filteredMeasuredSpeed\n");
     printf("File generated i guess\n");
 }
 
 void writeLog(){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f ; %f ; %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y, measuredSpeedOmega, filteredSpeedOmega);
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f ; %f ; %f ; %f %f %f %f ; %f %f ; %f %f ; %f %f\n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y, measuredSpeedOmega, filteredSpeedOmega,motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR,measuredSpeedX,measuredSpeedY,filteredSpeedX,filteredSpeedY);
 }
 
 uint8_t checkStartSwitch(){
