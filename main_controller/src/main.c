@@ -148,6 +148,7 @@ int main(){
                     printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
                     printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
                     printf("myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
+                    printf("myDestination x = %f y = %f\n",*destination.x,*destination.y);
                 }
 
                 elapsedTime = 0;

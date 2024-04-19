@@ -4,6 +4,7 @@
 #endif
 
 #define GRAB_SPEED 0.2
+#define POT_SPEED 0.05
 
 float fixActionDistance = 0.3;
 float mobileActionDistance = 0.4;
@@ -427,7 +428,7 @@ void computeForceVector(){
     averageError = averageError/10;
     
 
-    if(averageDistanceFromDest < 0.01 && fabs(averageError) < 1){
+    if(averageDistanceFromDest < 0.02 && fabs(averageError) < 1){
         arrivedAtDestination = 1;
         
     }
@@ -585,6 +586,7 @@ void myPotentialFieldController(){
         switch(myMoveType)
         {
         case GRABBING_MOVE:
+            
             printf("grabbing move\n");
             pthread_mutex_lock(&lockFilteredOpponent);
             pthread_mutex_lock(&lockFilteredPosition);
@@ -626,14 +628,14 @@ void myPotentialFieldController(){
                     break;
 
                 case (GO_FORWARD_POTS):
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.13){
                         myControllerState = STOPPED;
                         // destination_set = 0;
                         arrivedAtDestination = 1;
                         
                     }else{
                         outputSpeed[0] = 0;
-                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[1] = POT_SPEED;
                         outputSpeed[2] = 0;
                     }                
                     break;
@@ -644,7 +646,7 @@ void myPotentialFieldController(){
                             arrivedAtDestination = 1;
                             myControllerState = STOPPED;
                         }else{
-                            outputSpeed[0] = - 0.405 * GRAB_SPEED; 
+                            outputSpeed[0] = + 0.405 * GRAB_SPEED; 
                             outputSpeed[1] = - 0.914 * GRAB_SPEED;
                             outputSpeed[2] = 0;
                         }

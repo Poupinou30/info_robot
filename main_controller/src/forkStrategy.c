@@ -12,7 +12,7 @@ grabbingState myGrabState;
 actuationState myActuatorsState;
 uint8_t actuator_reception;
 int done = 0;
-uint8_t done1 = 0, done2 = 0, done3 = 0;
+uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0;
 char receivedData[255];
 
 void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
@@ -72,10 +72,11 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            if(!done1) done1 = deployForks();
-            if(!done2) done2 = done1 && setLowerFork(65);
-            if(!done3) done3 = done2 && setUpperFork(0);
-            if(done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
+            if(!done0) done0 = setGripperPosition(0);
+            if(!done1&&done0) done1 = deployForks();
+            if(!done2 && done1) done2 = done1 && setLowerFork(65);
+            if(!done3 && done2) done3 = done2 && setUpperFork(0);
+            if(done0 && done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
         
         case WAITING_ACTUATORS:
@@ -112,6 +113,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = GRAB_PLANTS_CLOSE;
             destination_set = 0;
+            arrivedAtDestination = 0;
         }
         break;
 
@@ -132,7 +134,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
                 actuator_reception = UART_receive(UART_handle,receivedData);
                 }
             //else printf("actuators_reception = %d\n",actuator_reception);
-            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0 || 1){ //J'ai rajouté le ou 1 car parfois le stopped est envoyé trop vite et on ne le recois pas, on en a pas besoin dans ce cas
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_PLANTS_END;
@@ -146,11 +148,13 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         break;
         
     case GRAB_PLANTS_END:
+    
         printf("grabplantEnd started\n");
         bestPlantZone->numberOfPlants = 0; 
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
+            receivedData[0] = '\0';
             if(!done1){
                 //printf("rentre dans le if setUpperFork\n");
                 done1 = setUpperFork(142);
@@ -194,11 +198,12 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             myGrabState = UNSTACK_POTS_MOVE;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
+            destination_set = 0;
         } 
         break;
 
     case UNSTACK_POTS_MOVE: // ça c'est de front vers captured sur le ppt
-        printf("unstackPotsMove started\n");
+        printf("unstackPotsMove started, destination_set = %d, arrivedAtDestination = %d \n",destination_set,arrivedAtDestination);
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
@@ -211,6 +216,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = UNSTACK_POT_TAKE;
             destination_set = 0;
+            arrivedAtDestination = 0;
         }
         break;
 
@@ -255,6 +261,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = UNSTACK_POT_DROP;
             destination_set = 0;
+            arrivedAtDestination = 0;
         }
         break;
 

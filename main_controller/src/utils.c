@@ -100,7 +100,15 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
 
     *v_y = 1.0167*radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
 
-    *omega = 112.5*/*1.043**/radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+    for(int i = 0; i<4; i++){
+        if(wheel_speeds[i] > 30){
+            printf("myWheelSpeed[%d] = %f\n",i,wheel_speeds[i]);
+        }
+    }
+
+    double tempoOmega =  112.5*/*1.043**/radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+
+    if(fabs(tempoOmega) < 500) *omega = tempoOmega;
 
     measuredSpeedX = *v_x;
     measuredSpeedY = *v_y;

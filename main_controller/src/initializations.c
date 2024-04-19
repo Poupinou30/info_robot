@@ -35,7 +35,7 @@ void initializePlantZones(){
 
     plantZones[2].zoneID = 2;
     plantZones[2].numberOfPlants = 6;
-    plantZones[2].posX = 0.5;
+    plantZones[2].posX = 0.7;
     plantZones[2].posY = 2;
     plantZones[2].targetPositionLowX = plantZones[2].posX;
     plantZones[2].targetPositionLowY = plantZones[2].posY - 0.39;
