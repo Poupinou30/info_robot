@@ -411,7 +411,8 @@ void computeForceVector(){
         if(startOfArrival.tv_sec == 0 && startOfArrival.tv_usec == 0){
             gettimeofday(&startOfArrival,NULL);
         }
-        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.5){
+        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.1){
+            printf("arrived at destination \n");
             arrivedAtDestination = 1;
         }
         //myControllerState = STOPPED;
@@ -571,9 +572,9 @@ float opponentDistance;
 void myPotentialFieldController(){
     double outputSpeed[3];
     if(myControllerState == MOVING /*&& destination_set == 1*/){ 
+        switch(myGrabState)
         {
         case GRABBING_MOVE:
-
             pthread_mutex_lock(&lockFilteredOpponent);
             pthread_mutex_lock(&lockFilteredPosition);
             myX = *myFilteredPos.x;
@@ -596,7 +597,7 @@ void myPotentialFieldController(){
                     xStart = *myFilteredPos.x;
                     yStart = *myFilteredPos.y;
                     destination_set = 1;
-                    arrivedAtDestination = 0;   
+                    arrivedAtDestination = 0;
                 }
                 switch (myMovingSubState)
                 {

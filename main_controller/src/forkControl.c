@@ -104,6 +104,7 @@ int disableStepperMotor() {
 
 int calibrateFork() {
     sprintf(dataToSend, "<H-0>");
+    printf("fork to calibrate\n");
     if (calibrateForkCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         calibrateForkCommandReceivedFlag = 1;

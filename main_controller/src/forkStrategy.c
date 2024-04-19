@@ -22,18 +22,19 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
     switch (myGrabState)
     {
     case MOVE_FRONT_PLANTS:
+
         if(destination_set != 1){
             definePlantsDestination(bestPlantZone);
             destination_set = 1;
             myMoveType = DISPLACEMENT_MOVE;
+            fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
-
         }
-        
         if(arrivedAtDestination){
             myGrabState = GRAB_PLANTS_INIT;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
+            printf("move<frontPlant> done\n");
         } 
         break;
         
@@ -79,9 +80,13 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         
         case WAITING_ACTUATORS:
         fprintf(stderr,"actuators reception = %d\n",actuator_reception);
-        fprintf(stderr,"received = %s\n",receivedData);
+        
             if(!actuator_reception){
-                actuator_reception = UART_receive(UART_handle,receivedData);}
+                actuator_reception = UART_receive(UART_handle,receivedData);
+                fprintf(stderr,"received = %s\n",receivedData);
+                fprintf(stderr,"actuators reception = %d\n",actuator_reception);
+
+            }
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 fprintf(stderr,"rentre dans le if de forkstrategy\n");
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
@@ -176,6 +181,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
 
     case MOVE_FRONT_POTS: // else *****
         if(destination_set == 0){
+            
             definePotsDestination(bestPotZone);
             destination_set = 1;
             myControllerState = MOVING;
@@ -185,6 +191,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             myGrabState = UNSTACK_POTS_MOVE;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
+            printf("move<frontPots> done\n");
         } 
         break;
 

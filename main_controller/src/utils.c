@@ -355,8 +355,10 @@ void* receptionPipe(void* pipefdvoid){
 
             //OPPONENT
             pthread_mutex_lock(&lockOpponentPosition);
+            if(buffer[3] > 0 && buffer[3] < 2 && buffer[4] > 0 && buffer[4] < 3){
             *myOpponent.x = buffer[3]; //A SORTIR DE LA CONDITION WALLAH
             *myOpponent.y = buffer[4];
+            }
             pthread_mutex_unlock(&lockOpponentPosition);
             //POSITION
             //printf("conditions: %d %d %d %d %d %d\n",buffer[0] > 0 , buffer[1] > 0 , buffer[0] < 2 , buffer[1]< 3 , (computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,buffer[0],buffer[1]) < 0.40),first);

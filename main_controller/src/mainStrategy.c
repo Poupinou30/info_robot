@@ -17,6 +17,7 @@ void mainStrategy(){
         pointsStrategy();
         break;
     case RETURN_TO_BASE:
+        printf("returnToBase\n");
         returnToBaseStrategy();
         break;
 
@@ -72,7 +73,9 @@ void pointsStrategy(){
     }
     
     else{ // let's earn some points
+        
         //fprintf(stderr,"check10.1\n");
+        
         if(changeOfPlan){
             //fprintf(stderr,"check10.2\n");
             defineBestAction();
@@ -94,10 +97,13 @@ void actionStrategy(){
     switch (myActionChoice)
     {
     case PLANTS_ACTION:
-        if(destination_set != 1){
+        printf("myGrabstate = %d\n", myGrabState);
+        /*if(destination_set != 1){
             definePlantsDestination(bestPlantZone);
-            destination_set = 1;
-        }
+            printf("destinationX = %f\n", *destination.x);
+            printf("destinationY = %f\n", *destination.y);
+            // destination_set = 1;
+        }*/
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, NULL);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
@@ -105,17 +111,14 @@ void actionStrategy(){
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
-        if(destination_set != 1){
-            definePlantsDestination(bestPlantZone);
-            destination_set = 1;
-        }
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, NULL);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
         }
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
-    case SOLAR_PANELS_ACTION:
+    case SOLAR_PANELS_ACTION: 
+        printf("Solar\n");
         //TODO
         break;
     default:
@@ -128,13 +131,11 @@ void returnToBaseStrategy(){
 };
 
 void defineBestAction(){
-    //fprintf(stderr,"check6\n");
     bestPlantZone = computeBestPlantsZone();
-    fprintf(stderr,"plant zone #%d \n",bestPlantZone->zoneID);
     if(bestPlantZone->numberOfPlants > 2){
-        fprintf(stderr,"action defined\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
+        
     }
     else{
         myActionChoice = SOLAR_PANELS_ACTION;
