@@ -373,6 +373,22 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
     /*
     case MOVE_FRONT_JARDINIERE:
     */
+    case MOVE_FORWARD_JARDINIERE:
+        printf("moveForwardJardiniere started\n");
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = GET_IN_JARDINIERE;
+            myControllerState = MOVING;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = MOVE_FORWARD_JARDINIERE;
+        }
+        else{
+            myGrabState = DROP_PLANTS;
+            destination_set = 0;
+            arrivedAtDestination = 0;
+        }
+    
 
     case DROP_PLANTS:
         printf("dropPlants started\n");
