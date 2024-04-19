@@ -180,9 +180,9 @@ void definePotsDestination(potZone* bestPotZone){
     }
     else{
         if(*myFilteredPos.y < *destination.y) {
-            *destination.theta = 180;
-        }else{
             *destination.theta = 0;
+        }else{
+            *destination.theta = 180;
         }
 
     }
