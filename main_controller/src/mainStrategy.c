@@ -178,9 +178,9 @@ void definePotsDestination(potZone* bestPotZone){
     *destination.x = bestPotZone->posX;
     *destination.y = bestPotZone->posY;
     if(*myFilteredPos.y < bestPlantZone->posY) {
-        *destination.theta = 180;
-    }else{
         *destination.theta = 0;
+    }else{
+        *destination.theta = 180;
     }
     pthread_mutex_unlock(&lockFilteredPosition);
 }
