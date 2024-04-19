@@ -111,15 +111,18 @@ void actionStrategy(){
         else{
             changeOfPlan = 1;
         }
-        //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
+        
     case PLANTS_POTS_ACTION:
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
-        else{
-            changeOfPlan = 1;
-        }
-        //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
+        if(nbrOfPots == 6){
+            if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);
+            else{
+                changeOfPlan = 1;
+            }
+        
         break;
+        }
+        
     case SOLAR_PANELS_ACTION: 
         printf("Solar\n");
         //TODO
@@ -174,14 +177,26 @@ void definePlantsDestination(plantZone* bestPlantZone){
 
 void definePotsDestination(potZone* bestPotZone){
     pthread_mutex_lock(&lockFilteredPosition);
-    
-    *destination.x = bestPotZone->posX;
-    *destination.y = bestPotZone->posY;
-    if(*myFilteredPos.y < bestPlantZone->posY) {
-        *destination.theta = 0;
-    }else{
-        *destination.theta = 180;
+    if(nbrOfPots == 6){
+        *destination.x = bestPotZone->targetPosition6X;
+        *destination.y = bestPotZone->targetPosition6Y;
     }
+    else{
+        *destination.x = bestPotZone->targetPosition5X;
+        *destination.y = bestPotZone->targetPosition5Y;
+    }
+    if(bestPotZone->zoneID > 3){
+        *destination.theta = 270;
+    }
+    else{
+        if(*myFilteredPos.y < *destination.y) {
+            *destination.theta = 0;
+        }else{
+            *destination.theta = 180;
+        }
+
+    }
+    
     pthread_mutex_unlock(&lockFilteredPosition);
 }
 

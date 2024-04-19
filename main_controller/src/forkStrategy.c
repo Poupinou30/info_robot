@@ -175,6 +175,12 @@ void manageGrabbing(plantZone* bestPlantZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
+                if(nbrOfPots == 6){
+                    myGrabState = MOVE_FRONT_POTS;
+                } 
+                else{
+                    myGrabState = GRAB_POTS_MOVE;
+                }
                 myGrabState = MOVE_FRONT_POTS;
                 destination_set = 0;
                 done1 = 0; done2 = 0; done3 = 0;

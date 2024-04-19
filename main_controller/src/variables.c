@@ -36,4 +36,5 @@ uint8_t startingPoint = 6;
 
 uint8_t changeOfPlan = 1;
 uint8_t forksCalibrated = 0;
+uint8_t nbrOfPots = 6;
 float timeFromStartOfMatch = 0;
