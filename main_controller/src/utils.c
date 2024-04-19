@@ -136,18 +136,14 @@ int initializeUART(){
     }
     return UART_handle;
 }
-void UART_send(int UART_handle, char* data){
-
-    char tempoChar[100] = "";
-    char tempoChar2[255] = "";
-    if(VERBOSE) printf("Sending '%s' by UART\n",data);
+uint8_t UART_send(int UART_handle, char* data){
+    if (VERBOSE) printf("Sending '%s' by UART\n", data);
     if(serWrite(UART_handle, data, strlen(data))!=0){
-        fprintf(stderr,"Error while writing \n");
+        fprintf(stderr,"Error while writing to UART\n");
+        return 0;
     }
-    else if(VERBOSE) printf("UART correctly sent\n");
-    
-
-}
+    else if (VERBOSE) printf("UART data sent successfully\n");
+    return 1;
 
 uint8_t UART_receive(int UART_handle, char* received){
     //printf("dans uart receive\n");
