@@ -84,6 +84,10 @@ typedef struct potZone{
     int zoneID;
     float posX;
     float posY;
+    float targetPosition5X;
+    float targetPosition5Y;
+    float targetPosition6X;
+    float targetPosition6Y;
     int numberOfPots;
 } potZone;
 
@@ -253,6 +257,7 @@ pthread_mutex_t lidarFlagLock;
 //STATES
 extern movingState myControllerState;
 extern uint8_t startingPoint;
+extern uint8_t nbrOfPots;
 
 void handle_sigint(int sig);
 
