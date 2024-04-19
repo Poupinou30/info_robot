@@ -432,6 +432,22 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             destination_set = 0;
         }
         break; 
+
+    case MOVE_SOLAR:
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = SOLARMOVE;
+            myControllerState = MOVING;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = MOVE_SOLAR;
+        }
+        else{
+            myGrabState = FINISHED;
+            destination_set = 0;
+        }
+        break;
+        
     case FINISHED:
         break;
 

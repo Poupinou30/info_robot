@@ -549,24 +549,7 @@ jardiniere* computeBestJardiniere(){
     return bestJardiniere;
 }
 
-solarpanel* computeBestSolarPanel(){
-    solarpanel* bestSolarPanel = &solarPanels[0];
-    int state = bestSolarPanel->state;
-    pthread_mutex_lock(&lockFilteredPosition);
-    float x = *myFilteredPos.x;
-    float y = *myFilteredPos.y;
-    pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, solarPanels[0].posX, solarPanels[0].posY);
 
-    for (int i = 1; i < 9; i++) {
-        if(solarPanels[i].state = myTeamColor){
-            if(computeEuclidianDistance(x, y, solarPanels[i].posX, solarPanels[i].posY) < smallestDistance){
-                bestSolarPanel = &solarPanels[i];
-            }
-        }
-    }
-    return bestSolarPanel;
-}
 
 endZone* computeBestEndZone(){
     endZone* bestEndZone = &endZones[3*myTeamColor];

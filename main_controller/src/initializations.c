@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-float solarOffset = 0.1;
+float solarOffset = 0.235;
 
 void initializePlantZones(){
     /*
@@ -170,76 +170,12 @@ void initializeJardinieres(){
     
 }
 
-void initializeSolarPanels(){
-    /*
-    LAYOUT:
-        0 1 2   3 4 5    6 7 8   
-
-	SP0 = 1.7824, 0.275
-	SP1 = 1.7824, 0.5
-	SP2 = 1.7824, 0.725
-	SP3 = 1.7824, 1.275
-	SP4 = 1.7824, 1.50
-	SP5 = 1.7824, 1.725
-	SP6 = 1.7824, 2.275
-	SP7 = 1.7824, 2.5
-	SP8 = 1.7824, 2.725
-
-    */
-
-    solarPanels = (solarpanel*)malloc(sizeof(solarpanel)*9);
-    solarPanels[0].panelID = 0;
-    solarPanels[0].posX = 1.7824;
-    solarPanels[0].posY = 0.275;
-    solarPanels[0].state = 2;
-
-    solarPanels[1].panelID = 1;
-    solarPanels[1].posX = 1.7824;
-    solarPanels[1].posY = 0.5;
-    solarPanels[1].state = 2;
-
-    solarPanels[2].panelID = 2;
-    solarPanels[2].posX = 1.7824;
-    solarPanels[2].posY = 0.725;
-    solarPanels[2].state = 2;
-
-    solarPanels[3].panelID = 3;
-    solarPanels[3].posX = 1.7824;
-    solarPanels[3].posY = 1.275;
-    solarPanels[3].state = 2;
-
-    solarPanels[4].panelID = 4;
-    solarPanels[4].posX = 1.7824;
-    solarPanels[4].posY = 1.5;
-    solarPanels[4].state = 2;
-
-    solarPanels[5].panelID = 5;
-    solarPanels[5].posX = 1.7824;
-    solarPanels[5].posY = 1.725;
-    solarPanels[5].state = 2;
-
-    solarPanels[6].panelID = 6;
-    solarPanels[6].posX = 1.7824;
-    solarPanels[6].posY = 2.275;
-    solarPanels[6].state = 2;
-
-    solarPanels[7].panelID = 7;
-    solarPanels[7].posX = 1.7824;
-    solarPanels[7].posY = 2.5;
-    solarPanels[7].state = 2;
-
-    solarPanels[8].panelID = 8;
-    solarPanels[8].posX = 1.7824;
-    solarPanels[8].posY = 2.725;
-    solarPanels[8].state = 2;
-}
-
 void initializeSolarZones(){
     /*layout
     
 
          zone 0     zone 1     zone 2
-        1  2  3    4  5  6    7  8  9
+        0  1  2    3  4  5     6  7  8
     
     */
     solarZones = (solarZone*)malloc(sizeof(solarZone)*3);

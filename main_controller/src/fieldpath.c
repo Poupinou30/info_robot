@@ -704,6 +704,26 @@ void myPotentialFieldController(){
                         outputSpeed[2] = 0;
                     }
                     break;
+                case (SOLARMOVE):
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.650){
+                        destination_set = 0;
+                        arrivedAtDestination = 1;
+                        myControllerState = STOPPED;
+                    }else{
+                        if(myTeamColor == 0)
+                        {
+                            outputSpeed[0] = 0; 
+                            outputSpeed[1] = - GRAB_SPEED;
+                            outputSpeed[2] = 0;
+                        }
+                        else
+                        {
+                            outputSpeed[0] = 0; 
+                            outputSpeed[1] = GRAB_SPEED;
+                            outputSpeed[2] = 0;
+                        }
+                    }
+                    break;
                 }  
             }
             break;
