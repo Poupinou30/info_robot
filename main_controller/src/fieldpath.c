@@ -586,8 +586,8 @@ void computeForceVector(){
                 else sign_f_rep_y = 1;
                 if(tempoObstacle->moving) k_reduc_repul = 1;
                 else{
-                    if(distanceFromDest < 0.15){
-                        k_reduc_repul = 0.3; 
+                    if(distanceFromDest < 0.20){
+                        k_reduc_repul = distanceFromDest+0.01/0.20; 
                     } 
                     else k_reduc_repul = 1;
                 } 
