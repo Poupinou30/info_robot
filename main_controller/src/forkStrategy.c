@@ -74,11 +74,11 @@ void manageGrabbing(plantZone* bestPlantZone){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            if(!done0) done0 = setGripperPosition(0);
-            if(!done1&&done0) done1 = deployForks();
+            //if(!done0) done0 = setGripperPosition(0);
+            if(!done1/*&&done0*/) done1 = deployForks();
             if(!done2 && done1) done2 = done1 && setLowerFork(69);
             if(!done3 && done2) done3 = done2 && setUpperFork(0);
-            if(done0 && done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
+            if(/*done0 &&*/ done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
         
         case WAITING_ACTUATORS:
@@ -385,9 +385,10 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = MOVING;
         }
         if(arrivedAtDestination && lidarAcquisitionFlag){
-            myGrabState = MOVE_FORWARD_JARDINIERE;
+            myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
+            destination_set = 0;
             printf("move<frontJardiniere> done\n");
         } 
         break;

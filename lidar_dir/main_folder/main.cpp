@@ -372,7 +372,7 @@ void* beacon_data(void* argument){
 
                     //printf("Angle horlogique = %f %f %f \n" ,angle_horlogique0, angle_horlogique1, angle_horlogique2);
 
-                    printf("angle horlogique = %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f \n dx = %f et dy = %f \n",angle_horlogique0,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
+                    //printf("angle horlogique = %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f \n dx = %f et dy = %f \n",angle_horlogique0,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
                     //printf("Position actuelle = %f %f %f \n",filteredPos.x,filteredPos.y,filteredPos.theta);
 
 
@@ -459,7 +459,7 @@ void* beacon_data(void* argument){
                     distanceToCenter = pow((object.x-1)*(object.x-1)+(object.y-1.5)*(object.y-1.5),0.5);
 
                     //printf("distanceToCenter = %f\n",distanceToCenter);
-                    score = 3/(distanceToCenter+0.5) + 1/(newd[k]+0.5);
+                    score = 3/(distanceToCenter+0.5) + 2/(newd[k]+0.5);
                     if(object.x < 1.87 && object.x > 0.13 && object.y < 2.87 && object.y > 0.13 && score>previousScore){
                         //printf("PotentialOpponent at %f %f \n",object.x,object.y);
                         //if(verbose) fprintf(stderr, "opponent added \n");
