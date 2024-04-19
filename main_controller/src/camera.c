@@ -26,7 +26,7 @@ int main(){
     //int x, y, z;
     float coordinates[6][3];
     int num_sublists = 0;
-    fp = popen("python3 agUrco.py", "r");//on ouvre le fichier python
+    fp = popen("python3 Aruco.py", "r");//on ouvre le fichier python
     if(fp == NULL){
         printf("Attention le code python run pas \n");
         return 1;
@@ -63,60 +63,6 @@ int main(){
    for(int i = 0; i < num_sublists;i++){
         printf("Sublist %d : (%.6f, %.6f, %.6f)\n", i+1, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
    }     
-        /*
-        if(sscanf(path, "%f %f %f", &x, &y, &z)==3){
-            printf("Received coord: (%.6f, %.6f, %.6f)\n", x, y, z);
-        }else {
-            printf("Error: Failed to parse coord from input.\n");
-        }
-        
-        token = strtok(path, "\n");
-        printf("token: %s\n", token);
-        float coord_list[3]={};
-        int counter=0;
-        //printf("token: %s\n, %d", token);
-        
-        while (token!=NULL && counter <3){
-            printf("ici counter %d", counter);
-            errno = 0;
-            if(counter ==0){
-                x=strtof(token, NULL);
-                printf("%f", x);
-            }
-            else if(counter ==1){
-                y=strtof(token, NULL);
-            }
-            else if(counter ==2){
-                z=strtof(token, NULL);
-            }
-            if(errno !=0){
-                perror("strtof");
-            }
-            
-            token = strtok(NULL, " ");
-            
-            //float float_val= strtof(token, NULL);
-            //printf("Received float value : %.6f\n", float_val);
-            //coord_list[counter]=float_val;
-            counter+=1;
-            * 
-        */   
-        
-        //printf("Received coord: (%.6f, %.6f, %.6f)\n", x, y, z);
-        //printf("%d \n", counter);
-        //printf("la liste: %f, %f, %f \n", coord_list[0], coord_list[1], coord_list[2]);
-        
-        /*
-        //int x, y, z;
-        if(sscanf(path, "%f %f %f", &x, &y, &z)==3){
-            printf("Received coordinates : (%f, %f, %f)\n", x, y, z);
-            //coord_list[0]=x;
-            //coord_list[1]=y;
-            //coord_list[2]=z;
-        */
-        
-    
-    
     pclose(fp);
     return 0;
 }

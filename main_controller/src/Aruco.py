@@ -3,7 +3,102 @@
 import cv2
 import numpy as np
 
-def data_cam():
+def detect_tags():
+	cap=cv2.VideoCapture(0)
+	if not cap.isOpened():
+		print("ERROR:la camera ne s'ouvre pas")
+		return
+	ret,frame = cap.read()
+	if not ret:
+		print("ERROR:la capture d'image ne se lance pas")
+		cap.release()
+		return
+	aruco_dict= cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
+	parameters = cv2.aruco.DetectorParameters_create()
+	fx=500
+	fy=500
+	cx=320
+	cy=240
+	mtx = np.array([[fx, 0, cx], [0, fx, cy], [0,0,1]])
+	dist = np.zeros((4,1))
+	
+	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+	corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+	coordinate=[]
+	if ids is not None:
+		print("il y a " + str(len(ids)) + "plantes !")
+		
+		markerSizeInM=0.02
+		rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
+		for i in range(len(ids)):
+			if(ids[i][0]==13 or ids[i][0]==36):
+				angle=rvec[i][0][0]*(180.0/np.pi)
+				if(angle<=140 and angle>=60 or angle<=-60 and angle>=-140):
+					#print("la plante est de traviole attention")
+					trav.append(i)
+				coord=[]
+				coord.append(tvec[i][0].tolist())
+				print(coord[0])
+				#coord.append(rvec[i][0].tolist())
+			#print(coord)
+			coordinate.append(coord[0])
+			#print(str(coord)+" \n")
+		if(len(ids)!=0):
+			return coordinate
+	else:
+		print("Pas de plante")
+		print(coordinate)
+		return coordinate
+		
+
+
+def data_cam(img_path):
+	cap=cv2.VideoCapture(0)
+	if not cap.isOpened():
+		print("ERROR:la camera ne s'ouvre pas")
+		return
+	ret,frame = cap.read()
+	if not ret:
+		print("ERROR:la capture d'image ne se lance pas")
+		cap.release()
+		return
+	cv2.imwrite(img_path, frame)
+	cap.release()
+	
+def calcul_aruco(img_path):
+	image=cv2.imread(img_path)
+	aruco_dict= cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
+	parameters = cv2.aruco.DetectorParameters_create()
+	fx=500
+	fy=500
+	cx=320
+	cy=240
+	mtx = np.array([[fx, 0, cx], [0, fx, cy], [0,0,1]])
+	dist = np.zeros((4,1))
+	
+	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+	#mask = np.zeros_like(frame)
+	trav=[]
+	
+	if ids is not None :
+		print("Y a des plantes")
+		#print("il y a " + str(len(ids)) + " plantes")
+		cv2.aruco.drawDetectedMarkers(image, corners, ids)
+		coordinate=[]#ICI POUR LES COORDS DE TOUTES LES PLANTES
+		markerSizeInM=0.02
+		rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
+		"""
+		cv2.imshow('Detected Aruco!', image)
+		cv2.waitKey(0)
+		cv2.destroyAllWindows()
+		"""
+		
+	else:
+		print("Y a pas de plante?")
+	
+	
+def data_cam_old():
 	
 	cap= cv2.VideoCapture(0)
 	aruco_dict= cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
@@ -146,20 +241,21 @@ def data_cam():
 	
 
 if __name__ == "__main__":
+	
+	detect_tags()
+	#ça c'est si tu veux store
+	"""
+	img_path= 'test.jpg'
+	data_cam(img_path)
+	calcul_aruco(img_path)
+	print("ça marche")
+	"""
+	#Ne pas enlever c'est la séquence de transfert
+	"""
 	coordinates= data_cam()
 	
-	#print(coordinates)
 	for coord in coordinates: 
 		coord_string = "[" + ", ".join(map(str, coord)) + "]" 
 		print(coord_string)
+	"""
 	
-	#for coord in coordinates:
-	#	coord_string = " ".join(map(str, coord))
-	#	print(coord_string)
-	
-	#for i in range (len(coordinates)):
-		
-	#print(str(coordinates)) #[0][0][2]
-	#print(coordinates)
-	#coordinates = 1
-	#print("ok")
