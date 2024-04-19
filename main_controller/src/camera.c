@@ -6,7 +6,26 @@
 #include <errno.h>
 #define MAX_LINE_LENGTH 256
 
+
 int main(){
+    FILE *fp;
+    char  path[256];
+    char num_plants[100];
+    fp = popen("python3 Aruco.py", "r");
+    if(fp==NULL){
+        printf("Attention le code python run pas \n");
+        return 1;
+    }    
+    if(fgets(path, sizeof(path), fp) != NULL){
+        printf("Donnee venant du fichier python : %s \n", path);
+        strcpy(num_plants, path);
+    }
+    pclose(fp);
+    printf("Donnee venant du fichier python : %s \n", num_plants);
+    return 0;
+}
+
+int main2(){
     /*
     int code= system(cam.cpp);
 

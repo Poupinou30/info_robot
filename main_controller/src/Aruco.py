@@ -2,15 +2,16 @@
 
 import cv2
 import numpy as np
+import sys
 
 def detect_tags():
 	cap=cv2.VideoCapture(0)
 	if not cap.isOpened():
-		print("ERROR:la camera ne s'ouvre pas")
+		#print("ERROR:la camera ne s'ouvre pas")
 		return
 	ret,frame = cap.read()
 	if not ret:
-		print("ERROR:la capture d'image ne se lance pas")
+		#print("ERROR:la capture d'image ne se lance pas")
 		cap.release()
 		return
 	aruco_dict= cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
@@ -26,7 +27,7 @@ def detect_tags():
 	corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 	coordinate=[]
 	if ids is not None:
-		print("il y a " + str(len(ids)) + "plantes !")
+		#print("il y a " + str(len(ids)) + "plantes !")
 		
 		markerSizeInM=0.02
 		rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, markerSizeInM,mtx,dist)
@@ -38,17 +39,15 @@ def detect_tags():
 					trav.append(i)
 				coord=[]
 				coord.append(tvec[i][0].tolist())
-				print(coord[0])
+				#print(coord[0])
 				#coord.append(rvec[i][0].tolist())
 			#print(coord)
 			coordinate.append(coord[0])
 			#print(str(coord)+" \n")
-		if(len(ids)!=0):
-			return coordinate
-	else:
-		print("Pas de plante")
-		print(coordinate)
-		return coordinate
+	#else:
+		#print("Pas de plante")
+		#print(coordinate)
+	return len(coordinate)
 		
 
 
@@ -242,7 +241,7 @@ def data_cam_old():
 
 if __name__ == "__main__":
 	
-	detect_tags()
+	sys.stdout.write(str(detect_tags()))
 	#ça c'est si tu veux store
 	"""
 	img_path= 'test.jpg'
