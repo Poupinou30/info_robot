@@ -21,7 +21,7 @@
 
 #endif //MAIN_CONTROLLER_HEADERS_H
 #define VERBOSE 1
-#define timeDelay 100 //ms
+#define timeDelay 30 //ms
 #define makeLog 1
 
 #define matchDuration 90 //seconds

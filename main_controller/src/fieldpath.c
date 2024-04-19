@@ -7,6 +7,8 @@
 
 float fixActionDistance = 0.3;
 float mobileActionDistance = 0.4;
+float myDistanceList[10] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
+float myErrorList[10] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
 
 float computeEuclidianDistance(double x1, double y1, double x2, double y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
@@ -405,22 +407,29 @@ void computeForceVector(){
     
 
     //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
+
+
+    //ROTATING LIST POUR MOYENNE
+    for (int i = 0; i < 9; ++i) {
+        myDistanceList[i] = myDistanceList[i+1];
+        myErrorList[i] = myErrorList[i+1];
+    }
+    myDistanceList[9] = distanceFromDest;
+    myErrorList[9] = error;
+
+    float averageDistanceFromDest = 0;
+    float averageError = 0;
+    for(int i = 0; i<10; i++ ){
+        averageDistanceFromDest+=myDistanceList[i];
+        averageError += myErrorList[i];
+    }
+    averageDistanceFromDest = averageDistanceFromDest/10;
+    averageError = averageError/10;
     
 
-    if(computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y) < 0.01 && fabs(error) < 1){
-        if(startOfArrival.tv_sec == 0 && startOfArrival.tv_usec == 0){
-            gettimeofday(&startOfArrival,NULL);
-        }
-        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.1){ // marche mieux qd on perds une balise? trop d'oscillation avec le lidar?
-            printf("arrived at destination \n");
-            arrivedAtDestination = 1;
-        }
-        //myControllerState = STOPPED;
+    if(averageDistanceFromDest < 0.01 && fabs(averageError) < 1){
+        arrivedAtDestination = 1;
         
-    }
-    else{
-        startOfArrival.tv_sec = 0;
-        startOfArrival.tv_usec = 0;
     }
     pthread_mutex_unlock(&lockFilteredPosition); 
     pthread_mutex_unlock(&lockDestination);
