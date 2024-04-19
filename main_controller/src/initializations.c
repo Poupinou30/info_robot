@@ -121,6 +121,7 @@ void initializePotZones(){
     potZones[5].numberOfPots = 6;
 }
 void initializeJardinieres(){
+    float marge = 0.015;
     /*
     LAYOUT:
           0         3
@@ -138,33 +139,33 @@ void initializeJardinieres(){
     */	
     jardinieres = (jardiniere*)malloc(sizeof(jardiniere)*6);
     jardinieres[0].zoneID = 0;
-    jardinieres[0].posX = 0.12;
+    jardinieres[0].posX = 0.12+marge;
     jardinieres[0].posY = 0.7625;
     jardinieres[0].numberOfPlants = 0;
 
     jardinieres[1].zoneID = 1;
     jardinieres[1].posX = 0.6125;
-    jardinieres[1].posY = 0.12;
+    jardinieres[1].posY = 0.12+marge;
     jardinieres[1].numberOfPlants = 0;
 
     jardinieres[2].zoneID = 2;
     jardinieres[2].posX = 1.3875;
-    jardinieres[2].posY = 2.88;
+    jardinieres[2].posY = 2.88-marge;
     jardinieres[2].numberOfPlants = 0;
 
     jardinieres[3].zoneID = 3;
-    jardinieres[3].posX = 0.12;
+    jardinieres[3].posX = 0.12+marge;
     jardinieres[3].posY = 2.2375;
     jardinieres[3].numberOfPlants = 0;
 
     jardinieres[4].zoneID = 4;
     jardinieres[4].posX = 0.6125;
-    jardinieres[4].posY = 2.88;
+    jardinieres[4].posY = 2.88-marge;
     jardinieres[4].numberOfPlants = 0;
 
     jardinieres[5].zoneID = 5;
     jardinieres[5].posX = 1.3875;
-    jardinieres[5].posY = 0.12;
+    jardinieres[5].posY = 0.12+marge;
     jardinieres[5].numberOfPlants = 0;
     
 }

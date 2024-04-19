@@ -4,7 +4,7 @@
 #endif
 
 #define GRAB_SPEED 0.2
-#define POT_SPEED 0.05
+#define POT_SPEED 0.1
 
 float fixActionDistance = 0.3;
 float mobileActionDistance = 0.4;
@@ -433,7 +433,7 @@ void computeForceVector(){
     averageError = averageError/20;
     
 
-    if(averageDistanceFromDest < 0.015 && fabs(averageError) < 0.7){
+    if(averageDistanceFromDest < 0.015 && fabs(averageError) < 1){
         arrivedAtDestination = 1;
         
     }
@@ -659,7 +659,7 @@ void myPotentialFieldController(){
 
                 case (Y_Align_Pots):
                     
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.35*POTWIDTH){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.4*POTWIDTH){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;

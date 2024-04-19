@@ -14,8 +14,10 @@ uint8_t actuator_reception;
 int done = 0;
 uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0;
 char receivedData[255];
+potZone* bestPotZone;
+jardiniere* bestJardiniere;
 
-void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
+void manageGrabbing(plantZone* bestPlantZone){
 
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     
@@ -30,7 +32,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination){
+        if(arrivedAtDestination && lidarAcquisitionFlag){
             myGrabState = GRAB_PLANTS_INIT;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
@@ -188,7 +190,8 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
     case MOVE_FRONT_POTS: // else *****
         printf("moveFrontPots started\n");
         if(destination_set == 0){
-            
+
+            computeBestPotsZone();
             definePotsDestination(bestPotZone);
             destination_set = 1;
             myControllerState = MOVING;
@@ -360,7 +363,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = DROP_PLANTS; // changer vers un Move_Front_jardiniere
+                myGrabState = MOVE_FRONT_JARDINIERE; // changer vers un Move_Front_jardiniere
                 receivedData[0] = '\0';
                 actuator_reception = 0;
                 done1 = 0; done2 = 0; done3 = 0;
@@ -370,9 +373,25 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         break;
 
     // ajouter le Move_Front_jardiniere (aller jusqu'en jardiniere)
-    /*
+
     case MOVE_FRONT_JARDINIERE:
-    */
+        if(destination_set != 1){
+
+            bestJardiniere = computeBestJardiniere();
+            defineJardiniereDestination(bestJardiniere);
+            destination_set = 1;
+            myMoveType = DISPLACEMENT_MOVE;
+            fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
+            myControllerState = MOVING;
+        }
+        if(arrivedAtDestination && lidarAcquisitionFlag){
+            myGrabState = MOVE_FORWARD_JARDINIERE;
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
+            printf("move<frontJardiniere> done\n");
+        } 
+        break;
+
     case MOVE_FORWARD_JARDINIERE:
         printf("moveForwardJardiniere started\n");
         if(destination_set == 0){
@@ -431,7 +450,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = FINISHED;
+                myGrabState = MOVE_BACK_JARDINIERE;
                 receivedData[0] = '\0';
                 actuator_reception = 0;   
             } 
@@ -439,6 +458,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         }
         break;
     case MOVE_BACK_JARDINIERE:
+        printf("moveBackJardiniere started destination_set = %d et arrivedAtDestination = %d\n", destination_set,arrivedAtDestination);
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GET_BACK_JARDINIERE;
@@ -448,11 +468,12 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             myGrabState = MOVE_BACK_JARDINIERE;
         }
         else{
-            myGrabState = LIFT_POTS;
+            myGrabState = FINISHED;
             destination_set = 0;
         }
         break; 
     case FINISHED:
+        //changeOfPlan = 1;
         break;
 
     default:
