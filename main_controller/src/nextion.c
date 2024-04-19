@@ -88,49 +88,6 @@ uint8_t UART_receive(int UART_handle, char* received){
     return 0;
 }
 
-uint8_t recvWithStartEndMarkers() {
-  static bool recvInProgress = false;
-  static uint8_t ndx = 0;
-  char startMarker[1] = {start_char[0]};  // '<'
-  char endMarker[1] = {end_char[0]};      // '>'
-  char rc[1];
-
-  //while (serialDataAvail (UART_handle)) {
-    printf("in rec\n");
-    int bytesRead = serRead(UART_handle, rc, 1);
-    if (bytesRead < 0) {
-        fprintf(stderr, "Error reading from UART.\n");
-        return 0; // Return 0 to indicate failure
-    }
-
-    printf("Char received : %c\n", rc);
-    if (recvInProgress == true) {
-      if (strcmp(rc, startMarker) != 0) {
-        receivedChars[ndx] = rc[0];
-        ndx++;
-        if (ndx >= NUM_CHARS) {
-          ndx = NUM_CHARS - 1;
-        }
-      } else {
-        receivedChars[ndx] = '\0';  // terminate the string
-        recvInProgress = false;
-        ndx = 0;
-        newData = true;
-        //DBG_PRINTF("Message received: %s\n", receivedChars);
-      }
-    } else if (strcmp(rc, startMarker) == 0) {
-      recvInProgress = true;
-    }
-
-    // Check if we have a complete command
-    if (newData) {
-      handleCommand(receivedChars);  // Handle the command
-      newData = false;  // Reset newData flag for the next command
-    }
-  //}
-  return 1;
-}
-
 void handleCommand(char *string) {
 
     char identifier[50];  // Buffer for the identifier

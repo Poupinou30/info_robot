@@ -567,6 +567,7 @@ endZone* computeBestEndZone(){
     return bestEndZone;
 }
 
+/*
 plantType* cameraConfirmation(){
     plantType *plantType = (plantType*)malloc(sizeof(plantType)) 
     for(int i = 1; i < numberPlants; i++){
@@ -684,3 +685,5 @@ uint8_t areOverlapping(float xc, float yc, float x, float y, float r2, float *ov
 
     return 0;
 }
+
+*/

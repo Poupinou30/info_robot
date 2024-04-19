@@ -334,10 +334,7 @@ extern int UART_handle_nextion;
 extern int UARTReception;
 
 // Serial input variables
-char start_char[1] = {'<'};
-char end_char[1] = {'>'};
 char receivedChars[NUM_CHARS];
-bool newData = false;
 
 char myTeam[10] = "";
 char myPage[25] = "";
@@ -364,7 +361,6 @@ int initializeUART_nextion();
 uint8_t UART_send(int UART_handle, char* data);
 uint8_t UART_send_commands(int UART_handle, char* data);
 uint8_t UART_receive(int UART_handle, char* received);
-uint8_t recvWithStartEndMarkers();
 void handleCommand(char *string);
 Queue* createQueue();
 void enqueue(Queue* q, const char* value);
