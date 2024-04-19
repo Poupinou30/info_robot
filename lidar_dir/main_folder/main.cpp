@@ -372,7 +372,7 @@ void* beacon_data(void* argument){
 
                     //printf("Angle horlogique = %f %f %f \n" ,angle_horlogique0, angle_horlogique1, angle_horlogique2);
 
-                    //printf("angle horlogique = %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f \n dx = %f et dy = %f \n",angle_horlogique0,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
+                    //printf("angle horlogique = %f %f %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f\n dx = %f et dy = %f \n",angle_horlogique0,angle_horlogique1,angle_horlogique2,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
                     //printf("Position actuelle = %f %f %f \n",filteredPos.x,filteredPos.y,filteredPos.theta);
 
 
@@ -405,7 +405,7 @@ void* beacon_data(void* argument){
             
             }
             if(beaconFound){
-
+                //printf("angle horlogique = %f %f %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f\n dx = %f et dy = %f \n",angle_horlogique0,angle_horlogique1,angle_horlogique2,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
                 //fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f perimetre = %f, dij = %f, djk = %f dik = %f  \n",bestBeaconTab[0].angle,bestBeaconTab[0].distance,bestBeaconTab[0].width,bestBeaconTab[1].angle,bestBeaconTab[1].distance,bestBeaconTab[1].width,bestBeaconTab[2].angle,bestBeaconTab[2].distance,bestBeaconTab[2].width, oldPerimetre,distance(bestBeaconTab[0].angle,bestBeaconTab[1].angle,bestBeaconTab[0].distance,bestBeaconTab[1].distance),distance(bestBeaconTab[1].angle,bestBeaconTab[2].angle,bestBeaconTab[1].distance,bestBeaconTab[2].distance),distance(bestBeaconTab[0].angle,bestBeaconTab[2].angle,bestBeaconTab[0].distance,bestBeaconTab[2].distance) );
                 if(verbose) printf("triangle: %f \n", oldPerimetre);
                 pthread_mutex_lock(&positionLock);
@@ -419,7 +419,8 @@ void* beacon_data(void* argument){
             //fprintf(stderr,"myX = %f and myY = %d \n", myX,myY);
             //Calcul angle augustin
             float alpha;
-            if(myColor == BLUE) alpha = 180-(360-bestBeaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
+            //if(myColor == BLUE) alpha = 180-(360-bestBeaconTab[0].angle) - atan(*myX/(*myY))*RAD2DEG;
+            if(myColor == BLUE) alpha = 180-(360-bestBeaconTab[0].angle) - atan((*myX - beaconRefPosition[0].x) / (*myY - beaconRefPosition[0].y))*RAD2DEG;
             else alpha = 360-((360 - bestBeaconTab[0].angle) + atan((*myX - beaconRefPosition[0].x) / (*myY - beaconRefPosition[0].y)) * RAD2DEG);
 
             if(alpha<0) alpha = alpha+360;

@@ -27,6 +27,7 @@ void manageGrabbing(plantZone* bestPlantZone){
 
         if(destination_set != 1){
             definePlantsDestination(bestPlantZone);
+            removeObstacle(bestPlantZone->obstacleID);
             destination_set = 1;
             myMoveType = DISPLACEMENT_MOVE;
             fprintf(stderr, "before moving \n");

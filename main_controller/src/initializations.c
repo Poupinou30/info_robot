@@ -24,6 +24,7 @@ void initializePlantZones(){
     plantZones[0].targetPositionLowY = plantZones[0].posY - 0.405;
     plantZones[0].targetPositionUpX = plantZones[0].posX;
     plantZones[0].targetPositionUpY = plantZones[0].posY + 0.405;
+    plantZones[0].obstacleID = 11;
 
     plantZones[1].zoneID = 1;
     plantZones[1].numberOfPlants = 6;
@@ -33,6 +34,7 @@ void initializePlantZones(){
     plantZones[1].targetPositionLowY = plantZones[1].posY - 0.405;
     plantZones[1].targetPositionUpX = plantZones[1].posX;
     plantZones[1].targetPositionUpY = plantZones[1].posY + 0.405;
+    plantZones[1].obstacleID = 12;
 
     plantZones[2].zoneID = 2;
     plantZones[2].numberOfPlants = 6;
@@ -41,7 +43,8 @@ void initializePlantZones(){
     plantZones[2].targetPositionLowX = plantZones[2].posX;
     plantZones[2].targetPositionLowY = plantZones[2].posY - 0.405;
     plantZones[2].targetPositionUpX = plantZones[2].posX;
-    plantZones[2].targetPositionUpY = plantZones[2].posY + 0.405;  
+    plantZones[2].targetPositionUpY = plantZones[2].posY + 0.405; 
+    plantZones[2].obstacleID = 13; 
 
     plantZones[3].zoneID = 3;
     plantZones[3].numberOfPlants = 6;
@@ -51,6 +54,7 @@ void initializePlantZones(){
     plantZones[3].targetPositionLowY = plantZones[3].posY - 0.405;
     plantZones[3].targetPositionUpX = plantZones[3].posX;
     plantZones[3].targetPositionUpY = plantZones[3].posY + 0.405;
+    plantZones[3].obstacleID = 14;
 
     plantZones[4].zoneID = 4;
     plantZones[4].numberOfPlants = 6;
@@ -60,6 +64,7 @@ void initializePlantZones(){
     plantZones[4].targetPositionLowY = plantZones[4].posY - 0.405;
     plantZones[4].targetPositionUpX = plantZones[4].posX;
     plantZones[4].targetPositionUpY = plantZones[4].posY + 0.405;
+    plantZones[4].obstacleID = 15;
 
     plantZones[5].zoneID = 5;
     plantZones[5].numberOfPlants = 6;
@@ -69,6 +74,7 @@ void initializePlantZones(){
     plantZones[5].targetPositionLowY = plantZones[5].posY - 0.405;
     plantZones[5].targetPositionUpX = plantZones[5].posX;
     plantZones[5].targetPositionUpY = plantZones[5].posY + 0.405;
+    plantZones[5].obstacleID = 16;
 }
 
 void initializePotZones(){

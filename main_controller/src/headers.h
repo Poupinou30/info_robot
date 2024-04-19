@@ -47,6 +47,7 @@ typedef struct obstacle{
     uint8_t isRectangle;
     float x1,x2,y1,y2;
     int obstacleID;
+    uint8_t obstacleEnabled;
 } obstacle;
 
 
@@ -78,6 +79,7 @@ typedef struct plantZone{
     float targetPositionLowY;
     float targetPositionUpX;
     float targetPositionUpY;
+    int obstacleID;
 } plantZone;
 
 typedef struct potZone{
@@ -85,6 +87,7 @@ typedef struct potZone{
     float posX;
     float posY;
     int numberOfPots;
+    int obstacleID;
 } potZone;
 
 typedef struct jardiniere{
