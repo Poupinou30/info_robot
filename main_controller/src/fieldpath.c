@@ -366,8 +366,9 @@ void computeForceVector(){
     
     float k_att_xy = 0.5;
     float k_att_tang = 0.1;
-    k_att_xy = k_att_xy * (1+ 1/(0.8+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_xy = k_att_xy * (1+ 1/(0.6+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
+    
     float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
@@ -647,14 +648,14 @@ void myPotentialFieldController(){
                             myControllerState = STOPPED;
                         }else{
                             outputSpeed[0] = + 1.5 * POT_SPEED; 
-                            outputSpeed[1] = - 2.5 * POT_SPEED;
+                            outputSpeed[1] = - 2 * POT_SPEED;
                             outputSpeed[2] = 0;
                         }
                     break;
 
                 case (Y_Align_Pots):
                     
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.5*POTWIDTH){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1*POTWIDTH){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
@@ -667,7 +668,7 @@ void myPotentialFieldController(){
 
                 case (X_Align_Pots):
                         
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.5 * POTWIDTH){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1 * POTWIDTH){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;

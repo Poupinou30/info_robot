@@ -79,13 +79,13 @@ void* updateKalman(void* args) {
 
     // Combinaison des mesures des deux capteurs
     pthread_mutex_lock(&lidarTimeLock);
-    if(lidarElapsedTime < 150){
+    if(lidarElapsedTime < 150 && myMoveType != GRABBING_MOVE){ //On prend le lidar en compte
         for(int i = 0; i < 3; i++){
             measurementsCombined[i] = measurements[i];
             measurementsCombined[i+3] = secondSensorMeasurement[i];
         }
     }
-    else{
+    else{ //On prend que l'odométrie
         for(int i = 0; i < 3; i++){
             measurementsCombined[i] = secondSensorMeasurement[i];
             measurementsCombined[i+3] = secondSensorMeasurement[i];

@@ -311,7 +311,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
 
     // faut ajouter la transistions ALIGN_POTS_MOVE (1st row vers aligned)
     case ALIGN_POTS_MOVE: // 1st row vers aligned sur le ppt
-        printf("alignPotsMove started\n");
+        printf("alignPotsMove started and destination_set = %d arrivedAtDestination = %d\n", destination_set,arrivedAtDestination);
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = X_Align_Pots;
