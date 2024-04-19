@@ -184,7 +184,6 @@ void myOdometry();
 //UART ET SPI et I2C
 uint8_t UART_send(int UART_handle, char* data);
 uint8_t UART_receive(int UART_handle, char* received);
-extern int UARTReception;
 extern uint8_t waitingForReception;
 int I2C_initialize(int address);
 void I2C_send(char* data,char* received, int I2C_handle);
@@ -298,7 +297,7 @@ extern uint8_t changeOfPlan;
 teamColor myTeamColor;
 
 struct timeval startOfMatch;
-uint8_t nextionStart;
+extern uint8_t nextionStart;
 
 // fonctions de Jeu
 void initializePlantZones();
@@ -330,11 +329,10 @@ uint8_t forksCalibrated;
 //Nextion
 ////////////////////////////////////
 
-int UART_handle_nextion;
-int UARTReception;
+extern int UART_handle_nextion;
 
 // Serial input variables
-char receivedChars[NUM_CHARS];
+extern char receivedChars[NUM_CHARS];
 
 extern char myTeam[10];
 extern char myPage[25];
@@ -353,19 +351,19 @@ typedef struct Queue {
     Node* rear;
 } Queue;
 
-Queue* q;
+extern Queue* q;
 
-struct timeval startInitialization, endQueue;
+extern struct timeval startInitialization, endQueue;
 
 int initializeUART_nextion();
 uint8_t UART_send_commands(int UART_handle, char* data);
-void handleCommand(char *string);
+void handleCommand(int UART_handle, char *string);
 Queue* createQueue();
 void enqueue(Queue* q, const char* value);
 char* dequeue(Queue* q);
 void display(Queue* q);
 void map_coordinates(float x_meters, float y_meters, char* x_map, char* y_map, int player);
-void nextion_communication();
+void nextion_communication(int UART_handle);
 
 //Score
 

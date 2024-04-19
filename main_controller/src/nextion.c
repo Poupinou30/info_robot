@@ -6,14 +6,14 @@ struct timeval now;
 int initializeUART_nextion(){
     int baud_rate = 9600;
     
-    UART_handle = serOpen("/dev/ttyAMA0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
-    if (UART_handle < 0){
+    UART_handle_nextion = serOpen("/dev/ttyAMA0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
+    if (UART_handle_nextion < 0){
         fprintf(stderr, "Erreur lors de l'ouverture de la connexion UART.\n");
         exit(1);    // Exit the program in case of error
     }
 
     struct termios tty;
-    if(tcgetattr(UART_handle, &tty) != 0) {
+    if(tcgetattr(UART_handle_nextion, &tty) != 0) {
         perror("Failed to get attributes of the serial port");
         return 1;
     }
@@ -37,12 +37,12 @@ int initializeUART_nextion(){
     tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
     tty.c_iflag &= ~(IGNBRK|BRKINT|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
 
-    if (tcsetattr(UART_handle, TCSANOW, &tty) != 0) {
+    if (tcsetattr(UART_handle_nextion, TCSANOW, &tty) != 0) {
         perror("Error from tcsetattr");
         return 1;
     }
 
-    return UART_handle;
+    return UART_handle_nextion;
 }
 
 uint8_t UART_send_commands(int UART_handle, char* data){
@@ -54,7 +54,7 @@ uint8_t UART_send_commands(int UART_handle, char* data){
     return 1;
 }
 
-void handleCommand(char *string) {
+void handleCommand(int UART_handle,char *string) {
 
     char identifier[50];  // Buffer for the identifier
     int value;            // Integer to store the extracted number
@@ -99,7 +99,7 @@ void handleCommand(char *string) {
 }
 
 Queue* createQueue() {
-    Queue* q = (Queue*) malloc(sizeof(Queue));
+    q = (Queue*) malloc(sizeof(Queue));
     q->front = q->rear = NULL;
     return q;
 }
@@ -187,7 +187,7 @@ void map_coordinates(float x_meters, float y_meters, char* x_map, char* y_map, i
 }
 
 // quand on appelle cette fonction toute les 30ms il faudra aussi qu'on ait bien la valeur now
-void nextion_communication(){
+void nextion_communication(int UART_handle){
 
     gettimeofday(&now, NULL);
     double nowValue = now.tv_sec*1000+now.tv_usec/1000;
@@ -256,7 +256,7 @@ void nextion_communication(){
         }
         if (UART_receive(UART_handle, receivedChars)){
             printf("received char : %s\n", receivedChars);
-            handleCommand(receivedChars);
+            handleCommand(UART_handle, receivedChars);
             receivedChars[0] = '\0';
         }
     }

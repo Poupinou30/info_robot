@@ -129,7 +129,7 @@ int initializeUART(){
     //int receive_PIN = 16;
     int baud_rate = 115200;
     
-    int UART_handle = serOpen("/dev/ttyS0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
+    UART_handle = serOpen("/dev/ttyS0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
     if (UART_handle < 0)
     {
         fprintf(stderr, "Erreur lors de l'ouverture de la connexion UART.\n");
