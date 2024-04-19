@@ -105,7 +105,7 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
     
 
     for(int i = 0; i<4; i++){
-        if(wheel_speeds[i] > 30){
+        if(fabs(wheel_speeds[i]) > 30){
             printf("myWheelSpeed[%d] = %f\n",i,wheel_speeds[i]);
             wheel_speeds[i] = oldWheelSpeeds[i];
         }

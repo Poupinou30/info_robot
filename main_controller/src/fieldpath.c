@@ -641,20 +641,20 @@ void myPotentialFieldController(){
                     break;
                 
                 case (UNSTACK_MOVE):
-                        if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.175){
+                        if(computeEuclidianDistance(xStart,yStart,myX,myY) > 2.9155*POTWIDTH){
                             //destination_set = 0;
                             arrivedAtDestination = 1;
                             myControllerState = STOPPED;
                         }else{
-                            outputSpeed[0] = + 0.5836 * GRAB_SPEED; 
-                            outputSpeed[1] = - 0.8792 * GRAB_SPEED;
+                            outputSpeed[0] = + 1.5 * POT_SPEED; 
+                            outputSpeed[1] = - 2.5 * POT_SPEED;
                             outputSpeed[2] = 0;
                         }
                     break;
 
                 case (Y_Align_Pots):
                     
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0904){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.5*POTWIDTH){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
@@ -667,12 +667,12 @@ void myPotentialFieldController(){
 
                 case (X_Align_Pots):
                         
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0708){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.5 * POTWIDTH){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
                     }else{
-                        outputSpeed[0] = POT_SPEED; 
+                        outputSpeed[0] = -POT_SPEED; 
                         outputSpeed[1] = 0;
                         outputSpeed[2] = 0;
                     }

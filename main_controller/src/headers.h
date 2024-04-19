@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #define _Pi 3.1415927
 #define DEG2RAD     (_Pi/180)
+#define POTWIDTH 0.0708
 #ifndef MAIN_CONTROLLER_HEADERS_H
 #define MAIN_CONTROLLER_HEADERS_H
 

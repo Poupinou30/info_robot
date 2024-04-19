@@ -248,7 +248,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         }
         break;
 
-    case UNSTACK_POT_POSITIONING: // captured vers unstacked sur le ppt
+    case UNSTACK_POT_POSITIONING: // captured vers unstacked sur le ppt DIAGONALE
         printf("unstackPotPositioning started, destination_set = %d arrivedAtDestination = %d\n",destination_set,arrivedAtDestination);
         
         if(destination_set == 0){
@@ -266,7 +266,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         }
         break;
 
-    case UNSTACK_POT_DROP:
+    case UNSTACK_POT_DROP: 
         printf("unstackPotDrop started\n");
         switch (myActuatorsState)
         {
@@ -304,6 +304,8 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = ALIGN_POTS_MOVE;
             destination_set = 0;
+            arrivedAtDestination = 0;
+
         }
         break;
 
@@ -321,6 +323,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = GRAB_ALL_POTS;
             destination_set = 0;
+            arrivedAtDestination = 0;
         }
         break;
 
@@ -338,6 +341,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = LIFT_POTS;
             destination_set = 0;
+            arrivedAtDestination = 0;
         }
         break;
 

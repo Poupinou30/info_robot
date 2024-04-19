@@ -2,7 +2,7 @@
 #include "headers.h"
 #define HEADERS
 #endif
-#define POTWIDTH 0.0708
+
 
 void initializePlantZones(){
     /*
