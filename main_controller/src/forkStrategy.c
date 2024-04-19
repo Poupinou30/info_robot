@@ -15,7 +15,7 @@ int done = 0;
 uint8_t done1 = 0, done2 = 0, done3 = 0;
 char receivedData[255];
 
-void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi tu passes bestPlantZone en argument? je vois pas où tu l'utilises
+void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
 
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     
@@ -146,6 +146,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
         
     case GRAB_PLANTS_END:
+        printf("grabplantEnd started\n");
         bestPlantZone->numberOfPlants = 0; 
         switch (myActuatorsState)
         {
@@ -169,6 +170,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = MOVE_FRONT_POTS;
+                destination_set = 0;
                 done1 = 0; done2 = 0; done3 = 0;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
@@ -180,6 +182,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case MOVE_FRONT_POTS: // else *****
+        printf("moveFrontPots started\n");
         if(destination_set == 0){
             
             definePotsDestination(bestPotZone);
@@ -191,11 +194,11 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             myGrabState = UNSTACK_POTS_MOVE;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
-            printf("move<frontPots> done\n");
         } 
         break;
 
     case UNSTACK_POTS_MOVE: // ça c'est de front vers captured sur le ppt
+        printf("unstackPotsMove started\n");
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
@@ -213,6 +216,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
 
 
     case UNSTACK_POT_TAKE: 
+        printf("unstackPotTake started\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -239,6 +243,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case UNSTACK_POT_POSITIONING: // captured vers unstacked sur le ppt
+        printf("unstackPotPositioning started\n");
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = UNSTACK_MOVE;
@@ -254,6 +259,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case UNSTACK_POT_DROP:
+        printf("unstackPotDrop started\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -278,6 +284,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case GRAB_POTS_MOVE: // unstacked vers 1st row sur le ppt
+        printf("grabPotsMove started\n");
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = Y_Align_Pots;
@@ -294,6 +301,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
 
     // faut ajouter la transistions ALIGN_POTS_MOVE (1st row vers aligned)
     case ALIGN_POTS_MOVE: // 1st row vers aligned sur le ppt
+        printf("alignPotsMove started\n");
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = X_Align_Pots;
@@ -310,6 +318,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
 
     // faut ajouter la transistions GRAB_ALL_POTS (aligned vers pots ready)
     case GRAB_ALL_POTS:
+        printf("grabAllPots started\n");
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GET_ALL_POTS;
@@ -325,6 +334,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case LIFT_POTS:
+        printf("liftPots started\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -353,6 +363,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
     */
 
     case DROP_PLANTS:
+        printf("dropPlants started\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -377,6 +388,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case DROP_ALL:
+        printf("dropAll started\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -411,9 +423,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
             myGrabState = LIFT_POTS;
             destination_set = 0;
         }
-        
-
-    
+        break; 
     case FINISHED:
         break;
 

@@ -29,6 +29,8 @@ void mainStrategy(){
 };
 
 plantZone* bestPlantZone;
+potZone* bestPotZone;
+
 
 void waitingStrategy(){
     myControllerState = STOPPED;
@@ -104,14 +106,14 @@ void actionStrategy(){
             printf("destinationY = %f\n", *destination.y);
             // destination_set = 1;
         }*/
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, NULL);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, bestPotZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
         }
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, NULL);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, bestPotZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
         }
@@ -132,6 +134,8 @@ void returnToBaseStrategy(){
 
 void defineBestAction(){
     bestPlantZone = computeBestPlantsZone();
+    printf("not yet lol \n");
+    bestPotZone = computeBestPotsZone();
     if(bestPlantZone->numberOfPlants > 2){
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;

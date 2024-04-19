@@ -466,7 +466,6 @@ plantZone* computeBestPlantsZone(){
         }else if(plantZones[i].numberOfPlants == numberOfPlants){
             double distanceFromPlant = computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY);
             if (distanceFromPlant < smallestDistance) {
-                fprintf(stderr,"Distance = %f and sma\n",computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY));
                 bestPlantZone = &plantZones[i];
                 smallestDistance = distanceFromPlant;
             }
@@ -476,23 +475,31 @@ plantZone* computeBestPlantsZone(){
 }
 
 potZone* computeBestPotsZone(){
+    printf("computing for pots\n");
     potZone* bestPotZone = &potZones[0];
+    printf("nolwenn a raison\n");
+    printf("bestpozone infos: %f %f %d\n",bestPotZone->posX,bestPotZone->posY,bestPotZone->numberOfPots);
     int numberOfPots = bestPotZone->numberOfPots;
+    printf("numberofplants\n");
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
+    printf("filterdpositions\n");
     float smallestDistance = computeEuclidianDistance(x, y, potZones[0].posX, potZones[0].posY);
-
+    printf("smallest distance computed\n");
     for (int i = 1; i < 6; i++) {
         if(potZones[i].numberOfPots > numberOfPots){
             bestPotZone = &potZones[i];
         }else if(potZones[i].numberOfPots = numberOfPots){
-            if (computeEuclidianDistance(x, y, potZones[i].posX, potZones[i].posY) < smallestDistance) {
+            double distanceFromPot = computeEuclidianDistance(x, y, potZones[i].posX, potZones[i].posY);
+            if (distanceFromPot < smallestDistance) {
                 bestPotZone = &potZones[i];
+                smallestDistance = distanceFromPot;
             }
         }
     }
+    printf("returning best pot zone\n");
     return bestPotZone;
 }
 
