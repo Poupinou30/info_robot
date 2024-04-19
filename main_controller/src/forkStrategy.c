@@ -83,24 +83,23 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         
             if(!actuator_reception){
                 actuator_reception = UART_receive(UART_handle,receivedData);
-                fprintf(stderr,"received = %s\n",receivedData);
-                fprintf(stderr,"actuators reception = %d\n",actuator_reception);
 
             }
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
-                fprintf(stderr,"rentre dans le if de forkstrategy\n");
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = GRAB_PLANTS_MOVE;
+                destination_set = 0;
                 done1=0; done2=0; done3 = 0;
                 receivedData[0] = '\0';
-                actuator_reception = 0;                
+                actuator_reception = 0;   
             } 
             break;
         }
         break;
 
     case GRAB_PLANTS_MOVE:
+        printf("grabplantMove started\n");
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
@@ -117,6 +116,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){ // pourquoi
         break;
 
     case GRAB_PLANTS_CLOSE:
+        printf("grabplantClose started\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:

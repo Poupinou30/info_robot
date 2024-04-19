@@ -411,7 +411,7 @@ void computeForceVector(){
         if(startOfArrival.tv_sec == 0 && startOfArrival.tv_usec == 0){
             gettimeofday(&startOfArrival,NULL);
         }
-        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.1){
+        else if(nowTime - (startOfArrival.tv_sec + startOfArrival.tv_usec/1000000) > 0.1){ // marche mieux qd on perds une balise? trop d'oscillation avec le lidar?
             printf("arrived at destination \n");
             arrivedAtDestination = 1;
         }
@@ -571,10 +571,12 @@ float opponentDistance;
 
 void myPotentialFieldController(){
     double outputSpeed[3];
-    if(myControllerState == MOVING /*&& destination_set == 1*/){ 
-        switch(myGrabState)
+    if(myControllerState == MOVING){ 
+        printf("myMoveType = %d \n",myMoveType);
+        switch(myMoveType)
         {
         case GRABBING_MOVE:
+            printf("grabbing move\n");
             pthread_mutex_lock(&lockFilteredOpponent);
             pthread_mutex_lock(&lockFilteredPosition);
             myX = *myFilteredPos.x;
@@ -586,7 +588,7 @@ void myPotentialFieldController(){
 
             opponentDistance = computeEuclidianDistance(myX,myY,myXOpponent,myYOpponent);
             if(opponentDistance < 0.40 /*|| arrivedAtDestination == 1*/){ 
-
+                printf("opponent too close\n");
                 //S'arrête si il est bloqué par l'adversaire
                 outputSpeed[0] = 0;
                 outputSpeed[1] = 0;
@@ -602,6 +604,7 @@ void myPotentialFieldController(){
                 switch (myMovingSubState)
                 {
                 case GO_FORWARD_PLANTS:
+                    printf("goForwardPlant\n");
                     if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.25){
                         myControllerState = STOPPED;
                         // destination_set = 0;
@@ -691,8 +694,10 @@ void myPotentialFieldController(){
                     break;
                 }  
             }
+            break;
 
         case (DISPLACEMENT_MOVE):
+            printf("displacement move\n");
             computeForceVector();
             convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
             break;
