@@ -208,6 +208,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
             myControllerState = MOVING;
+            
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = UNSTACK_POTS_MOVE;

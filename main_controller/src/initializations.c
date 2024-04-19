@@ -3,6 +3,8 @@
 #define HEADERS
 #endif
 
+float solarOffset = 0.1;
+
 void initializePlantZones(){
     /*
     LAYOUT:
@@ -230,6 +232,49 @@ void initializeSolarPanels(){
     solarPanels[8].posX = 1.7824;
     solarPanels[8].posY = 2.725;
     solarPanels[8].state = 2;
+}
+
+void initializeSolarZones(){
+    /*layout
+    
+
+         zone 0     zone 1     zone 2
+        1  2  3    4  5  6    7  8  9
+    
+    */
+    solarZones = (solarZone*)malloc(sizeof(solarZone)*3);
+    solarzones[0].zoneID = 0;
+    solarzones[0].posX = 1.7824;
+    solarzones[0].posY = 0.5;
+    solarzones[0].stateLeft = 2;
+    solarzones[0].stateCenter = 2;
+    solarzones[0].stateRight = 2;
+    solarzones[0].targetPositionLowX = solarzones[0].posX;
+    solarzones[0].targetPositionLowY = solarzones[0].posY - solarOffset;
+    solarzones[0].targetPositionUpX = solarzones[0].posX;
+    solarzones[0].targetPositionUpY = solarzones[0].posY + solarOffset;
+
+    solarzones[1].zoneID = 1;
+    solarzones[1].posX = 1.7824;
+    solarzones[1].posY = 1.5;
+    solarzones[1].stateLeft = 2;
+    solarzones[1].stateCenter = 2;
+    solarzones[1].stateRight = 2;
+    solarzones[1].targetPositionLowX = solarzones[1].posX;
+    solarzones[1].targetPositionLowY = solarzones[1].posY - solarOffset;
+    solarzones[1].targetPositionUpX = solarzones[1].posX;
+    solarzones[1].targetPositionUpY = solarzones[1].posY + solarOffset;
+
+    solarzones[2].zoneID = 2;
+    solarzones[2].posX = 1.7824;
+    solarzones[2].posY = 2.5;
+    solarzones[2].stateLeft = 2;
+    solarzones[2].stateCenter = 2;
+    solarzones[2].stateRight = 2;
+    solarzones[2].targetPositionLowX = solarzones[2].posX;
+    solarzones[2].targetPositionLowY = solarzones[2].posY - solarOffset;
+    solarzones[2].targetPositionUpX = solarzones[2].posX;
+    solarzones[2].targetPositionUpY = solarzones[2].posY + solarOffset;
 }
 
 void initializeEndZones(){

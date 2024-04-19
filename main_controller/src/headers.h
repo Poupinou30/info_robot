@@ -100,6 +100,19 @@ typedef struct solarpanel{
     int state;
 } solarpanel;
 
+typedef struct solarZone{
+    int zoneID;
+    float posX;
+    float posY;
+    int stateLeft;
+    int stateCenter;
+    int stateRight;
+    float targetPositionLowX;
+    float targetPositionLowY;
+    float targetPositionUpX;
+    float targetPositionUpY;
+} solarZone;   
+
 
 typedef struct EndZone{
     int zoneID;
@@ -113,6 +126,7 @@ plantZone* plantZones;
 potZone* potZones;
 jardiniere* jardinieres;
 solarpanel* solarPanels;
+solarZone* solarZones;
 endZone* endZones;
 endZone* dropZones;
 
@@ -298,6 +312,7 @@ void initializePlantZones();
 void initializePotZones();
 void initializeJardinieres();
 void initializeSolarPanels();
+void initializeSolarZones();
 void initializeEndZones();
 plantZone* computeBestPlantsZone();
 potZone* computeBestPotsZone();
