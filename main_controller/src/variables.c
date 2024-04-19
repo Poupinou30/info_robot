@@ -36,3 +36,11 @@ uint8_t startingPoint = 5;
 
 uint8_t changeOfPlan = 1;
 uint8_t forksCalibrated = 0;
+
+//Nextion
+char myTeam[10] = "";
+char myPage[25] = "";
+int go = 2;
+bool finish = false;
+uint8_t score = 0;
+uint8_t cameraEnable = 0;

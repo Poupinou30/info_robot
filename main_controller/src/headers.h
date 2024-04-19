@@ -182,7 +182,7 @@ void resetOdometry();
 void myOdometry();
 
 //UART ET SPI et I2C
-void UART_send(int UART_handle, char* data);
+uint8_t UART_send(int UART_handle, char* data);
 uint8_t UART_receive(int UART_handle, char* received);
 extern int UARTReception;
 extern uint8_t waitingForReception;
@@ -330,18 +330,18 @@ uint8_t forksCalibrated;
 //Nextion
 ////////////////////////////////////
 
-extern int UART_handle_nextion;
-extern int UARTReception;
+int UART_handle_nextion;
+int UARTReception;
 
 // Serial input variables
 char receivedChars[NUM_CHARS];
 
-char myTeam[10] = "";
-char myPage[25] = "";
+extern char myTeam[10];
+extern char myPage[25];
 int startY;
 int startB;
-int go = 2;
-bool finish = false;
+extern int go;
+extern bool finish;
 
 typedef struct Node {
     char* data;
@@ -355,18 +355,16 @@ typedef struct Queue {
 
 Queue* q;
 
-struct timeval startInitialization, endQueue, now;
+struct timeval startInitialization, endQueue;
 
 int initializeUART_nextion();
-uint8_t UART_send(int UART_handle, char* data);
 uint8_t UART_send_commands(int UART_handle, char* data);
-uint8_t UART_receive(int UART_handle, char* received);
 void handleCommand(char *string);
 Queue* createQueue();
 void enqueue(Queue* q, const char* value);
 char* dequeue(Queue* q);
 void display(Queue* q);
-void map_coordinates(double x_meters, double y_meters, char* x_map, char* y_map, int player);
+void map_coordinates(float x_meters, float y_meters, char* x_map, char* y_map, int player);
 void nextion_communication();
 
 //Score
@@ -376,8 +374,8 @@ typedef struct plantType {
     uint8_t purple;
 } plantType;
 
-extern uint8_t score = 0;
-extern uint8_t cameraEnable = 0;
+extern uint8_t score;
+extern uint8_t cameraEnable;
 uint8_t cameraConfirmation();
 void computePoints();
 
@@ -385,7 +383,7 @@ void computePoints();
 
 uint8_t radius_opponent;
 void missingPlants();
-void bool isInPlantZone(float x, float y, float xc, float yc);
+bool isInPlantZone(float x, float y, float xc, float yc);
 float distance(float x1, float y1, float x2, float y2);
 uint8_t areOverlapping(float xc, float yc, float x, float y, float r2, float *overlap);
 

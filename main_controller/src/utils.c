@@ -144,24 +144,27 @@ uint8_t UART_send(int UART_handle, char* data){
     }
     else if (VERBOSE) printf("UART data sent successfully\n");
     return 1;
+}
 
 uint8_t UART_receive(int UART_handle, char* received){
-    //printf("dans uart receive\n");
     char tempoChar[100] = "";
-    char tempoChar2[255] = "";
     
-    //if(VERBOSE) fprintf(stderr,"Size of received buffer : %d \n",strlen(received));
-    int bytesRead = 0;
-
-        bytesRead = serRead(UART_handle, tempoChar, 255);
-        if (bytesRead > 0) {
+    int bytesRead = serRead(UART_handle, tempoChar, 255);
+    if (bytesRead < 0) {
+        fprintf(stderr, "Error reading from UART.\n");
+        return 0; // Return 0 to indicate failure
+    } else if (bytesRead > 0) {
         strcat(received,tempoChar);
         fprintf(stderr,"%d received bytes : '%s' \n",bytesRead,tempoChar);
-        if(tempoChar[bytesRead-1] == '>') return 1;
-
+		
+        if(tempoChar[bytesRead-1] == '>') {
+            tempoChar[bytesRead] = '\0'; // Null-terminate the string
+            return 1;
+        }
     }
-    printf("received: '%s' \n",received);
-    return 0;}
+	printf("received: '%s' \n",received);
+    return 0;
+}
 
 void initializeLaunchGPIO(){
     int gpio = 25; // Remplacez par le numéro de votre broche GPIO
@@ -430,7 +433,7 @@ void generateLog(){
     logFile = fopen("../logFiles/logPosition.txt", "w");
     if (logFile == NULL) {
         printf("Erreur lors de l'ouverture du fichier\n");
-        return 1;
+        return;
     }
     fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos ; opponentFilteredPos ; measuredOmega ; filteredOmega\n");
     printf("File generated i guess\n");

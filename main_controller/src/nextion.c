@@ -1,10 +1,9 @@
 #include "headers.h"
-
-int UART_handle_nextion;
 float tempoMyX, tempoMyY, tempoOppX, tempoOppY;
 char myScore[25];
+struct timeval now;
 
-int initializeUART(){
+int initializeUART_nextion(){
     int baud_rate = 9600;
     
     UART_handle = serOpen("/dev/ttyAMA0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
@@ -46,21 +45,6 @@ int initializeUART(){
     return UART_handle;
 }
 
-uint8_t UART_send(int UART_handle, char* data){
-    if (VERBOSE) printf("Sending '%s' by UART\n", data);
-    if(serWrite(UART_handle, data, strlen(data))!=0){
-        fprintf(stderr,"Error while writing to UART\n");
-        return 0;
-    }
-    //int bytes_written = serWrite(UART_handle, data, strlen(data));
-    //if (bytes_written != strlen(data)) {
-    //    fprintf(stderr, "Error writing to UART.\n");
-    //    return 0;
-    //}
-    else if (VERBOSE) printf("UART data sent successfully\n");
-    return 1;
-}
-
 uint8_t UART_send_commands(int UART_handle, char* data){
     unsigned char endString = 0xff;
     if (UART_send(UART_handle, data) != 1) return 0;
@@ -68,24 +52,6 @@ uint8_t UART_send_commands(int UART_handle, char* data){
     serWrite(UART_handle, &endString,1);
     serWrite(UART_handle, &endString,1);
     return 1;
-}
-
-uint8_t UART_receive(int UART_handle, char* received){
-    char tempoChar[100] = "";
-    
-    int bytesRead = serRead(UART_handle, tempoChar, 255);
-    if (bytesRead < 0) {
-        fprintf(stderr, "Error reading from UART.\n");
-        return 0; // Return 0 to indicate failure
-    } else if (bytesRead > 0) {
-        strcat(received,tempoChar);
-        //strcpy(received, tempoChar);
-        if(tempoChar[bytesRead-1] == '>') {
-            tempoChar[bytesRead] = '\0'; // Null-terminate the string
-            return 1;
-        }
-    }
-    return 0;
 }
 
 void handleCommand(char *string) {
@@ -179,36 +145,36 @@ void display(Queue* q) {
     printf("\n");
 }
 
-void map_coordinates(float x_meters, double y_meters, char* x_map, char* y_map, int player) {
+void map_coordinates(float x_meters, float y_meters, char* x_map, char* y_map, int player) {
     // Original map dimensions in meters
-    double original_width_m = 2.0;   // meters
-    double original_height_m = 3.0;  // meters
+    float original_width_m = 2.0;   // meters
+    float original_height_m = 3.0;  // meters
 
     // New map dimensions in millimeters (now flipped for x and y)
-    double new_width_mm = 483.0;     // millimeters (originally y dimension)
-    double new_height_mm = 322.0;    // millimeters (originally x dimension)
+    float new_width_mm = 483.0;     // millimeters (originally y dimension)
+    float new_height_mm = 322.0;    // millimeters (originally x dimension)
 
     // Convert new map dimensions to meters for scaling calculation
-    double new_width_m = new_width_mm / 1000.0;  // meters
-    double new_height_m = new_height_mm / 1000.0; // meters
+    float new_width_m = new_width_mm / 1000.0;  // meters
+    float new_height_m = new_height_mm / 1000.0; // meters
 
     // Calculate scaling factors
-    double scale_x = new_height_m / original_width_m;  // Flip scale to match dimensions
-    double scale_y = new_width_m / original_height_m;
+    float scale_x = new_height_m / original_width_m;  // Flip scale to match dimensions
+    float scale_y = new_width_m / original_height_m;
 
     // Apply the scaling to input coordinates
-    double x_scaled = x_meters * scale_x;
-    double y_scaled = y_meters * scale_y;
+    float x_scaled = x_meters * scale_x;
+    float y_scaled = y_meters * scale_y;
 
     // Apply the origin offset of the new map (convert it to meters)
-    double origin_offset_x_m = 121.0 / 1000.0;  // meters (originally y offset)
-    double origin_offset_y_m = 47.0 / 1000.0;   // meters (originally x offset)
+    float origin_offset_x_m = 121.0 / 1000.0;  // meters (originally y offset)
+    float origin_offset_y_m = 47.0 / 1000.0;   // meters (originally x offset)
 
     // Calculate the final coordinates in millimeters
     // Inverted x and y for final map coordinates
     // Adjust for square centering by subtracting half of the square's dimensions
-    double y_mm = (x_scaled + origin_offset_x_m) * 1000.0 - 29.0;  // 29 mm is half the width of the square
-    double x_mm = (y_scaled + origin_offset_y_m) * 1000.0 - 29.0;  // 29 mm is half the height of the square
+    float y_mm = (x_scaled + origin_offset_x_m) * 1000.0 - 29.0;  // 29 mm is half the width of the square
+    float x_mm = (y_scaled + origin_offset_y_m) * 1000.0 - 29.0;  // 29 mm is half the height of the square
 
     // Assuming x_map and y_map point to buffers large enough to hold the resulting strings
     if (player == 0) {
@@ -222,6 +188,9 @@ void map_coordinates(float x_meters, double y_meters, char* x_map, char* y_map, 
 
 // quand on appelle cette fonction toute les 30ms il faudra aussi qu'on ait bien la valeur now
 void nextion_communication(){
+
+    gettimeofday(&now, NULL);
+    double nowValue = now.tv_sec*1000+now.tv_usec/1000;
 
     // Condition obligatoire avant de lancer toute communication
     if(nowValue - (startInitialization.tv_sec*1000+startInitialization.tv_usec/1000) > 3000){
@@ -261,7 +230,6 @@ void nextion_communication(){
             enqueue(q, myScore);
             
             gettimeofday(&endQueue, NULL);
-            endValueQueue = endQueue.tv_sec*1000+endQueue.tv_usec/1000;
         }
         
         if(go == 1){

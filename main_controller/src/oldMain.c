@@ -28,7 +28,7 @@ int mainPattern(){
     int Kp = 10; //reference
     int Ki = 60; //reference
     //Tune PID
-    tunePID(spi_handle_front,spi_handle_rear,Kp,0,Ki,0);
+    tunePIDOLD(spi_handle_front,spi_handle_rear,Kp,0,Ki,0);
 
     createArray(0,0,dataFront);
     createArray(0,0,dataRear);
