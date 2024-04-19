@@ -14,6 +14,7 @@ void initializePlantZones(){
     
     */
     plantZones = (plantZone*)malloc(sizeof(plantZone)*6);
+    
     plantZones[0].zoneID = 0;
     plantZones[0].numberOfPlants = 6;
     plantZones[0].posX = 0.5;
@@ -87,7 +88,7 @@ void initializePotZones(){
 
 
     */
-    potZone *potZones = (potZone*)malloc(sizeof(potZone)*6);
+    potZones = (potZone*)malloc(sizeof(potZone)*6);
     potZones[0].zoneID = 0;
     potZones[0].posX = 0.6125;
     potZones[0].posY = 0.4305;
@@ -184,7 +185,7 @@ void initializeSolarPanels(){
 
     */
 
-    solarpanel *solarPanels = (solarpanel*)malloc(sizeof(solarpanel)*9);
+    solarPanels = (solarpanel*)malloc(sizeof(solarpanel)*9);
     solarPanels[0].panelID = 0;
     solarPanels[0].posX = 1.7824;
     solarPanels[0].posY = 0.275;
