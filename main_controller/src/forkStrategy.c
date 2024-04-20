@@ -486,7 +486,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination){
+        if(arrivedAtDestination && lidarAcquisitionFlag){
             myGrabState = WHEEL_TURN;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
