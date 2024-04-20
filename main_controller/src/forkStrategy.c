@@ -436,6 +436,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         } 
         break;
 
+    // on peut le réactiver avec une distance nettement plus faible pour passer de l'etat ajouté (MOVE_FRONT_JARDINIERE) vers DROP_PLANTS
     case MOVE_FORWARD_JARDINIERE:
         printf("moveForwardJardiniere started\n");
         if(destination_set == 0){

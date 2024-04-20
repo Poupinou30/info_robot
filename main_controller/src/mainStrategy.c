@@ -30,6 +30,8 @@ void mainStrategy(){
         returnToBaseStrategy();
         break;
     case GAME_OVER:
+        // on enverrait pas aussi pour bien faire un stop all? 
+        // (jsp si c'est déjà dans une fsm de myControllerState)
         myControllerState = STOPPED;
 
     default:
@@ -166,7 +168,7 @@ void defineBestAction(){
     printf("define best action called\n");
     
     bestPlantZone = computeBestPlantsZone();
-    bestPotZone = computeBestPotsZone();
+    bestPotZone = computeBestPotsZone(); // update en fct des zones de dépot et jardinières
     if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) ){
         printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
         myActionChoice = PLANTS_POTS_ACTION;
