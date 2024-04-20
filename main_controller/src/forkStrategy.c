@@ -16,6 +16,16 @@ uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0;
 char receivedData[255];
 potZone* bestPotZone;
 jardiniere* bestJardiniere;
+struct timeval commandSended;
+struct timeval actualTime;
+uint8_t timeStarted = 0;
+
+double computeTimeElapsed(struct timeval start, struct timeval end){ //en ms
+    double timeElapsed = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
+    timeElapsed += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+    return timeElapsed;
+}
+
 
 void manageGrabbing(plantZone* bestPlantZone){
 
@@ -51,6 +61,17 @@ void manageGrabbing(plantZone* bestPlantZone){
             done = calibrateFork();
 
             //sleep(5);
+            if(!timeStarted){
+                timeStarted = 1;
+                gettimeofday(&commandSended,NULL);
+            }
+            else{
+                gettimeofday(&actualTime,NULL);
+                if(computeTimeElapsed(commandSended,actualTime) > 200){
+                    done = 1;
+                    timeStarted = 0;
+                }
+            }
             if(done) myActuatorsState = WAITING_ACTUATORS;
             done = 0;
             break;
@@ -186,7 +207,6 @@ void manageGrabbing(plantZone* bestPlantZone){
                 }else if ( myActionChoice == PLANTS_POTS_ACTION){
                     myGrabState = MOVE_FRONT_POTS;
                 }
-                myGrabState = MOVE_FRONT_POTS;
                 destination_set = 0;
                 done1 = 0; done2 = 0; done3 = 0;
                 receivedData[0] = '\0';
@@ -252,7 +272,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         case SENDING_INSTRUCTION:
             printf("dans unstack pots and done = %d\n",done1);
             if(!done1) done1 = setLowerFork(125);
-            if (done1) myActuatorsState = WAITING_ACTUATORS;
+            if (done1) myActuatorsState = WAITING_ACTUATORS; //RAJOUTER UN TIMEOUT
             break;
 
         case WAITING_ACTUATORS:
@@ -435,6 +455,7 @@ void manageGrabbing(plantZone* bestPlantZone){
 
     case DROP_PLANTS:
         printf("dropPlants started\n");
+        bestJardiniere->numberOfPlants = 6;
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:

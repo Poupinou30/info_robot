@@ -129,7 +129,7 @@ void initializePotZones(){
     potZones[5].numberOfPots = 6;
 }
 void initializeJardinieres(){
-    float marge = 0.015;
+    float marge = 0.017;
     /*
     LAYOUT:
           0         3

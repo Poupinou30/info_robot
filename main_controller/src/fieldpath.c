@@ -402,7 +402,7 @@ void computeForceVector(){
     
     double error = theta-desiredTheta;
 
-    k_att_theta = k_att_theta * (1+ 3/(0.2+fabs(error))); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_theta = k_att_theta * (1+ 3/(0.05+fabs(error))); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
 
     if(error<-180){
         error += 360;
@@ -674,7 +674,7 @@ void myPotentialFieldController(){
                 {
                 case GO_FORWARD_PLANTS:
                     //printf("goForwardPlant\n");
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.28){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.30){
                         myControllerState = STOPPED;
                         // destination_set = 0;
                         arrivedAtDestination = 1;
