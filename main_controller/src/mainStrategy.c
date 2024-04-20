@@ -136,6 +136,7 @@ void returnToBaseStrategy(){
 };
 
 void defineBestAction(){
+    /*
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
     if(bestPlantZone->numberOfPlants > 2){
@@ -143,9 +144,9 @@ void defineBestAction(){
         myGrabState = MOVE_FRONT_PLANTS;
         
     }
-    else{
+    else{*/
         myActionChoice = SOLAR_PANELS_ACTION;
-    }
+    //}
     //fprintf(stderr,"check7\n");
 };
 
