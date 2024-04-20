@@ -162,6 +162,7 @@ void returnToBaseStrategy(){
         arrivedAtDestination = 0;}
     else if(arrivedAtDestination){
         mySupremeState = GAME_OVER;
+        printf("--------------ARRIVED, GAME OVER---------------\n");
     }
     
 
