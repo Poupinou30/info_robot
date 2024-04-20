@@ -231,7 +231,12 @@ void manageGrabbing(plantZone* bestPlantZone){
         }
         else if(arrivedAtDestination){
             printf("dans if 2 \n");
-            myGrabState = UNSTACK_POTS_MOVE;
+            if(nbrOfPots == 6){
+                myGrabState = UNSTACK_POTS_MOVE;
+            }else{
+                myGrabState = GRAB_POTS_MOVE;
+            }
+            
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
             destination_set = 0;
