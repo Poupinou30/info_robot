@@ -120,12 +120,6 @@ void actionStrategy(){
     {
     case PLANTS_ACTION:
         printf("myGrabstate = %d\n", myGrabState);
-        /*if(destination_set != 1){
-            definePlantsDestination(bestPlantZone);
-            printf("destinationX = %f\n", *destination.x);
-            printf("destinationY = %f\n", *destination.y);
-            // destination_set = 1;
-        }*/
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             printf("changeOfPlant 1\n");
@@ -173,16 +167,20 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) /*|| (myGrabState ==  GRAB_PLANTS_MOVE|| myGrabState == GRAB_PLANTS_CLOSE || myGrabState ==  GRAB_PLANTS_END || myGrabState == MOVE_FRONT_POTS || myGrabState == UNSTACK_POTS_MOVE || myGrabState == UNSTACK_POT_TAKE|| myGrabState == UNSTACK_POT_POSITIONING || myGrabState == UNSTACK_POT_DROP || myGrabState == GRAB_POTS_MOVE || myGrabState == ALIGN_POTS_MOVE || myGrabState == LIFT_POTS|| myGrabState == GRAB_ALL_POTS|| myGrabState == MOVE_FRONT_JARDINIERE|| myGrabState == MOVE_FORWARD_JARDINIERE|| myGrabState == DROP_PLANTS|| myGrabState ==  DROP_ALL|| myGrabState == MOVE_BACK_JARDINIERE)*/){
+    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) ){
         printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
         
     }
     else{
-    if(!solarDone){
+        bestPlantZone = computeBestPlantsZone();
+        myActionChoice = PLANTS_ACTION;
+        myGrabState = MOVE_FRONT_PLANTS;
+        
+    /*if(!solarDone){
         myActionChoice = SOLAR_PANELS_ACTION;
-        myGrabState = SOLAR_SET;}
+        myGrabState = SOLAR_SET;}*/
     }
     //fprintf(stderr,"check7\n");
 };

@@ -381,7 +381,7 @@ void computeForceVector(){
     k_att_xy = k_att_xy * (1+ 1/(0.5+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
-    float k_repul =0.0001 ;
+    float k_repul =0.00005 ;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
     pthread_mutex_lock(&lockFilteredPosition); 
@@ -830,10 +830,10 @@ void initializeObstacles(){
     addRoundObstacle(1.3,1,0.125,0,14); //Zone plantes f4
     addRoundObstacle(1.3,2,0.125,0,15);  //Zone plantes f5
     addRoundObstacle(1.5,1.5,0.125,0,16); //Zone plantes f6*/
-    removeObstacle(11);
+    /*removeObstacle(11);
     removeObstacle(12);
     removeObstacle(13);
     removeObstacle(14);removeObstacle(15);
-    removeObstacle(16);
+    removeObstacle(16);*/
 
 }
