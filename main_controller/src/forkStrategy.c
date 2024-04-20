@@ -101,7 +101,12 @@ void manageGrabbing(plantZone* bestPlantZone){
         case SENDING_INSTRUCTION:
             //if(!done0) done0 = setGripperPosition(0);
             if(!done1/*&&done0*/) done1 = deployForks();
-            if(!done2 && done1) done2 = done1 && setLowerFork(69);
+            if (myActionChoice == PLANTS_ACTION){
+                if(!done2 && done1) done2 = setLowerFork(74);
+            }
+            else if(myActionChoice == PLANTS_POTS_ACTION){
+                if(!done2 && done1) done2 = setLowerFork(69);
+            }
             if(!done3 && done2) done3 = done2 && setUpperFork(0);
             if(/*done0 &&*/ done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
@@ -390,6 +395,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case LIFT_POTS:
+
         bestPotZone->numberOfPots = 0; 
         printf("liftPots started\n");
         switch (myActuatorsState)
@@ -418,22 +424,27 @@ void manageGrabbing(plantZone* bestPlantZone){
 
     case MOVE_FRONT_JARDINIERE:
         if(destination_set != 1){
-
             bestJardiniere = computeBestJardiniere();
             defineJardiniereDestination(bestJardiniere);
+            printf("Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
+            pthread_mutex_lock(&lockFilteredPosition);
+            printf("my position is x = %f and y = %f \n",*myFilteredPos.x, *myFilteredPos.y);
+            pthread_mutex_unlock(&lockFilteredPosition);
             destination_set = 1;
             resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;
             fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination && lidarAcquisitionFlag){
+        if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
+            printf("arrived at destination (jardinière mon con)\n");
             myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
             destination_set = 0;
             printf("move<frontJardiniere> done\n");
         } 
+        printf("if not, im fking lost...");
         break;
 
     case MOVE_FORWARD_JARDINIERE:
