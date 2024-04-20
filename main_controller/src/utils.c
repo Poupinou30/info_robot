@@ -95,16 +95,27 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 
 }
 
+float oldWheelSpeeds[4] = {0,0,0,0};
+
 void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, double *omega) {
+    
+
+    
+
+    for(int i = 0; i<4; i++){
+        if(fabs(wheel_speeds[i]) > 30){
+            printf("myWheelSpeed[%d] = %f\n",i,wheel_speeds[i]);
+            wheel_speeds[i] = oldWheelSpeeds[i];
+        }
+    }
+
     *v_x = 1.02*1.04*radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
     *v_y = 1.0167*radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
 
-    for(int i = 0; i<4; i++){
-        if(wheel_speeds[i] > 30){
-            printf("myWheelSpeed[%d] = %f\n",i,wheel_speeds[i]);
-        }
-    }
+    
+
+
 
     double tempoOmega =  112.5*/*1.043**/radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
@@ -113,6 +124,11 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
     measuredSpeedX = *v_x;
     measuredSpeedY = *v_y;
     measuredSpeedOmega = *omega;
+
+    oldWheelSpeeds[0] = wheel_speeds[0];
+    oldWheelSpeeds[1] = wheel_speeds[1];
+    oldWheelSpeeds[2] = wheel_speeds[2];
+    oldWheelSpeeds[3] = wheel_speeds[3];
 
 }
 
@@ -446,12 +462,12 @@ void generateLog(){
         printf("Erreur lors de l'ouverture du fichier\n");
         return 1;
     }
-    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos ; opponentFilteredPos ; measuredOmega ; filteredOmega\n");
+    fprintf(logFile, "lidarPos ; odometryPos ; filteredPos ; opponentPos ; opponentFilteredPos ; measuredOmega ; filteredOmega ; wheelSpeeds ; measuredSpeed ; filteredMeasuredSpeed\n");
     printf("File generated i guess\n");
 }
 
 void writeLog(){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f ; %f ; %f \n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y, measuredSpeedOmega, filteredSpeedOmega);
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f ; %f ; %f ; %f %f %f %f ; %f %f ; %f %f ; %f %f\n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y, measuredSpeedOmega, filteredSpeedOmega,motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR,measuredSpeedX,measuredSpeedY,filteredSpeedX,filteredSpeedY);
 }
 
 uint8_t checkStartSwitch(){
@@ -529,23 +545,29 @@ endZone* computeBestDropZone(){
 }
 
 jardiniere* computeBestJardiniere(){
+    //fprintf(stderr,"Dans computeBestJardiniere ");
     jardiniere* bestJardiniere = &jardinieres[3*myTeamColor];
     int number_of_plants = jardinieres[3*myTeamColor].numberOfPlants;
     pthread_mutex_lock(&lockFilteredPosition);
+    //fprintf(stderr,"Dans computeBestJardiniere1 ");
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
     float smallestDistance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor].posX, jardinieres[3*myTeamColor].posY);
+    //fprintf(stderr,"Dans computeBestJardinier3 ");
 
     for (int i = 1; i < 3; i++) {
-        if(jardinieres[i].numberOfPlants < number_of_plants){
-            bestJardiniere = &jardinieres[i];
-        }else if (jardinieres[i].numberOfPlants = number_of_plants){
-            if(computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY) < smallestDistance){
-                bestJardiniere = &jardinieres[i];
+        if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
+            bestJardiniere = &jardinieres[3*myTeamColor+i];
+        }else if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
+            float distance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
+            if(distance < smallestDistance){
+                bestJardiniere = &jardinieres[3*myTeamColor+i];
+                smallestDistance = distance;
             }
         }
     }
+    //fprintf(stderr,"Dans computeBestJardiniere4\n");
     return bestJardiniere;
 }
 

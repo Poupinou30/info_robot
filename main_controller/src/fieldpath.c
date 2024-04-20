@@ -4,12 +4,12 @@
 #endif
 
 #define GRAB_SPEED 0.2
-#define POT_SPEED 0.05
+#define POT_SPEED 0.1
 
 float fixActionDistance = 0.3;
 float mobileActionDistance = 0.4;
-float myDistanceList[10] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
-float myErrorList[10] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
+float myDistanceList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
+float myErrorList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
 
 float computeEuclidianDistance(double x1, double y1, double x2, double y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
@@ -364,10 +364,12 @@ void computeForceVector(){
     double distanceFromDest = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
     double k_mult_att;
     
-    float k_att_xy = 0.5;
+    float k_att_xy = 0.4;
     float k_att_tang = 0.1;
-    k_att_xy = k_att_xy * (1+ 1/(0.8+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
+    
+    
     float k_repul = 0.0005;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
@@ -388,6 +390,9 @@ void computeForceVector(){
     if(desiredTheta > 180) desiredTheta+=-360;
     
     double error = theta-desiredTheta;
+
+    k_att_theta = k_att_theta * (1+ 3/(0.2+fabs(error))); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+
     if(error<-180){
         error += 360;
     }
@@ -411,24 +416,24 @@ void computeForceVector(){
 
 
     //ROTATING LIST POUR MOYENNE
-    for (int i = 0; i < 9; ++i) {
+    for (int i = 0; i < 19; ++i) {
         myDistanceList[i] = myDistanceList[i+1];
         myErrorList[i] = myErrorList[i+1];
     }
-    myDistanceList[9] = distanceFromDest;
-    myErrorList[9] = error;
+    myDistanceList[19] = distanceFromDest;
+    myErrorList[19] = error;
 
     float averageDistanceFromDest = 0;
     float averageError = 0;
-    for(int i = 0; i<10; i++ ){
+    for(int i = 0; i<20; i++ ){
         averageDistanceFromDest+=myDistanceList[i];
         averageError += myErrorList[i];
     }
-    averageDistanceFromDest = averageDistanceFromDest/10;
-    averageError = averageError/10;
+    averageDistanceFromDest = averageDistanceFromDest/20;
+    averageError = averageError/20;
     
 
-    if(averageDistanceFromDest < 0.02 && fabs(averageError) < 1){
+    if(averageDistanceFromDest < 0.015 && fabs(averageError) < 1){
         arrivedAtDestination = 1;
         
     }
@@ -616,7 +621,7 @@ void myPotentialFieldController(){
                 {
                 case GO_FORWARD_PLANTS:
                     printf("goForwardPlant\n");
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.25){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.265){
                         myControllerState = STOPPED;
                         // destination_set = 0;
                         arrivedAtDestination = 1;
@@ -641,39 +646,41 @@ void myPotentialFieldController(){
                     break;
                 
                 case (UNSTACK_MOVE):
-                        if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.175){
+                        if(computeEuclidianDistance(xStart,yStart,myX,myY) > 2.8*POTWIDTH){
+                            //destination_set = 0;
+                            arrivedAtDestination = 1;
                             myControllerState = STOPPED;
                             //destination_set = 0;
                             arrivedAtDestination = 1;
                             
                         }else{
-                            outputSpeed[0] = + 0.405 * GRAB_SPEED; 
-                            outputSpeed[1] = - 0.914 * GRAB_SPEED;
+                            outputSpeed[0] = + 1.6 * POT_SPEED; 
+                            outputSpeed[1] = - 2 * POT_SPEED;
                             outputSpeed[2] = 0;
                         }
                     break;
 
                 case (Y_Align_Pots):
                     
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0904){
-                        // destination_set = 0;
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.4*POTWIDTH){
+                        //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
                     }else{
                         outputSpeed[0] = 0; 
-                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[1] = POT_SPEED;
                         outputSpeed[2] = 0;
                     }
                     break;
 
                 case (X_Align_Pots):
                         
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0708){
-                        destination_set = 0;
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.5 * POTWIDTH){
+                        //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
                     }else{
-                        outputSpeed[0] = GRAB_SPEED; 
+                        outputSpeed[0] = -POT_SPEED; 
                         outputSpeed[1] = 0;
                         outputSpeed[2] = 0;
                     }
@@ -682,20 +689,32 @@ void myPotentialFieldController(){
                 case (GET_ALL_POTS):
             
                     if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0708){
-                        destination_set = 0;
+                        //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
                     }else{
                         outputSpeed[0] = 0; 
-                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[1] = POT_SPEED;
                         outputSpeed[2] = 0;
                     }
                     break;
+                case (GET_IN_JARDINIERE):
+                        
+                        if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){//  ajuster la distance
+                            //destination_set = 0;
+                            arrivedAtDestination = 1;
+                            myControllerState = STOPPED;
+                        }else{
+                            outputSpeed[0] = 0; 
+                            outputSpeed[1] = GRAB_SPEED;
+                            outputSpeed[2] = 0;
+                        }
+                        break;
                     
                 case (GET_BACK_JARDINIERE):
                     
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){
-                        destination_set = 0;
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){ // ajouter la distance
+                        //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
                     }else{

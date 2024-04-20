@@ -15,15 +15,14 @@ lidarPos, odometryPos, filteredPos, opponentPos, opponentFilteredPos, measuredOm
 for line in lines:
     # Extraire les données
     data = line.split(';')
-    lidar, odometry, filtered, opponent, opponent_filtered, omega = data[0], data[1], data[2], data[3], data[4], data[5]
+    lidar, odometry, filtered, opponent, opponent_filtered, measuredOmegaLines, filteredOmegaLines = data[0], data[1], data[2], data[3], data[4], data[5], data[6]
     lidarPos.append([float(val) for val in lidar.split()])
     odometryPos.append([float(val) for val in odometry.split()])
     filteredPos.append([float(val) for val in filtered.split()])
     opponentPos.append([float(val) for val in opponent.split()])
     opponentFilteredPos.append([float(val) for val in opponent_filtered.split()])
-    omega_vals = omega.split()
-    measuredOmega.append(float(omega_vals[0]))
-    filteredOmega.append(float(omega_vals[1]))
+    measuredOmega.append([float(val) for val in measuredOmegaLines.split()])
+    filteredOmega.append([float(val) for val in filteredOmegaLines.split()])
 
 # Convertir les listes en tableaux pour faciliter le traçage
 lidarPos = np.array(lidarPos)

@@ -40,12 +40,12 @@ int mainFORKS(){
     myGrabState = CALIB_FORK;
     myActuatorsState = SENDING_INSTRUCTION;
     while(myGrabState != FINISHED){
-        manageGrabbing(NULL,NULL);
+        manageGrabbing(NULL);
     }
     myGrabState = GRAB_PLANTS_INIT;
     myActuatorsState = SENDING_INSTRUCTION;
     while(myGrabState != FINISHED){
-        manageGrabbing(NULL,NULL);
+        manageGrabbing(NULL);
     }
 }
 
@@ -149,6 +149,8 @@ int main(){
                     printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
                     printf("myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
                     printf("myDestination x = %f y = %f\n",*destination.x,*destination.y);
+                    printf("timeElapsed = %f",timeFromStartOfMatch);
+                    printf("myTeam = %d",myTeamColor);
                 }
 
                 elapsedTime = 0;
@@ -168,7 +170,7 @@ int main(){
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
             pthread_mutex_lock(&lidarFlagLock);
-            if(((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<1) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<1) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -541,6 +543,9 @@ void initializeMainController(){
     addOpponentObstacle();
     //Initialisation PID
     tunePID(60,15,i2c_handle_front,i2c_handle_rear);
+
+    if(startingPoint < 4) myTeamColor =BLUE;
+    else myTeamColor = YELLOW;
 }
 
 int mainFINAL(){

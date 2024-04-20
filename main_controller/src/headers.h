@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #define _Pi 3.1415927
 #define DEG2RAD     (_Pi/180)
+#define POTWIDTH 0.0708
 #ifndef MAIN_CONTROLLER_HEADERS_H
 #define MAIN_CONTROLLER_HEADERS_H
 
@@ -132,7 +133,7 @@ endZone* dropZones;
 
 typedef enum {DISPLACEMENT_MOVE, GRABBING_MOVE} moveType;
 typedef enum{BLUE, YELLOW} teamColor;
-typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE, Y_Align_Pots, X_Align_Pots,GET_ALL_POTS,GET_BACK_JARDINIERE,SOLARMOVE} movingSubState;
+typedef enum{GO_FORWARD_POTS, GO_FORWARD_PLANTS, UNSTACK_MOVE, Y_Align_Pots, X_Align_Pots,GET_ALL_POTS,GET_IN_JARDINIERE,GET_BACK_JARDINIERE,SOLARMOVE} movingSubState;
 
 typedef enum{MOVING,STOPPED} movingState;
 typedef enum {WAITING_FOR_START, EARNING_POINTS, RETURN_TO_BASE, GAME_OVER} supremeState;
@@ -289,10 +290,10 @@ void waitingStrategy();
 void pointsStrategy();
 void returnToBaseStrategy();
 void actionStrategy();
-void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone);
+void manageGrabbing(plantZone* bestPlantZone);
 uint8_t checkStartSwitch();
 
-typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,ALIGN_POTS_MOVE,LIFT_POTS,GRAB_ALL_POTS,DROP_PLANTS, DROP_ALL,MOVE_BACK_JARDINIERE,MOVE_FRONT_SOLAR,MOVE_SOLAR,FINISHED } grabbingState;
+typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,ALIGN_POTS_MOVE,LIFT_POTS,GRAB_ALL_POTS,MOVE_FRONT_JARDINIERE,MOVE_FORWARD_JARDINIERE,DROP_PLANTS, DROP_ALL,MOVE_BACK_JARDINIERE,MOVE_FRONT_SOLAR,MOVE_SOLAR,FINISHED } grabbingState;
 extern grabbingState myGrabState;
 typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
 extern actuationState myActuatorsState;
@@ -325,6 +326,7 @@ void definedropZoneDestination(endZone* bestDropZone);
 void defineJardiniereDestination(jardiniere* bestJardiniere);
 void defineSolarDestination(solarpanel* bestSolarPanel);
 void defineEndZoneDestination(endZone* bestEndZone);
+void defineJardiniereDestination(jardiniere* bestJardiniere);
 
 void defineBestAction();
 
@@ -334,3 +336,5 @@ void defineBestAction();
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
 uint8_t forksDeployed;
 uint8_t forksCalibrated;
+
+extern float timeFromStartOfMatch;

@@ -14,8 +14,10 @@ uint8_t actuator_reception;
 int done = 0;
 uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0;
 char receivedData[255];
+potZone* bestPotZone;
+jardiniere* bestJardiniere;
 
-void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
+void manageGrabbing(plantZone* bestPlantZone){
 
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     
@@ -30,7 +32,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination){
+        if(arrivedAtDestination && lidarAcquisitionFlag){
             myGrabState = GRAB_PLANTS_INIT;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
@@ -74,7 +76,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         case SENDING_INSTRUCTION:
             if(!done0) done0 = setGripperPosition(0);
             if(!done1&&done0) done1 = deployForks();
-            if(!done2 && done1) done2 = done1 && setLowerFork(65);
+            if(!done2 && done1) done2 = done1 && setLowerFork(69);
             if(!done3 && done2) done3 = done2 && setUpperFork(0);
             if(done0 && done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
@@ -188,7 +190,8 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
     case MOVE_FRONT_POTS: // else *****
         printf("moveFrontPots started\n");
         if(destination_set == 0){
-            
+
+            computeBestPotsZone();
             definePotsDestination(bestPotZone);
             destination_set = 1;
             myControllerState = MOVING;
@@ -249,8 +252,9 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         }
         break;
 
-    case UNSTACK_POT_POSITIONING: // captured vers unstacked sur le ppt
-        printf("unstackPotPositioning started\n");
+    case UNSTACK_POT_POSITIONING: // captured vers unstacked sur le ppt DIAGONALE
+        printf("unstackPotPositioning started, destination_set = %d arrivedAtDestination = %d\n",destination_set,arrivedAtDestination);
+        
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = UNSTACK_MOVE;
@@ -266,7 +270,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         }
         break;
 
-    case UNSTACK_POT_DROP:
+    case UNSTACK_POT_DROP: 
         printf("unstackPotDrop started\n");
         switch (myActuatorsState)
         {
@@ -304,12 +308,14 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = ALIGN_POTS_MOVE;
             destination_set = 0;
+            arrivedAtDestination = 0;
+
         }
         break;
 
     // faut ajouter la transistions ALIGN_POTS_MOVE (1st row vers aligned)
     case ALIGN_POTS_MOVE: // 1st row vers aligned sur le ppt
-        printf("alignPotsMove started\n");
+        printf("alignPotsMove started and destination_set = %d arrivedAtDestination = %d\n", destination_set,arrivedAtDestination);
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = X_Align_Pots;
@@ -321,6 +327,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = GRAB_ALL_POTS;
             destination_set = 0;
+            arrivedAtDestination = 0;
         }
         break;
 
@@ -338,6 +345,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         else{
             myGrabState = LIFT_POTS;
             destination_set = 0;
+            arrivedAtDestination = 0;
         }
         break;
 
@@ -356,7 +364,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = DROP_PLANTS; // changer vers un Move_Front_jardiniere
+                myGrabState = MOVE_FRONT_JARDINIERE; // changer vers un Move_Front_jardiniere
                 receivedData[0] = '\0';
                 actuator_reception = 0;
                 done1 = 0; done2 = 0; done3 = 0;
@@ -366,9 +374,41 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         break;
 
     // ajouter le Move_Front_jardiniere (aller jusqu'en jardiniere)
-    /*
+
     case MOVE_FRONT_JARDINIERE:
-    */
+        if(destination_set != 1){
+
+            bestJardiniere = computeBestJardiniere();
+            defineJardiniereDestination(bestJardiniere);
+            destination_set = 1;
+            myMoveType = DISPLACEMENT_MOVE;
+            fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
+            myControllerState = MOVING;
+        }
+        if(arrivedAtDestination && lidarAcquisitionFlag){
+            myGrabState = MOVE_FORWARD_JARDINIERE;
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
+            printf("move<frontJardiniere> done\n");
+        } 
+        break;
+
+    case MOVE_FORWARD_JARDINIERE:
+        printf("moveForwardJardiniere started\n");
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = GET_IN_JARDINIERE;
+            myControllerState = MOVING;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = MOVE_FORWARD_JARDINIERE;
+        }
+        else{
+            myGrabState = DROP_PLANTS;
+            destination_set = 0;
+            arrivedAtDestination = 0;
+        }
+    
 
     case DROP_PLANTS:
         printf("dropPlants started\n");
@@ -411,7 +451,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = FINISHED;
+                myGrabState = MOVE_BACK_JARDINIERE;
                 receivedData[0] = '\0';
                 actuator_reception = 0;   
             } 
@@ -419,6 +459,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         }
         break;
     case MOVE_BACK_JARDINIERE:
+        printf("moveBackJardiniere started destination_set = %d et arrivedAtDestination = %d\n", destination_set,arrivedAtDestination);
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GET_BACK_JARDINIERE;
@@ -428,7 +469,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
             myGrabState = MOVE_BACK_JARDINIERE;
         }
         else{
-            myGrabState = LIFT_POTS;
+            myGrabState = FINISHED;
             destination_set = 0;
         }
         break; 
@@ -466,6 +507,7 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         break;
         
     case FINISHED:
+        //changeOfPlan = 1;
         break;
 
     default:

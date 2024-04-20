@@ -36,7 +36,7 @@ void waitingStrategy(){
     myControllerState = STOPPED;
     if(!forksCalibrated){
         myGrabState = CALIB_FORK;
-        manageGrabbing(NULL,NULL);
+        manageGrabbing(NULL);
     }
     else if((checkStartSwitch()||nextionStart) && readyToGo){
         gettimeofday(&startOfMatch, NULL);
@@ -65,7 +65,8 @@ void pointsStrategy(){
     //fprintf(stderr,"check3\n");
     float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
     //fprintf(stderr,"check10\n");
-    if(now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000 > matchDuration - TimeNeededToGetHome){
+    timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
+    if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
         //fprintf(stderr,"check11\n");
         mySupremeState = RETURN_TO_BASE;
         if(VERBOSE)
@@ -106,14 +107,14 @@ void actionStrategy(){
             printf("destinationY = %f\n", *destination.y);
             // destination_set = 1;
         }*/
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, bestPotZone);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
         }
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, bestPotZone);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
         }
@@ -147,6 +148,15 @@ void defineBestAction(){
     }
     //fprintf(stderr,"check7\n");
 };
+
+void defineJardiniereDestination(jardiniere* bestJardiniere){
+    pthread_mutex_lock(&lockFilteredPosition);
+    *destination.x = bestJardiniere->posX;
+    *destination.y = bestJardiniere->posY;
+    *destination.theta = 0;
+    pthread_mutex_unlock(&lockFilteredPosition);
+};
+
 
 void definePlantsDestination(plantZone* bestPlantZone){
     pthread_mutex_lock(&lockFilteredPosition);
