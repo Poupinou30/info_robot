@@ -119,13 +119,15 @@ void actionStrategy(){
         }*/
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
-            changeOfPlan = 1;
+            printf("changeOfPlant 1\n");
+             changeOfPlan = 1;
         }
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
+            printf("changeOfPlant 2\n");
             changeOfPlan = 1;
         }
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
@@ -134,6 +136,7 @@ void actionStrategy(){
         if(myGrabState != FINISHED || forksDeployed) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
+            printf("changeOfPlant 3\n");
         }
         break;
     default:
@@ -159,7 +162,7 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 65) || (myGrabState ==  GRAB_PLANTS_MOVE|| myGrabState == GRAB_PLANTS_CLOSE || myGrabState ==  GRAB_PLANTS_END || myGrabState == MOVE_FRONT_POTS || myGrabState == UNSTACK_POTS_MOVE || myGrabState == UNSTACK_POT_TAKE|| myGrabState == UNSTACK_POT_POSITIONING || myGrabState == UNSTACK_POT_DROP || myGrabState == GRAB_POTS_MOVE || myGrabState == ALIGN_POTS_MOVE || myGrabState == LIFT_POTS|| myGrabState == GRAB_ALL_POTS|| myGrabState == MOVE_FRONT_JARDINIERE|| myGrabState == MOVE_FORWARD_JARDINIERE|| myGrabState == DROP_PLANTS|| myGrabState ==  DROP_ALL|| myGrabState == MOVE_BACK_JARDINIERE)){
+    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 65) /*|| (myGrabState ==  GRAB_PLANTS_MOVE|| myGrabState == GRAB_PLANTS_CLOSE || myGrabState ==  GRAB_PLANTS_END || myGrabState == MOVE_FRONT_POTS || myGrabState == UNSTACK_POTS_MOVE || myGrabState == UNSTACK_POT_TAKE|| myGrabState == UNSTACK_POT_POSITIONING || myGrabState == UNSTACK_POT_DROP || myGrabState == GRAB_POTS_MOVE || myGrabState == ALIGN_POTS_MOVE || myGrabState == LIFT_POTS|| myGrabState == GRAB_ALL_POTS|| myGrabState == MOVE_FRONT_JARDINIERE|| myGrabState == MOVE_FORWARD_JARDINIERE|| myGrabState == DROP_PLANTS|| myGrabState ==  DROP_ALL|| myGrabState == MOVE_BACK_JARDINIERE)*/){
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
         

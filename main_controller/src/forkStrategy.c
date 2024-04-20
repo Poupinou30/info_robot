@@ -159,7 +159,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            receivedData[0] = '\0';
+            //receivedData[0] = '\0';
             if(!done1){
                 //printf("rentre dans le if setUpperFork\n");
                 done1 = setUpperFork(142);
