@@ -121,7 +121,7 @@ void actionStrategy(){
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case SOLAR_PANELS_ACTION: 
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, bestPotZone);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
         }

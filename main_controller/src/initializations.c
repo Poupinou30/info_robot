@@ -171,7 +171,7 @@ void initializeJardinieres(){
     
 }
 
-void initializeSolarZones(){
+void initializesolarZones(){
     /*layout
     
 
@@ -180,38 +180,38 @@ void initializeSolarZones(){
     
     */
     solarZones = (solarZone*)malloc(sizeof(solarZone)*3);
-    solarzones[0].zoneID = 0;
-    solarzones[0].posX = 1.7824;
-    solarzones[0].posY = 0.5;
-    solarzones[0].stateLeft = 2;
-    solarzones[0].stateCenter = 2;
-    solarzones[0].stateRight = 2;
-    solarzones[0].targetPositionLowX = solarzones[0].posX;
-    solarzones[0].targetPositionLowY = solarzones[0].posY - solarOffset;
-    solarzones[0].targetPositionUpX = solarzones[0].posX;
-    solarzones[0].targetPositionUpY = solarzones[0].posY + solarOffset;
+    solarZones[0].zoneID = 0;
+    solarZones[0].posX = 1.7824;
+    solarZones[0].posY = 0.5;
+    solarZones[0].stateLeft = 2;
+    solarZones[0].stateCenter = 2;
+    solarZones[0].stateRight = 2;
+    solarZones[0].targetPositionLowX = solarZones[0].posX;
+    solarZones[0].targetPositionLowY = solarZones[0].posY - solarOffset;
+    solarZones[0].targetPositionUpX = solarZones[0].posX;
+    solarZones[0].targetPositionUpY = solarZones[0].posY + solarOffset;
 
-    solarzones[1].zoneID = 1;
-    solarzones[1].posX = 1.7824;
-    solarzones[1].posY = 1.5;
-    solarzones[1].stateLeft = 2;
-    solarzones[1].stateCenter = 2;
-    solarzones[1].stateRight = 2;
-    solarzones[1].targetPositionLowX = solarzones[1].posX;
-    solarzones[1].targetPositionLowY = solarzones[1].posY - solarOffset;
-    solarzones[1].targetPositionUpX = solarzones[1].posX;
-    solarzones[1].targetPositionUpY = solarzones[1].posY + solarOffset;
+    solarZones[1].zoneID = 1;
+    solarZones[1].posX = 1.7824;
+    solarZones[1].posY = 1.5;
+    solarZones[1].stateLeft = 2;
+    solarZones[1].stateCenter = 2;
+    solarZones[1].stateRight = 2;
+    solarZones[1].targetPositionLowX = solarZones[1].posX;
+    solarZones[1].targetPositionLowY = solarZones[1].posY - solarOffset;
+    solarZones[1].targetPositionUpX = solarZones[1].posX;
+    solarZones[1].targetPositionUpY = solarZones[1].posY + solarOffset;
 
-    solarzones[2].zoneID = 2;
-    solarzones[2].posX = 1.7824;
-    solarzones[2].posY = 2.5;
-    solarzones[2].stateLeft = 2;
-    solarzones[2].stateCenter = 2;
-    solarzones[2].stateRight = 2;
-    solarzones[2].targetPositionLowX = solarzones[2].posX;
-    solarzones[2].targetPositionLowY = solarzones[2].posY - solarOffset;
-    solarzones[2].targetPositionUpX = solarzones[2].posX;
-    solarzones[2].targetPositionUpY = solarzones[2].posY + solarOffset;
+    solarZones[2].zoneID = 2;
+    solarZones[2].posX = 1.7824;
+    solarZones[2].posY = 2.5;
+    solarZones[2].stateLeft = 2;
+    solarZones[2].stateCenter = 2;
+    solarZones[2].stateRight = 2;
+    solarZones[2].targetPositionLowX = solarZones[2].posX;
+    solarZones[2].targetPositionLowY = solarZones[2].posY - solarOffset;
+    solarZones[2].targetPositionUpX = solarZones[2].posX;
+    solarZones[2].targetPositionUpY = solarZones[2].posY + solarOffset;
 }
 
 void initializeEndZones(){
