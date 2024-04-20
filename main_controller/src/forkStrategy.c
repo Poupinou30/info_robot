@@ -516,30 +516,17 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case WHEEL_TURN:
-        switch (myActuatorsState)
-        {
-        case SENDING_INSTRUCTION:
             if(!done){
                 if (myTeamColor == 0) done = setWheelSpeed(-10); 
                 else done = setWheelSpeed(10);
             } 
-            if(done) myActuatorsState = WAITING_ACTUATORS;
-            break;
-        
-        case WAITING_ACTUATORS:
-            if(!actuator_reception){
-                actuator_reception = UART_receive(UART_handle,receivedData);}
-            if(strcmp(receivedData,endMessage) == 0){
-                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
-                actuator_reception = 0;
-                myActuatorsState = SENDING_INSTRUCTION;
+            if(done){
                 myGrabState = MOVE_SOLAR;
-                receivedData[0] = '\0';
                 done = 0;
             } 
             break;
-        }
-        break;
+        
+
 
     case MOVE_SOLAR:
         if(destination_set == 0){

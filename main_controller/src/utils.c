@@ -54,11 +54,14 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     pthread_mutex_lock(&lockFilteredOpponent);
     pthread_mutex_lock(&lockFilteredPosition);
     double distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
+    double distanceFromDestination;
+    if(destination_set) distanceFromDestination = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
 
     if(lidarElapsedTime > 500) v_max = 0.3;
     else if (distanceFromOpponent<0.7){
         v_max = 0.5*distanceFromOpponent/0.7;
     }
+    else if(myMoveType == DISPLACEMENT_MOVE && destination_set && distanceFromDestination < 0.15 ) v_max = 0.15;
     else v_max = 0.5;
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockFilteredPosition);

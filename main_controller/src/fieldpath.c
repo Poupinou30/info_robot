@@ -366,7 +366,7 @@ void computeForceVector(){
     
     float k_att_xy = 0.4;
     float k_att_tang = 0.1;
-    k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_xy = k_att_xy * (1+ 1/(0.5+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
     
@@ -548,10 +548,10 @@ void computeForceVector(){
             else sign_f_rep_y = 1;
             if(tempoObstacle->moving) k_reduc_repul = 1;
             else{
-                if(distanceFromDest < 0.15){
-                    k_reduc_repul = 0.3; 
-                } 
-                else k_reduc_repul = 1;
+                 if(distanceFromDest < 0.20){
+                        k_reduc_repul = ((distanceFromDest)/0.20)*((distanceFromDest)/0.20); 
+                    } 
+                    else k_reduc_repul = 1;
             } 
             f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
             f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
@@ -724,7 +724,7 @@ void myPotentialFieldController(){
                     }
                     break;
                 case (SOLARMOVE):
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.650){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.60){
                         destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
@@ -732,13 +732,13 @@ void myPotentialFieldController(){
                         if(myTeamColor == 0)
                         {
                             outputSpeed[0] = 0; 
-                            outputSpeed[1] = - POT_SPEED;
+                            outputSpeed[1] = - POT_SPEED/2;
                             outputSpeed[2] = 0;
                         }
                         else
                         {
                             outputSpeed[0] = 0; 
-                            outputSpeed[1] = POT_SPEED;
+                            outputSpeed[1] = +POT_SPEED/2;
                             outputSpeed[2] = 0;
                         }
                     }
