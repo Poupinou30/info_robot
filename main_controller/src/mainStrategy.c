@@ -120,8 +120,10 @@ void actionStrategy(){
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case SOLAR_PANELS_ACTION: 
-        printf("Solar\n");
-        //TODO
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone, bestPotZone);//CHANGER  NULL PAR BESTPOTZONE
+        else{
+            changeOfPlan = 1;
+        }
         break;
     default:
         break;
@@ -134,7 +136,6 @@ void returnToBaseStrategy(){
 
 void defineBestAction(){
     bestPlantZone = computeBestPlantsZone();
-    printf("not yet lol \n");
     bestPotZone = computeBestPotsZone();
     if(bestPlantZone->numberOfPlants > 2){
         myActionChoice = PLANTS_POTS_ACTION;
