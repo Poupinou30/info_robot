@@ -592,13 +592,14 @@ void computeForceVector(){
                 else sign_f_rep_x = 1;
                 if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
-                if(myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.1) k_reduc_repul = 0;
+                if(myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.06) k_reduc_repul = 0;
                 else if(tempoObstacle->obstacleID == 0 && distanceFromDest>0.2) k_reduc_repul = 0.2;
                 else{
                     if(distanceFromDest < 0.20){
                         if(tempoObstacle->obstacleID == 0) k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20)*0.2; 
-                        else k_reduc_repul = k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20);
-                    } 
+                        else  k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
+                    }
+                    else k_reduc_repul = 1; 
                     
                 } 
                 printf("repul force for obstacle with id = %d is %f and obstacle isEnabled = %d\n",tempoObstacle->obstacleID,k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)),tempoObstacle->obstacleEnabled);
