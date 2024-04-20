@@ -400,7 +400,12 @@ void manageGrabbing(plantZone* bestPlantZone){
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
-            if(!done1) done1 = setLowerFork(135);
+            if (nbrOfPots == 6){
+                if(!done1) done1 = setLowerFork(135);
+            }
+            else{
+                if(!done1) done1 = setLowerFork(130);
+            }
             if(done1) myActuatorsState = WAITING_ACTUATORS;
             break;
 
@@ -491,7 +496,13 @@ void manageGrabbing(plantZone* bestPlantZone){
         {
         case SENDING_INSTRUCTION:
             if(!done1) done1 = setLowerFork(75);
-            if(!done2) done2 = done1 && setUpperFork(80);
+
+            if (nbrOfPots == 6){
+                if(!done2) done2 = done1 && setUpperFork(80);
+            }else{
+                if(!done2) done2 = done1 && setUpperFork(86);
+            }
+    
             if(done1 && done2) myActuatorsState = WAITING_ACTUATORS;
             break;
 

@@ -216,13 +216,18 @@ void definePlantsDestination(plantZone* bestPlantZone){
 
 void definePotsDestination(potZone* bestPotZone){
     pthread_mutex_lock(&lockFilteredPosition);
-    
-    *destination.x = bestPotZone->posX;
-    *destination.y = bestPotZone->posY;
-    if(*myFilteredPos.y < bestPlantZone->posY) {
-        *destination.theta = 180;
-    }else{
+    if(nbrOfPots == 6){
+        *destination.x = bestPotZone->pos6X;
+        *destination.y = bestPotZone->pos6Y;
+    }
+    else{
+        *destination.x = bestPotZone->pos5X;
+        *destination.y = bestPotZone->pos5Y;
+    }
+    if(*myFilteredPos.y < *destination.y) {
         *destination.theta = 0;
+    }else{
+        *destination.theta = 180;
     }
     pthread_mutex_unlock(&lockFilteredPosition);
 }

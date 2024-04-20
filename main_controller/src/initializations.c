@@ -99,33 +99,57 @@ void initializePotZones(){
     */
     potZones = (potZone*)malloc(sizeof(potZone)*6);
     potZones[0].zoneID = 0;
-    potZones[0].posX = 0.6125+POTWIDTH;
+    potZones[0].posX = 0.6125;
     potZones[0].posY = 0.4305;
+    potZones[0].pos5X = potZones[0].posX - (POTWIDTH)/2;
+    potZones[0].pos5Y = potZones[0].posY;
+    potZones[0].pos6X = potZones[0].posX + POTWIDTH;
+    potZones[0].pos6Y = potZones[0].posY;
     potZones[0].numberOfPots = 6;
 
     potZones[1].zoneID = 1;
-    potZones[1].posX = 0.6125-POTWIDTH;
-    potZones[1].posY = 2.5695 ;   
+    potZones[1].posX = 0.6125;
+    potZones[1].posY = 2.5695 ;
+    potZones[1].pos5X = potZones[1].posX + (POTWIDTH)/2;
+    potZones[1].pos5Y = potZones[1].posY;
+    potZones[1].pos6X = potZones[1].posX - POTWIDTH;
+    potZones[1].pos6Y = potZones[1].posY;
     potZones[1].numberOfPots = 6;
 
     potZones[2].zoneID = 2;
-    potZones[2].posX = 1.3875+POTWIDTH;
+    potZones[2].posX = 1.3875;
     potZones[2].posY = 0.4305;
+    potZones[2].pos5X = potZones[2].posX - (POTWIDTH)/2;
+    potZones[2].pos5Y = potZones[2].posY;
+    potZones[2].pos6X = potZones[2].posX + POTWIDTH;
+    potZones[2].pos6Y = potZones[2].posY;
     potZones[2].numberOfPots = 6;
 
     potZones[3].zoneID = 3;
-    potZones[3].posX = 1.3875-POTWIDTH;
+    potZones[3].posX = 1.3875;
     potZones[3].posY = 2.5695;
+    potZones[3].pos5X = potZones[3].posX + (POTWIDTH)/2;
+    potZones[3].pos5Y = potZones[3].posY;
+    potZones[3].pos6X = potZones[3].posX - POTWIDTH;
+    potZones[3].pos6Y = potZones[3].posY;
     potZones[3].numberOfPots = 6;
 
     potZones[4].zoneID = 4;
     potZones[4].posX = 1.5695;
-    potZones[4].posY = 1+POTWIDTH;
+    potZones[4].posY = 1;
+    potZones[4].pos5X = potZones[4].posX;
+    potZones[4].pos5Y = potZones[4].posY - (POTWIDTH)/2;
+    potZones[4].pos6X = potZones[4].posX;
+    potZones[4].pos6Y = potZones[4].posY + POTWIDTH;
     potZones[4].numberOfPots = 6;
 
     potZones[5].zoneID = 5;
     potZones[5].posX = 1.5695;
-    potZones[5].posY = 2+POTWIDTH;
+    potZones[5].posY = 2;
+    potZones[5].pos5X = potZones[5].posX;
+    potZones[5].pos5Y = potZones[5].posY - (POTWIDTH)/2;
+    potZones[5].pos6X = potZones[5].posX;
+    potZones[5].pos6Y = potZones[5].posY + POTWIDTH;
     potZones[5].numberOfPots = 6;
 }
 void initializeJardinieres(){

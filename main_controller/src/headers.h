@@ -86,6 +86,10 @@ typedef struct potZone{
     int zoneID;
     float posX;
     float posY;
+    float pos5X;
+    float pos5Y;
+    float pos6X;
+    float pos6Y;
     int numberOfPots;
     int obstacleID;
 } potZone;
@@ -342,5 +346,6 @@ uint8_t forksCalibrated;
 
 extern float timeFromStartOfMatch;
 uint8_t solarDone;
+uint8_t nbrOfPots;
 
 void resetErrorLists();

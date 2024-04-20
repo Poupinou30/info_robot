@@ -505,8 +505,6 @@ plantZone* computeBestPlantsZone(){
 potZone* computeBestPotsZone(){
     printf("computing for pots\n");
     potZone* bestPotZone = &potZones[0];
-    printf("nolwenn a raison\n");
-    printf("bestpozone infos: %f %f %d\n",bestPotZone->posX,bestPotZone->posY,bestPotZone->numberOfPots);
     int numberOfPots = bestPotZone->numberOfPots;
     printf("numberofplants\n");
     pthread_mutex_lock(&lockFilteredPosition);
