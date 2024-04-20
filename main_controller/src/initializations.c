@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-float solarOffset = 0.235;
+float solarOffset = 0.255;
 
 void initializePlantZones(){
     /*
@@ -181,7 +181,7 @@ void initializeSolarZones(){
     */
     solarZones = (solarZone*)malloc(sizeof(solarZone)*3);
     solarZones[0].zoneID = 0;
-    solarZones[0].posX = 1.7824;
+    solarZones[0].posX = 1.75;
     solarZones[0].posY = 0.5;
     solarZones[0].stateLeft = 2;
     solarZones[0].stateCenter = 2;
@@ -192,7 +192,7 @@ void initializeSolarZones(){
     solarZones[0].targetPositionUpY = solarZones[0].posY + solarOffset;
 
     solarZones[1].zoneID = 1;
-    solarZones[1].posX = 1.7824;
+    solarZones[1].posX = 1.75;
     solarZones[1].posY = 1.5;
     solarZones[1].stateLeft = 2;
     solarZones[1].stateCenter = 2;
@@ -203,7 +203,7 @@ void initializeSolarZones(){
     solarZones[1].targetPositionUpY = solarZones[1].posY + solarOffset;
 
     solarZones[2].zoneID = 2;
-    solarZones[2].posX = 1.7824;
+    solarZones[2].posX = 1.75;
     solarZones[2].posY = 2.5;
     solarZones[2].stateLeft = 2;
     solarZones[2].stateCenter = 2;

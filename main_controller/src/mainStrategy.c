@@ -146,6 +146,7 @@ void defineBestAction(){
     }
     else{*/
         myActionChoice = SOLAR_PANELS_ACTION;
+        myGrabState = SOLAR_SET;
     //}
     //fprintf(stderr,"check7\n");
 };
@@ -188,11 +189,24 @@ void definePotsDestination(potZone* bestPotZone){
 }
 
 void defineSolarDestination(solarZone* bestSolarZone){
+    printf("before targetPositon\n");
     pthread_mutex_lock(&lockFilteredPosition);
-    *destination.x = bestSolarZone->posX;
-    *destination.y = bestSolarZone->posY;
-    *destination.theta = 0;
+    pthread_mutex_lock(&lockDestination);
+    if(*myFilteredPos.y < bestSolarZone->posY) {
+        //printf("dans le if 1\n");
+        *destination.x = bestSolarZone->targetPositionLowX;
+        *destination.y = bestSolarZone->targetPositionLowY;
+        *destination.theta = 0;
+        //printf("fin le if 1\n");
+    }
+    else{
+        *destination.x = bestSolarZone->targetPositionUpX;
+        *destination.y = bestSolarZone->targetPositionUpY;
+        *destination.theta = 0;
+    }
+    pthread_mutex_unlock(&lockDestination);
     pthread_mutex_unlock(&lockFilteredPosition);
+
 };
 
 void defineEndZoneDestination(endZone* bestEndZone){

@@ -485,7 +485,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = MOVING;
         }
         if(arrivedAtDestination){
-            myGrabState = MOVE_SOLAR;
+            myGrabState = WHEEL_TURN;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
             destination_set = 0;
@@ -507,7 +507,7 @@ void manageGrabbing(plantZone* bestPlantZone){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 actuator_reception = 0;
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = WHEEL_TURN;
+                myGrabState = MOVE_FRONT_SOLAR;
                 receivedData[0] = '\0';
                 done = 0;
             } 

@@ -399,7 +399,7 @@ void computeForceVector(){
     else if(error>180){
         error-=360;
     }
-    if(pow(measuredSpeedX*measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5)< 0.05 && fabs(error) > 15 && (*myFilteredPos.x > 0.15 || *myFilteredPos.x <1.85 || *myFilteredPos.y > 0.15 || *myFilteredPos.y <2.85)){
+    if(pow(measuredSpeedX*measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5)< 0.05 && fabs(error) > 15 && (*myFilteredPos.x > 0.25 || *myFilteredPos.x <1.75 || *myFilteredPos.y > 0.25 || *myFilteredPos.y <2.75)){
         turningMove = 1;
         
     }
