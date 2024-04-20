@@ -171,7 +171,7 @@ void initializeJardinieres(){
     
 }
 
-void initializesolarZones(){
+void initializeSolarZones(){
     /*layout
     
 

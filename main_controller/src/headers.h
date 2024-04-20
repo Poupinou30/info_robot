@@ -318,13 +318,13 @@ plantZone* computeBestPlantsZone();
 potZone* computeBestPotsZone();
 endZone* computeBestDropZone();
 jardiniere* computeBestJardiniere();
-solarpanel* computeBestSolarZone();
+solarZone* computeBestSolarZone();
 endZone* computeBestEndZone();
 void definePlantsDestination(plantZone* bestPlantZone);
 void definePotsDestination(potZone* bestPotZone);
 void definedropZoneDestination(endZone* bestDropZone);
 void defineJardiniereDestination(jardiniere* bestJardiniere);
-void defineSolarDestination(solarpanel* bestSolarPanel);
+void defineSolarDestination(solarZone* bestSolarZone);
 void defineEndZoneDestination(endZone* bestEndZone);
 void defineJardiniereDestination(jardiniere* bestJardiniere);
 
