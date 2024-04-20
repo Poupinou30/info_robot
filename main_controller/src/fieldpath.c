@@ -7,7 +7,7 @@
 #define POT_SPEED 0.1
 
 float fixActionDistance = 0.3;
-float mobileActionDistance = 0.4;
+float mobileActionDistance = 0.3;
 float myDistanceList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
 float myErrorList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
 
@@ -592,15 +592,16 @@ void computeForceVector(){
                 else sign_f_rep_x = 1;
                 if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
-                if(myGrabState = MOVE_FRONT_JARDINIERE && distanceFromDest < 0.1) k_reduc_repul = 0;
-                else if(tempoObstacle->moving && distanceFromDest>0.2) k_reduc_repul = 0.2;
+                if(myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.1) k_reduc_repul = 0;
+                else if(tempoObstacle->obstacleID == 0 && distanceFromDest>0.2) k_reduc_repul = 0.2;
                 else{
                     if(distanceFromDest < 0.20){
-                        k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); 
+                        if(tempoObstacle->obstacleID == 0) k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20)*0.2; 
+                        else k_reduc_repul = k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20);
                     } 
-                    else k_reduc_repul = 1;
+                    
                 } 
-                //printf("repul force for obstacle with id = %d is %f \n",tempoObstacle->obstacleID,k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)));
+                printf("repul force for obstacle with id = %d is %f and obstacle isEnabled = %d\n",tempoObstacle->obstacleID,k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)),tempoObstacle->obstacleEnabled);
                 f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
                 f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
 

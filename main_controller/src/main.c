@@ -130,7 +130,9 @@ int main(){
         {
             if(makeLog) writeLog();
             
+            printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
             mainStrategy();
+            
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
@@ -152,6 +154,7 @@ int main(){
                     printf("timeElapsed = %f\n",timeFromStartOfMatch);
                     printf("myTeam = %d\n",myTeamColor);
                     printf("forksDeployed = %d\n",forksDeployed);
+                    //printf("obstacle 14 enabled? = %d\n",myObstacleList[14].enabled);
                 }
 
                 elapsedTime = 0;

@@ -34,7 +34,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
+        if(arrivedAtDestination && lidarAcquisitionFlag){
             myGrabState = GRAB_PLANTS_INIT;
             myControllerState = STOPPED;
             destination_set = 0;
@@ -44,6 +44,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
         
     case CALIB_FORK:
+        printf("Calibrating\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -203,13 +204,17 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = MOVING;
             myMoveType = DISPLACEMENT_MOVE;
         }
-        if(arrivedAtDestination){
-            printf("dans if 1 \n");
+        else if(arrivedAtDestination){
+            printf("dans if 2 \n");
             myGrabState = UNSTACK_POTS_MOVE;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
             destination_set = 0;
         } 
+        else{
+            printf("dans if 3 \n");
+            myGrabState = MOVE_FRONT_POTS;
+        }
         break;
 
     case UNSTACK_POTS_MOVE: // ça c'est de front vers captured sur le ppt
@@ -397,7 +402,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination/* && lidarAcquisitionFlag*/){
+        if(arrivedAtDestination && lidarAcquisitionFlag){
             myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
@@ -486,6 +491,8 @@ void manageGrabbing(plantZone* bestPlantZone){
         else{
             myGrabState = FINISHED;
             destination_set = 0;
+            arrivedAtDestination = 0;
+            
         }
         break; 
 
@@ -498,7 +505,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
+        if(arrivedAtDestination && lidarAcquisitionFlag){
             myGrabState = WHEEL_TURN;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
@@ -564,7 +571,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     default:
-        break;
+        printf("URGENCE URGENCE !!!!!!!!!\n");
     }
 }
 

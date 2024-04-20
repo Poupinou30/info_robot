@@ -7,6 +7,15 @@ struct timeval now;
 
 
 void mainStrategy(){
+    gettimeofday(&now, NULL);
+    if(startOfMatch.tv_sec == 0 && startOfMatch.tv_usec == 0){
+        gettimeofday(&startOfMatch, NULL);
+        timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
+    }
+    
+    if(timeFromStartOfMatch > matchDuration){
+        mySupremeState = GAME_OVER;
+    }
     switch (mySupremeState)
     {
     case WAITING_FOR_START:
@@ -37,7 +46,7 @@ potZone* bestPotZone;
 void waitingStrategy(){
     myControllerState = STOPPED;
     printf("readyToGo = %d nextionStart = %d, checkstartSwitch = %d\n", readyToGo, nextionStart, checkStartSwitch());
-    if(!forksCalibrated){
+    if(myGrabState != FINISHED){
         myGrabState = CALIB_FORK;
         manageGrabbing(NULL);
     }
@@ -163,7 +172,8 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 65) /*|| (myGrabState ==  GRAB_PLANTS_MOVE|| myGrabState == GRAB_PLANTS_CLOSE || myGrabState ==  GRAB_PLANTS_END || myGrabState == MOVE_FRONT_POTS || myGrabState == UNSTACK_POTS_MOVE || myGrabState == UNSTACK_POT_TAKE|| myGrabState == UNSTACK_POT_POSITIONING || myGrabState == UNSTACK_POT_DROP || myGrabState == GRAB_POTS_MOVE || myGrabState == ALIGN_POTS_MOVE || myGrabState == LIFT_POTS|| myGrabState == GRAB_ALL_POTS|| myGrabState == MOVE_FRONT_JARDINIERE|| myGrabState == MOVE_FORWARD_JARDINIERE|| myGrabState == DROP_PLANTS|| myGrabState ==  DROP_ALL|| myGrabState == MOVE_BACK_JARDINIERE)*/){
+    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) /*|| (myGrabState ==  GRAB_PLANTS_MOVE|| myGrabState == GRAB_PLANTS_CLOSE || myGrabState ==  GRAB_PLANTS_END || myGrabState == MOVE_FRONT_POTS || myGrabState == UNSTACK_POTS_MOVE || myGrabState == UNSTACK_POT_TAKE|| myGrabState == UNSTACK_POT_POSITIONING || myGrabState == UNSTACK_POT_DROP || myGrabState == GRAB_POTS_MOVE || myGrabState == ALIGN_POTS_MOVE || myGrabState == LIFT_POTS|| myGrabState == GRAB_ALL_POTS|| myGrabState == MOVE_FRONT_JARDINIERE|| myGrabState == MOVE_FORWARD_JARDINIERE|| myGrabState == DROP_PLANTS|| myGrabState ==  DROP_ALL|| myGrabState == MOVE_BACK_JARDINIERE)*/){
+        printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
         
