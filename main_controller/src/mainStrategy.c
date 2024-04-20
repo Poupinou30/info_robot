@@ -165,6 +165,8 @@ void returnToBaseStrategy(){
 };
 
 void defineBestAction(){
+    // dream sequence (see ppt):
+        // F1.P0.JB1.F0.JB0.F3.P4.SB2.(SZ1.SZ0).SB2
     printf("define best action called\n");
     
     bestPlantZone = computeBestPlantsZone();
