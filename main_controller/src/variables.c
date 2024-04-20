@@ -33,7 +33,6 @@ double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
 uint8_t startingPoint = 6;
-uint8_t startingPoint = 6;
 
 uint8_t changeOfPlan = 1;
 uint8_t forksCalibrated = 0;
