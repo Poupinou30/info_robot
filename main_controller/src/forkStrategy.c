@@ -202,9 +202,11 @@ void manageGrabbing(plantZone* bestPlantZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                if (myActionChoice == PLANTS_ACTION){
+                if (myActionChoice == PLANTS_JARD_ACTION){
                     myGrabState = MOVE_FRONT_JARDINIERE;
-                }else if ( myActionChoice == PLANTS_POTS_ACTION){
+                }else if ( myActionChoice == PLANTS_POTS_JARD_ACTION){
+                    myGrabState = MOVE_FRONT_POTS;
+                }else if (myActionChoice == PLANTS_POTS_DROP_ACTION){
                     myGrabState = MOVE_FRONT_POTS;
                 }
                 destination_set = 0;
@@ -405,7 +407,23 @@ void manageGrabbing(plantZone* bestPlantZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = MOVE_FRONT_JARDINIERE; // changer vers un Move_Front_jardiniere
+
+                pthread_mutex_lock(&lockFilteredPosition);
+                float x = *myFilteredPos.x;
+                float y = *myFilteredPos.y;
+                pthread_mutex_unlock(&lockFilteredPosition);
+
+                jardiniere* closestJard_pots = computeClosestJardiniere(x, y);
+                float distance_pots_jardinnière = computeEuclidianDistance(closestJard.posX, closestJard.posY, bestPotZone.posX, bestPotZone.posY);
+                endZone* closestDrop = computeBestDropZone_pots();
+                float distance_pots_drop = computeEuclidianDistance(closestDrop.posX, closestDrop.posY, bestPotZone.posX, bestPotZone.posY);
+                if (distance_pots_jardinnière<distance_pots_drop){
+                    myGrabState = MOVE_FRONT_JARDINIERE;
+                }else{
+                    myGrabState = MOVE_DROP_ZONE;
+                }
+
+                 // changer vers un Move_Front_jardiniere
                 receivedData[0] = '\0';
                 actuator_reception = 0;
                 done1 = 0; done2 = 0; done3 = 0;
@@ -522,6 +540,30 @@ void manageGrabbing(plantZone* bestPlantZone){
             
         }
         break; 
+
+    case MOVE_DROP_ZONE:  // on aurait surement besoin de descendre les fourches
+        if(destination_set != 1){
+
+            pthread_mutex_lock(&lockFilteredPosition);
+            float x = *myFilteredPos.x;
+            float y = *myFilteredPos.y;
+            pthread_mutex_unlock(&lockFilteredPosition);
+            endZone* dropZone = computeBestDropZone_pots(x,y);
+            defineEndZoneDestination(dropZone);
+            destination_set = 1;
+            resetErrorLists();
+            myMoveType = DISPLACEMENT_MOVE;
+            fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
+            myControllerState = MOVING;
+        }
+        if(arrivedAtDestination && lidarAcquisitionFlag){
+            myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
+            destination_set = 0;
+            printf("move<frontJardiniere> done\n");
+        } 
+        break;
 
     case MOVE_FRONT_SOLAR:
         printf("Dans move front solar panels et arrivedAtDestination = %d \n",arrivedAtDestination);

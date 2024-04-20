@@ -44,7 +44,6 @@ void mainStrategy(){
 plantZone* bestPlantZone;
 potZone* bestPotZone;
 
-
 void waitingStrategy(){
     myControllerState = STOPPED;
     printf("readyToGo = %d nextionStart = %d, checkstartSwitch = %d\n", readyToGo, nextionStart, checkStartSwitch());
@@ -120,7 +119,7 @@ void actionStrategy(){
     // encore un peu éclaté, mais ça commence à ressembler à quelque chose
     switch (myActionChoice)
     {
-    case PLANTS_ACTION:
+    case PLANTS_JARD_ACTION:
         printf("myGrabstate = %d\n", myGrabState);
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
@@ -129,10 +128,18 @@ void actionStrategy(){
         }
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
-    case PLANTS_POTS_ACTION:
+    case PLANTS_POTS_JARD_ACTION:
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             printf("changeOfPlant 2\n");
+            changeOfPlan = 1;
+        }
+        //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
+        break;
+    case PLANTS_POTS_DROP_ACTION:
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
+        else{
+            printf("changeOfPlant 3\n");
             changeOfPlan = 1;
         }
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
@@ -141,7 +148,7 @@ void actionStrategy(){
         if(myGrabState != FINISHED || forksDeployed) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
-            printf("changeOfPlant 3\n");
+            printf("changeOfPlant 4\n");
         }
         break;
     default:
@@ -171,15 +178,30 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone(); // update en fct des zones de dépot et jardinières
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) ){
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float distance_robot_plants_pot = computeEuclidianDistance(x, y, bestPlantZone.posX, bestPlantZone.posY) + computeEuclidianDistance(x, y, bestPotZone.posX, bestPotZone.posY);
+    jardiniere* closestJard_pots = computeClosestJardiniere(bestPotZone->posX, bestPotZone->posY);
+    jardiniere* closestJard_plants = computeClosestJardiniere(bestPlantZone->posX, bestPlantZone->posY);
+    float distance_pots_jardinnière = computeEuclidianDistance(closestJard.posX, closestJard.posY, bestPotZone.posX, bestPotZone.posY);
+    endZone* closestDrop = computeBestDropZone_pots();
+    float distance_pots_drop = computeEuclidianDistance(closestDrop.posX, closestDrop.posY, bestPotZone.posX, bestPotZone.posY);
+
+    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) && (distance_robot_plants_pot+closestJard_pots < computeEuclidianDistance(x, y, bestPlantZone.posX, bestPlantZone.posY)+closestJard_plants) ){
         printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
-        myActionChoice = PLANTS_POTS_ACTION;
+        myActionChoice = PLANTS_POTS_JARD_ACTION;
+        myGrabState = MOVE_FRONT_PLANTS;    
+    }
+    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 40) && ((computeEuclidianDistance(x, y, bestPlantZone.posX, bestPlantZone.posY))+closestJard_plants) < distance_robot_plants_pot+distance_pots_drop){
+        printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
+        myActionChoice = PLANTS_JARD_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
         
     }
     else{
-        bestPlantZone = computeBestPlantsZone();
-        myActionChoice = PLANTS_ACTION;
+        myActionChoice = PLANTS_POTS_DROP_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
         
     /*if(!solarDone){

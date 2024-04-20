@@ -596,6 +596,29 @@ jardiniere* computeBestJardiniere(){
     return bestJardiniere;
 }
 
+jardiniere* computeClosestJardiniere(float potX, float potY){
+    //fprintf(stderr,"Dans computeBestJardiniere ");
+    jardiniere* bestJardiniere = &jardinieres[3*myTeamColor];
+    int number_of_plants = jardinieres[3*myTeamColor].numberOfPlants;
+    
+    float smallestDistance = computeEuclidianDistance(potX, potY, jardinieres[3*myTeamColor].posX, jardinieres[3*myTeamColor].posY);
+    //fprintf(stderr,"Dans computeBestJardinier3 ");
+
+    for (int i = 1; i < 3; i++) {
+        if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
+            bestJardiniere = &jardinieres[3*myTeamColor+i];
+        }else if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
+            float distance = computeEuclidianDistance(potX, potY, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
+            if(distance < smallestDistance){
+                bestJardiniere = &jardinieres[3*myTeamColor+i];
+                smallestDistance = distance;
+            }
+        }
+    }
+    //fprintf(stderr,"Dans computeBestJardiniere4\n");
+    return bestJardiniere;
+}
+
 
 
 endZone* computeBestEndZone(){
@@ -614,5 +637,16 @@ endZone* computeBestEndZone(){
     return bestEndZone;
 }
 
+endZone* computeBestDropZone_pots(float potX, float potY){
+    endZone* bestDropZone = &endZones[3*myTeamColor];
+    float smallestDistance = computeEuclidianDistance(potX, potY, endZones[3*myTeamColor].posX, endZones[3*myTeamColor].posY);
+        
+    for (int i = 1; i < 3; i++) {
+        if((computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY) < smallestDistance) && (endZones[3*myTeamColor+i].zoneID != startingPoint - 1)){
+           bestDropZone = &endZones[i];
+        }
+    }
+    return bestDropZone;
+}
 
 
