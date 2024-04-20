@@ -498,7 +498,7 @@ void initializeMainController(){
     initializePlantZones();
     initializePotZones();
     initializeJardinieres();
-    initializeSolarPanels();
+    initializeSolarZones();
     initializeEndZones();
     spi_handle_front = initializeSPI(0);
     spi_handle_rear = initializeSPI(1);

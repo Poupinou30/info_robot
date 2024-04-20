@@ -212,6 +212,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
             myControllerState = MOVING;
+            
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = UNSTACK_POTS_MOVE;
@@ -455,6 +456,8 @@ void manageGrabbing(plantZone* bestPlantZone){
                 myGrabState = MOVE_BACK_JARDINIERE;
                 receivedData[0] = '\0';
                 actuator_reception = 0;   
+                done = 0;
+                done1 = 0; done2 = 0; done3 = 0;
             } 
             break;
         }
@@ -474,8 +477,77 @@ void manageGrabbing(plantZone* bestPlantZone){
             destination_set = 0;
         }
         break; 
+
+    case MOVE_FRONT_SOLAR:
+        if(destination_set != 1){
+            defineSolarDestination(computeBestSolarZone());
+            destination_set = 1;
+            myMoveType = DISPLACEMENT_MOVE;
+            fprintf(stderr, "before moving \n");
+            myControllerState = MOVING;
+        }
+        if(arrivedAtDestination){
+            myGrabState = WHEEL_TURN;
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
+            destination_set = 0;
+            printf("move<frontPlant> done\n");
+        } 
+        break;
+    case SOLAR_SET:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            if(!done) done = deployArm();
+            if(done) myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                actuator_reception = 0;
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = MOVE_FRONT_SOLAR;
+                receivedData[0] = '\0';
+                done = 0;
+            } 
+            break;
+        }
+        break;
+
+    case WHEEL_TURN:
+            if(!done){
+                if (myTeamColor == 0) done = setWheelSpeed(-10); 
+                else done = setWheelSpeed(10);
+            } 
+            if(done){
+                myGrabState = MOVE_SOLAR;
+                done = 0;
+            } 
+            break;
+        
+
+
+    case MOVE_SOLAR:
+        if(destination_set == 0){
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = SOLARMOVE;
+            myControllerState = MOVING;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = MOVE_SOLAR;
+        }
+        else{
+            myGrabState = FINISHED;
+            destination_set = 0;
+        }
+        break;
+        
     case FINISHED:
-        //changeOfPlan = 1;
+        setWheelSpeed(0);
+        retractForks();
         break;
 
     default:

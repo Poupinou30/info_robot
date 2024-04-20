@@ -54,11 +54,14 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     pthread_mutex_lock(&lockFilteredOpponent);
     pthread_mutex_lock(&lockFilteredPosition);
     double distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
+    double distanceFromDestination;
+    if(destination_set) distanceFromDestination = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
 
     if(lidarElapsedTime > 500) v_max = 0.3;
     else if (distanceFromOpponent<0.7){
         v_max = 0.5*distanceFromOpponent/0.7;
     }
+    else if(myMoveType == DISPLACEMENT_MOVE && destination_set && distanceFromDestination < 0.15 ) v_max = 0.15;
     else v_max = 0.5;
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockFilteredPosition);
@@ -544,6 +547,27 @@ endZone* computeBestDropZone(){
     return bestDropZone;
 }
 
+solarZone* computeBestSolarZone(){
+    solarZone* bestSolarZone = &solarZones[1];
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, solarZones[1].posX, solarZones[1].posY);
+    
+    if(myTeamColor == 0){
+        if(computeEuclidianDistance(x, y, solarZones[0].posX, solarZones[0].posY) < smallestDistance){
+            bestSolarZone = &solarZones[0];
+        }
+    }else{
+        if(computeEuclidianDistance(x, y, solarZones[2].posX, solarZones[2].posY) < smallestDistance){
+            bestSolarZone = &solarZones[2];
+        }
+    }    
+    return bestSolarZone;
+
+}
+
 jardiniere* computeBestJardiniere(){
     //fprintf(stderr,"Dans computeBestJardiniere ");
     jardiniere* bestJardiniere = &jardinieres[3*myTeamColor];
@@ -571,24 +595,7 @@ jardiniere* computeBestJardiniere(){
     return bestJardiniere;
 }
 
-solarpanel* computeBestSolarPanel(){
-    solarpanel* bestSolarPanel = &solarPanels[0];
-    int state = bestSolarPanel->state;
-    pthread_mutex_lock(&lockFilteredPosition);
-    float x = *myFilteredPos.x;
-    float y = *myFilteredPos.y;
-    pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, solarPanels[0].posX, solarPanels[0].posY);
 
-    for (int i = 1; i < 9; i++) {
-        if(solarPanels[i].state = myTeamColor){
-            if(computeEuclidianDistance(x, y, solarPanels[i].posX, solarPanels[i].posY) < smallestDistance){
-                bestSolarPanel = &solarPanels[i];
-            }
-        }
-    }
-    return bestSolarPanel;
-}
 
 endZone* computeBestEndZone(){
     endZone* bestEndZone = &endZones[3*myTeamColor];

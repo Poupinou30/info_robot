@@ -370,7 +370,7 @@ void computeForceVector(){
     
     float k_att_xy = 0.4;
     float k_att_tang = 0.1;
-    k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_xy = k_att_xy * (1+ 1/(0.5+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
     float k_repul =0.001 ;
@@ -402,7 +402,7 @@ void computeForceVector(){
     else if(error>180){
         error-=360;
     }
-    if(pow(measuredSpeedX*measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5)< 0.05 && fabs(error) > 15 && (*myFilteredPos.x > 0.15 || *myFilteredPos.x <1.85 || *myFilteredPos.y > 0.15 || *myFilteredPos.y <2.85)){
+    if(pow(measuredSpeedX*measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5)< 0.05 && fabs(error) > 15 && (*myFilteredPos.x > 0.25 || *myFilteredPos.x <1.75 || *myFilteredPos.y > 0.25 || *myFilteredPos.y <2.75)){
         turningMove = 1;
         
     }
@@ -689,6 +689,9 @@ void myPotentialFieldController(){
                             //destination_set = 0;
                             arrivedAtDestination = 1;
                             myControllerState = STOPPED;
+                            //destination_set = 0;
+                            arrivedAtDestination = 1;
+                            
                         }else{
                             outputSpeed[0] = + 1.6 * POT_SPEED; 
                             outputSpeed[1] = - 2 * POT_SPEED;
@@ -757,6 +760,26 @@ void myPotentialFieldController(){
                         outputSpeed[0] = 0; 
                         outputSpeed[1] = - GRAB_SPEED;
                         outputSpeed[2] = 0;
+                    }
+                    break;
+                case (SOLARMOVE):
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.60){
+                        destination_set = 0;
+                        arrivedAtDestination = 1;
+                        myControllerState = STOPPED;
+                    }else{
+                        if(myTeamColor == 0)
+                        {
+                            outputSpeed[0] = 0; 
+                            outputSpeed[1] = - POT_SPEED/2;
+                            outputSpeed[2] = 0;
+                        }
+                        else
+                        {
+                            outputSpeed[0] = 0; 
+                            outputSpeed[1] = +POT_SPEED/2;
+                            outputSpeed[2] = 0;
+                        }
                     }
                     break;
                 }  
