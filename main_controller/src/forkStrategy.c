@@ -29,6 +29,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             definePlantsDestination(bestPlantZone);
             removeObstacle(bestPlantZone->obstacleID);
             destination_set = 1;
+            resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;
             fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
@@ -83,7 +84,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             break;
         
         case WAITING_ACTUATORS:
-        fprintf(stderr,"actuators reception = %d\n",actuator_reception);
+        //fprintf(stderr,"actuators reception = %d\n",actuator_reception);
         
             if(!actuator_reception){
                 actuator_reception = UART_receive(UART_handle,receivedData);
@@ -103,11 +104,12 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case GRAB_PLANTS_MOVE:
-        printf("grabplantMove started\n");
+        //printf("grabplantMove started\n");
         if(destination_set == 0){ 
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_PLANTS;
             myControllerState = MOVING;
+            //destination_set = 1;
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = GRAB_PLANTS_MOVE;
@@ -121,7 +123,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case GRAB_PLANTS_CLOSE:
-        printf("grabplantClose started\n");
+        //printf("grabplantClose started\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -152,7 +154,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         
     case GRAB_PLANTS_END:
     
-        printf("grabplantEnd started\n");
+        //printf("grabplantEnd started\n");
         bestPlantZone->numberOfPlants = 0; 
         switch (myActuatorsState)
         {
@@ -191,7 +193,7 @@ void manageGrabbing(plantZone* bestPlantZone){
     case MOVE_FRONT_POTS: // else *****
         printf("moveFrontPots started\n");
         if(destination_set == 0){
-
+            resetErrorLists();
             computeBestPotsZone();
             definePotsDestination(bestPotZone);
             destination_set = 1;
@@ -351,6 +353,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case LIFT_POTS:
+        bestPotZone->numberOfPots = 0; 
         printf("liftPots started\n");
         switch (myActuatorsState)
         {
@@ -382,6 +385,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             bestJardiniere = computeBestJardiniere();
             defineJardiniereDestination(bestJardiniere);
             destination_set = 1;
+            resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;
             fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
             myControllerState = MOVING;
@@ -482,6 +486,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         if(destination_set != 1){
             defineSolarDestination(computeBestSolarZone());
             destination_set = 1;
+            resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;
             fprintf(stderr, "before moving \n");
             myControllerState = MOVING;

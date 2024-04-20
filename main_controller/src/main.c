@@ -136,7 +136,7 @@ int main(){
             updateKalman(NULL);
             if(mySupremeState != WAITING_FOR_START) sendFilteredPos(pipefdCL[1]);
             elapsedTime += currentElapsedTime;
-            if (elapsedTime >= 1000)
+            if (elapsedTime >= 300)
             {
                 
                 

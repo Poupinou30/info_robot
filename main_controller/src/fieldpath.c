@@ -11,6 +11,14 @@ float mobileActionDistance = 0.4;
 float myDistanceList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
 float myErrorList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
 
+void resetErrorLists(){
+    for (int i = 0; i < 20; ++i) {
+        myDistanceList[i] = INFINITY;
+        myErrorList[i] = INFINITY;
+    }
+
+}
+
 float computeEuclidianDistance(double x1, double y1, double x2, double y2){
     return pow(pow(x2-x1,2)+pow(y2-y1,2),0.5);
 }
@@ -249,7 +257,7 @@ void addRoundObstacle(double posX, double posY, double size, uint8_t moving, int
 
 void addOpponentObstacle(){
     obstacle myObstacle;
-    myObstacle.size = 0.25;
+    myObstacle.size = 0.22;
     myObstacle.isRectangle = 0;
     myObstacle.obstacleEnabled = 1;
     myObstacle.moving = 1;
@@ -436,7 +444,7 @@ void computeForceVector(){
     averageError = averageError/20;
     
 
-    if(averageDistanceFromDest < 0.015 && fabs(averageError) < 1){
+    if(averageDistanceFromDest < 0.0175 && fabs(averageError) < 1){
         arrivedAtDestination = 1;
         
     }
@@ -584,10 +592,11 @@ void computeForceVector(){
                 else sign_f_rep_x = 1;
                 if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
-                if(tempoObstacle->moving) k_reduc_repul = 1;
+                if(myGrabState = MOVE_FRONT_JARDINIERE && distanceFromDest < 0.1) k_reduc_repul = 0;
+                else if(tempoObstacle->moving && distanceFromDest>0.2) k_reduc_repul = 0.2;
                 else{
                     if(distanceFromDest < 0.20){
-                        k_reduc_repul = distanceFromDest+0.01/0.20; 
+                        k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); 
                     } 
                     else k_reduc_repul = 1;
                 } 
@@ -642,6 +651,14 @@ void myPotentialFieldController(){
             pthread_mutex_unlock(&lockFilteredPosition);
 
             opponentDistance = computeEuclidianDistance(myX,myY,myXOpponent,myYOpponent);
+            if(destination_set == 0){
+                xStart = *myFilteredPos.x;
+                yStart = *myFilteredPos.y;
+                destination_set = 1;
+                resetErrorLists();
+                arrivedAtDestination = 0;
+            }
+
             if(opponentDistance < 0.40 /*|| arrivedAtDestination == 1*/){ 
                 printf("opponent too close\n");
                 //S'arrête si il est bloqué par l'adversaire
@@ -650,17 +667,12 @@ void myPotentialFieldController(){
                 outputSpeed[2] = 0;
 
             } else{
-                if(destination_set == 0){
-                    xStart = *myFilteredPos.x;
-                    yStart = *myFilteredPos.y;
-                    destination_set = 1;
-                    arrivedAtDestination = 0;
-                }
+                
                 switch (myMovingSubState)
                 {
                 case GO_FORWARD_PLANTS:
-                    printf("goForwardPlant\n");
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.265){
+                    //printf("goForwardPlant\n");
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.28){
                         myControllerState = STOPPED;
                         // destination_set = 0;
                         arrivedAtDestination = 1;
@@ -789,7 +801,7 @@ void myPotentialFieldController(){
             break;
 
         case (DISPLACEMENT_MOVE):
-            printf("displacement move\n");
+            //printf("displacement move\n");
             computeForceVector();
             convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,outputSpeed);
             break;

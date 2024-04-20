@@ -20,6 +20,8 @@ void mainStrategy(){
         printf("returnToBase\n");
         returnToBaseStrategy();
         break;
+    case GAME_OVER:
+        myControllerState = STOPPED;
 
     default:
         break;
@@ -34,11 +36,13 @@ potZone* bestPotZone;
 
 void waitingStrategy(){
     myControllerState = STOPPED;
+    printf("readyToGo = %d nextionStart = %d, checkstartSwitch = %d\n", readyToGo, nextionStart, checkStartSwitch());
     if(!forksCalibrated){
         myGrabState = CALIB_FORK;
         manageGrabbing(NULL);
     }
-    else if((checkStartSwitch()||nextionStart) && readyToGo){
+    
+    else if((!checkStartSwitch()||nextionStart) && readyToGo){
         gettimeofday(&startOfMatch, NULL);
         mySupremeState = EARNING_POINTS;
         defineInitialPosition();
@@ -138,7 +142,17 @@ void actionStrategy(){
 };
 
 void returnToBaseStrategy(){
-    defineEndZoneDestination(computeBestEndZone());
+    if(destination_set != 1){
+        endZone* bestEndZone = computeBestEndZone();
+        defineEndZoneDestination(bestEndZone);
+        destination_set = 1;
+        resetErrorLists();
+        arrivedAtDestination = 0;}
+    else if(arrivedAtDestination){
+        mySupremeState = GAME_OVER;
+    }
+    
+
 };
 
 void defineBestAction(){
