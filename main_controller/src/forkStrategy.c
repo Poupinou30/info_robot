@@ -454,6 +454,8 @@ void manageGrabbing(plantZone* bestPlantZone){
                 myGrabState = MOVE_BACK_JARDINIERE;
                 receivedData[0] = '\0';
                 actuator_reception = 0;   
+                done = 0;
+                done1 = 0; done2 = 0; done3 = 0;
             } 
             break;
         }
@@ -490,6 +492,54 @@ void manageGrabbing(plantZone* bestPlantZone){
             printf("move<frontPlant> done\n");
         } 
         break;
+    case SOLAR_SET:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            if(!done) done = deployArm();
+            if(done) myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                actuator_reception = 0;
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = WHEEL_TURN;
+                receivedData[0] = '\0';
+                done = 0;
+            } 
+            break;
+        }
+        break;
+
+    case WHEEL_TURN:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            if(!done){
+                if (myTeamColor == 0) done = setWheelSpeed(-10); 
+                else done = setWheelSpeed(10);
+            } 
+            if(done) myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                actuator_reception = 0;
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = MOVE_SOLAR;
+                receivedData[0] = '\0';
+                done = 0;
+            } 
+            break;
+        }
+        break;
 
     case MOVE_SOLAR:
         if(destination_set == 0){
@@ -507,7 +557,8 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
         
     case FINISHED:
-        //changeOfPlan = 1;
+        setWheelSpeed(0);
+        retractForks();
         break;
 
     default:

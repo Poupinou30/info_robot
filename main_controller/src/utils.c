@@ -544,6 +544,27 @@ endZone* computeBestDropZone(){
     return bestDropZone;
 }
 
+solarZone* computeBestSolarZone(){
+    solarZone* bestSolarZone = &solarZones[1];
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, solarZones[1].posX, solarZones[1].posY);
+    
+    if(myTeamColor == 0){
+        if(computeEuclidianDistance(x, y, solarZones[0].posX, solarZones[0].posY) < smallestDistance){
+            bestSolarZone = &solarZones[0];
+        }
+    }else{
+        if(computeEuclidianDistance(x, y, solarZones[2].posX, solarZones[2].posY) < smallestDistance){
+            bestSolarZone = &solarZones[2];
+        }
+    }    
+    return bestSolarZone;
+
+}
+
 jardiniere* computeBestJardiniere(){
     //fprintf(stderr,"Dans computeBestJardiniere ");
     jardiniere* bestJardiniere = &jardinieres[3*myTeamColor];

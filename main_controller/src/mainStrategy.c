@@ -187,6 +187,14 @@ void definePotsDestination(potZone* bestPotZone){
     pthread_mutex_unlock(&lockFilteredPosition);
 }
 
+void defineSolarDestination(solarZone* bestSolarZone){
+    pthread_mutex_lock(&lockFilteredPosition);
+    *destination.x = bestSolarZone->posX;
+    *destination.y = bestSolarZone->posY;
+    *destination.theta = 0;
+    pthread_mutex_unlock(&lockFilteredPosition);
+};
+
 void defineEndZoneDestination(endZone* bestEndZone){
     pthread_mutex_lock(&lockFilteredPosition);
     *destination.x = bestEndZone->posX;

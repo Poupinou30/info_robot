@@ -732,13 +732,13 @@ void myPotentialFieldController(){
                         if(myTeamColor == 0)
                         {
                             outputSpeed[0] = 0; 
-                            outputSpeed[1] = - GRAB_SPEED;
+                            outputSpeed[1] = - POT_SPEED;
                             outputSpeed[2] = 0;
                         }
                         else
                         {
                             outputSpeed[0] = 0; 
-                            outputSpeed[1] = GRAB_SPEED;
+                            outputSpeed[1] = POT_SPEED;
                             outputSpeed[2] = 0;
                         }
                     }
