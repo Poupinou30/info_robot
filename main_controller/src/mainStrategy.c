@@ -159,6 +159,7 @@ void returnToBaseStrategy(){
 };
 
 void defineBestAction(){
+    printf("define best action called\n");
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
