@@ -101,7 +101,12 @@ void manageGrabbing(plantZone* bestPlantZone){
         case SENDING_INSTRUCTION:
             //if(!done0) done0 = setGripperPosition(0);
             if(!done1/*&&done0*/) done1 = deployForks();
-            if(!done2 && done1) done2 = done1 && setLowerFork(69);
+            if (myActionChoice == PLANTS_ACTION){
+                if(!done2 && done1) done2 = setLowerFork(74);
+            }
+            else if(myActionChoice == PLANTS_POTS_ACTION){
+                if(!done2 && done1) done2 = setLowerFork(69);
+            }
             if(!done3 && done2) done3 = done2 && setUpperFork(0);
             if(/*done0 &&*/ done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
@@ -427,7 +432,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
             myControllerState = MOVING;
         }
-        if(arrivedAtDestination && lidarAcquisitionFlag){
+        if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
             myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
             myControllerState = STOPPED;
             arrivedAtDestination = 0;

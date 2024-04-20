@@ -189,8 +189,14 @@ void defineJardiniereDestination(jardiniere* bestJardiniere){
     pthread_mutex_lock(&lockFilteredPosition);
     *destination.x = bestJardiniere->posX;
     *destination.y = bestJardiniere->posY;
-    if(*myFilteredPos.y < bestJardiniere->posY) *destination.theta = 0;
-    else *destination.theta = 180;
+    if((bestJardiniere->zoneID == 0) || ( bestJardiniere->zoneID == 3)){
+        *destination.theta = 90;
+    }else{
+        if(*myFilteredPos.y < bestJardiniere->posY){
+            *destination.theta = 0;
+        } 
+        else *destination.theta = 180;
+    }
     pthread_mutex_unlock(&lockFilteredPosition);
 };
 
