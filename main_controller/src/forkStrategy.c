@@ -497,7 +497,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break; 
 
     case MOVE_FRONT_SOLAR:
-        printf("Dans move front solar panels et arrivedAtDes")
+        printf("Dans move front solar panels et arrivedAtDestination = %d \n",arrivedAtDestination);
         if(destination_set != 1){
             defineSolarDestination(computeBestSolarZone());
             destination_set = 1;
