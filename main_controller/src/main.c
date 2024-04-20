@@ -118,7 +118,7 @@ int main(){
     gettimeofday(&lastExecutionTime, NULL);
     double elapsedTime = 0;
 
-    nextionStart = 1; //NE DOIT PAS RESTER!!!
+    nextionStart = 0; //NE DOIT PAS RESTER!!!
 
     while (1)
     {
@@ -149,8 +149,9 @@ int main(){
                     printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
                     printf("myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
                     printf("myDestination x = %f y = %f\n",*destination.x,*destination.y);
-                    printf("timeElapsed = %f",timeFromStartOfMatch);
-                    printf("myTeam = %d",myTeamColor);
+                    printf("timeElapsed = %f\n",timeFromStartOfMatch);
+                    printf("myTeam = %d\n",myTeamColor);
+                    printf("forksDeployed = %d\n",forksDeployed);
                 }
 
                 elapsedTime = 0;

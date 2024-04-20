@@ -626,12 +626,12 @@ float opponentDistance;
 void myPotentialFieldController(){
     double outputSpeed[3];
     if(myControllerState == MOVING){ 
-        printf("myMoveType = %d \n",myMoveType);
+        //printf("myMoveType = %d \n",myMoveType);
         switch(myMoveType)
         {
         case GRABBING_MOVE:
             
-            printf("grabbing move\n");
+            //printf("grabbing move\n");
             pthread_mutex_lock(&lockFilteredOpponent);
             pthread_mutex_lock(&lockFilteredPosition);
             myX = *myFilteredPos.x;
@@ -763,10 +763,12 @@ void myPotentialFieldController(){
                     }
                     break;
                 case (SOLARMOVE):
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.60){
-                        destination_set = 0;
+                    //printf("euclidian distance = %f\n",computeEuclidianDistance(xStart,yStart,myX,myY));
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.64){
+                        //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
+                        solarDone = 1;
                     }else{
                         if(myTeamColor == 0)
                         {

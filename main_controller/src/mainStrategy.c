@@ -69,6 +69,12 @@ void pointsStrategy(){
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
         //fprintf(stderr,"check11\n");
         mySupremeState = RETURN_TO_BASE;
+        removeObstacle(11);
+        removeObstacle(12);
+        removeObstacle(13);
+        removeObstacle(14);
+        removeObstacle(15);
+        removeObstacle(16);
         if(VERBOSE)
             printf("Match ending, going to RETURN_TO_BASE mode\n");
             printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
@@ -121,7 +127,7 @@ void actionStrategy(){
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case SOLAR_PANELS_ACTION: 
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED || forksDeployed) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
         else{
             changeOfPlan = 1;
         }
@@ -136,18 +142,19 @@ void returnToBaseStrategy(){
 };
 
 void defineBestAction(){
-    /*
+    
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if(bestPlantZone->numberOfPlants > 2){
+    if(bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 65){
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
         
     }
-    else{*/
+    else{
+    if(!solarDone){
         myActionChoice = SOLAR_PANELS_ACTION;
-        myGrabState = SOLAR_SET;
-    //}
+        myGrabState = SOLAR_SET;}
+    }
     //fprintf(stderr,"check7\n");
 };
 

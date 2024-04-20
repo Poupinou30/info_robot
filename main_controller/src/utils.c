@@ -291,6 +291,7 @@ void handle_sigsegv(int sig) {
 
 void handle_sigint(int sig) {
     processInstructionNew(0.0,0,0,i2c_handle_front,i2c_handle_rear);
+    setWheelSpeed(0);
     gpioTerminate();
     fprintf(stderr,"SIGINT handled \n");
     if (child_pid > 0) {

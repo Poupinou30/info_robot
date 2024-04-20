@@ -519,8 +519,8 @@ void manageGrabbing(plantZone* bestPlantZone){
 
     case WHEEL_TURN:
             if(!done){
-                if (myTeamColor == 0) done = setWheelSpeed(-10); 
-                else done = setWheelSpeed(10);
+                if (myTeamColor == 0) done = setWheelSpeed(-18); 
+                else done = setWheelSpeed(+18);
             } 
             if(done){
                 myGrabState = MOVE_SOLAR;
@@ -546,6 +546,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
         
     case FINISHED:
+        printf("rentre dans finished\n");
         setWheelSpeed(0);
         retractForks();
         break;

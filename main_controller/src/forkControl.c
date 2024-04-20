@@ -166,6 +166,7 @@ int setUpperFork(int height) {
 }
 
 int retractForks() {
+    forksDeployed = 0;
     sprintf(dataToSend, "<S-0>");
     if (retractForksCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
@@ -181,6 +182,7 @@ int retractForks() {
 }
 
 int deployForks() {
+    forksDeployed = 1;
     sprintf(dataToSend, "<S-1>");
     if (deployForksCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
@@ -196,6 +198,7 @@ int deployForks() {
 }
 
 int deployArm() {
+    forksDeployed = 1;
     sprintf(dataToSend, "<S-2>");
     if (deployArmCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);

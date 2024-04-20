@@ -3,7 +3,7 @@
 #define HEADERS
 #endif
 
-float solarOffset = 0.3;
+float solarOffset = 0.32;
 
 void initializePlantZones(){
     /*

@@ -341,3 +341,4 @@ uint8_t forksDeployed;
 uint8_t forksCalibrated;
 
 extern float timeFromStartOfMatch;
+uint8_t solarDone;
