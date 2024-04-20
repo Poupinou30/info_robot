@@ -433,6 +433,23 @@ void manageGrabbing(plantZone* bestPlantZone, potZone* bestPotZone){
         }
         break; 
 
+    case MOVE_FRONT_SOLAR:
+        if(destination_set != 1){
+            defineSolarDestination(computeBestSolarZone());
+            destination_set = 1;
+            myMoveType = DISPLACEMENT_MOVE;
+            fprintf(stderr, "before moving \n");
+            myControllerState = MOVING;
+        }
+        if(arrivedAtDestination){
+            myGrabState = MOVE_SOLAR;
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
+            destination_set = 0;
+            printf("move<frontPlant> done\n");
+        } 
+        break;
+
     case MOVE_SOLAR:
         if(destination_set == 0){
             myMoveType = GRABBING_MOVE;
