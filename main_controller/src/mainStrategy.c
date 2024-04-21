@@ -192,7 +192,7 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20 || timeFromStartOfMatch > 45) ){
+    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 43 || timeFromStartOfMatch > 45) ){
         printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;

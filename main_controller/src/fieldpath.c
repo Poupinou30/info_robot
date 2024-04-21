@@ -622,7 +622,7 @@ void computeForceVector(){
                     if(distanceFromDest < 0.2){
                         k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
                     }
-                    else k_reduc_repul = 1; 
+                    else k_reduc_repul = 0.1; 
                     
                 } 
 
