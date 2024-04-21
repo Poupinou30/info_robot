@@ -355,6 +355,25 @@ void removeObstacle(int obstacleID){
     fprintf(stderr,"Obstacle removed\n", myForce.obstacleNumber);
 }
 
+void enableObstacle(int obstacleID){
+    printf("Enabling obstacle #%d \n",obstacleID);
+    int j = 0;
+    while (myForce.obstacleList[j].obstacleID != obstacleID) {
+        /*for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
+            myForce.obstacleList[k] = myForce.obstacleList[k+1];
+        }
+        myForce.obstacleNumber--;
+        for (int k = j; k < myForce.movingNumber; ++k) {
+            myForce.movingIndexes[k]--;
+        }*/
+        j++;
+    }
+    myForce.obstacleList[j].obstacleEnabled = 1;
+    //myForce.movingNumber = 0;
+    //myForce.obstacleList = realloc(myForce.obstacleList, sizeof(obstacle)*myForce.obstacleNumber);
+    fprintf(stderr,"Obstacle enabled\n", myForce.obstacleNumber);
+}
+
 uint8_t turningMove = 0;
 
 void printObstacleLists(){
@@ -378,13 +397,14 @@ void computeForceVector(){
     
     float k_att_xy = 0.4;
     float k_att_tang = 0.1;
-    k_att_xy = k_att_xy * (1+ 1/(0.5+distanceFromDest)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_xy = k_att_xy * (1+ 1/(0.15+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
-    float k_repul =0.00005 ;
+    float k_repul =0.000005 ;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
     pthread_mutex_lock(&lockFilteredPosition); 
+    
 
 
 
@@ -402,7 +422,7 @@ void computeForceVector(){
     
     double error = theta-desiredTheta;
 
-    k_att_theta = k_att_theta * (1+ 3/(0.05+fabs(error))); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_theta = k_att_theta * (1+ 3/(0.1+fabs(error)/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
 
     if(error<-180){
         error += 360;
@@ -539,7 +559,7 @@ void computeForceVector(){
                 tempoRectangle[1] = tempoPoint2;
                 pthread_mutex_lock(&lockFilteredPosition);
                 myClosestPoint = closestPoint(tempoRectangle,myFilteredPos);
-                distance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *myClosestPoint.x, *myClosestPoint.y); //Calcul la distance
+                distance = fabs(computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *myClosestPoint.x, *myClosestPoint.y)-robotLengthYUndeployed); //Calcul la distance
                 //printf("distance = %f \n",distance);
                 pthread_mutex_unlock(&lockFilteredPosition);
                 tempoX = *myClosestPoint.x; //Calcule la position en x
@@ -830,6 +850,13 @@ void initializeObstacles(){
     addRoundObstacle(1.3,1,0.125,0,14); //Zone plantes f4
     addRoundObstacle(1.3,2,0.125,0,15);  //Zone plantes f5
     addRoundObstacle(1.5,1.5,0.125,0,16); //Zone plantes f6*/
+
+    addRoundObstacle(0.6125,0,0.125,0,21); //Zone POT f1
+    addRoundObstacle(0.60125,3,0.125,0,22); //Zone POT f2
+    addRoundObstacle(1.3875,0,0.125,0,23); //Zone pot f3
+    addRoundObstacle(1.3875,3,0.125,0,24); //Zone pot f4
+    addRoundObstacle(2,1,0.125,0,25);  //Zone pot f5
+    addRoundObstacle(2,2,0.125,0,26); //Zone pot f6*/
     /*removeObstacle(11);
     removeObstacle(12);
     removeObstacle(13);

@@ -125,10 +125,14 @@ float triangulationPierlot(float *x, float *y,
 
 void* beacon_data(void* argument){
     float distanceToCenter;
-    float oldError = 100;
+    float oldError = INFINITY;
     if(verbose) printf("rentre dans beaconData\n");
     float oldPerimetre = 0;
-    float oldIsoceleCondition = 999;
+    float oldIsoceleCondition = INFINITY;
+    float debugPerimetre;
+    float debugIsoceleCondition;
+    float debugBalises[3][2];
+    
     /*for(int i = 0; i<counter; i++){
         if(verbose) fprintf(stderr,"Point at angle %f and distance %f \n",a[i],d[i]);
 
@@ -378,10 +382,34 @@ void* beacon_data(void* argument){
 
                     uint8_t condition = (beaconTab[0].angle > (angle_horlogique0 - angleTolerance) && beaconTab[0].angle < (angle_horlogique0 + angleTolerance)) && (beaconTab[1].angle > (angle_horlogique1 - angleTolerance) && beaconTab[1].angle < (angle_horlogique1 + angleTolerance)) && (beaconTab[2].angle > (angle_horlogique2 - angleTolerance) && beaconTab[2].angle < (angle_horlogique2 + angleTolerance))  && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
                     actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
+                    //DEBUG ---------------
+                    if(actualError < 0.3){
+                        debugIsoceleCondition = dij - djk;
+                        debugPerimetre = triangle;
+                        debugBalises[0][0] = beaconTab[0].angle;
+                        debugBalises[0][1] = beaconTab[0].distance;
+                        debugBalises[1][0] = beaconTab[1].angle;
+                        debugBalises[1][1] = beaconTab[1].distance;
+                        debugBalises[2][0] = beaconTab[2].angle;
+                        debugBalises[2][1] = beaconTab[2].distance;
+                    }
+                    //FIN-DEBUG -----------
                     
                     //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
                     //if(verbose && triangle >8.5&& triangle < 8.7 /*&& fabs(beaconTab[0].angle-90) < 20*/) printf("Nous avons un triangle de taille %f à angles %f %f %f à une distance %f %f %f %d %d %d %d %d %d %d %d \n",triangle,a1,a2,a3, dij,djk,dik, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.2+isoceleTolerance , dij>=3.2-isoceleTolerance , djk>=3.2-isoceleTolerance , djk<=3.2+isoceleTolerance , dik>=2-isoceleTolerance , dik<=2+isoceleTolerance);
                     if(condition && actualError < oldError){//faudrait rajouter une condition brrr genre sur les anngles
+
+                        //DEBUG --------
+                        debugIsoceleCondition = dij - djk;
+                        debugPerimetre = triangle;
+                        debugBalises[0][0] = beaconTab[0].angle;
+                        debugBalises[0][1] = beaconTab[0].distance;
+                        debugBalises[1][0] = beaconTab[1].angle;
+                        debugBalises[1][1] = beaconTab[1].distance;
+                        debugBalises[2][0] = beaconTab[2].angle;
+                        debugBalises[2][1] = beaconTab[2].distance;
+                        //FIN-DEBUG --------
+
                         beaconFound = 1;
                         bestBeaconTab[0] = beaconTab[0];
                         bestBeaconTab[1] = beaconTab[1];
@@ -479,7 +507,7 @@ void* beacon_data(void* argument){
                     if(tempoD < 0.3) printf("chosen Opponent = %f %f \n",tempoX,tempoY);
                     myOpponent.x = tempoX;
                     myOpponent.y = tempoY;
-                    writeLog(tempoA,tempoD,previousDistanceToCenter);
+                    writeLog(tempoA,tempoD,previousDistanceToCenter,debugBalises,debugPerimetre,debugIsoceleCondition);
                 }
             pthread_mutex_unlock(&filteredPositionLock);
             pthread_mutex_unlock(&lockOpponentPosition);
@@ -809,10 +837,10 @@ void generateLog(){
     if (logFile == NULL) {
         printf("Erreur lors de l'ouverture du fichier LogLidar\n");
     }
-    fprintf(logFile, "myFilteredPos ; myLidarPos ; opponentPos ; opponentAngle ; opponentDistance ; DistanceFromCenter\n");
+    fprintf(logFile, "myFilteredPos ; myLidarPos ; opponentPos ; opponentAngle ; opponentDistance ; DistanceFromCenter ; Angle balises recherchés ; debugPerimetre ; debugIsocele \n");
     printf("File generated i guess\n");
 }
 
-void writeLog(float angle, float distance, float distanceFromCenter){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f ; %f ; %f ; %f\n",filteredPos.x, filteredPos.y, filteredPos.theta,myPos.x,myPos.y,myPos.theta,myOpponent.x,myOpponent.y,angle, distance, distanceFromCenter);
+void writeLog(float angle, float distance, float distanceFromCenter, float debugBalises[3][2], float debugPerimetre, float debugIsoceleCondition){
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f ; %f ; %f ; %f ; %f %f %f ; %f ; %f \n",filteredPos.x, filteredPos.y, filteredPos.theta,myPos.x,myPos.y,myPos.theta,myOpponent.x,myOpponent.y,angle, distance, distanceFromCenter,debugBalises[0][0],debugBalises[0][1],debugBalises[1][0],debugBalises[1][1],debugBalises[2][0],debugBalises[2][1],debugPerimetre,debugIsoceleCondition);
 }

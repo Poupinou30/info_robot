@@ -25,7 +25,7 @@
 #define timeDelay 30 //ms
 #define makeLog 1
 
-#define matchDuration 90 //seconds
+#define matchDuration 90 //seconds 
 
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
@@ -99,6 +99,7 @@ typedef struct jardiniere{
     float posX;
     float posY;
     int numberOfPlants;
+    int obstacleID;
 } jardiniere;
 
 typedef struct solarpanel{
@@ -179,6 +180,7 @@ void makeHeatmap();
 void addRoundObstacle(double posX, double posY, double size, uint8_t moving, int obstacleID);
 void printObstacleLists();
 void removeObstacle(int obstacleID);
+void enableObstacle(int obstacleID);
 void computeForceVector();
 void myPotentialFieldController();
 void* updateKalman(void* args);
