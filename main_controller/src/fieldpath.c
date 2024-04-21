@@ -337,7 +337,7 @@ void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t mo
 }
 
 void removeObstacle(int obstacleID){
-    printf("Removing obstacle #%d \n",obstacleID);
+    //printf("Removing obstacle #%d \n",obstacleID);
     int j = 0;
     while (myForce.obstacleList[j].obstacleID != obstacleID) {
         /*for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
@@ -352,11 +352,11 @@ void removeObstacle(int obstacleID){
     myForce.obstacleList[j].obstacleEnabled = 0;
     //myForce.movingNumber = 0;
     //myForce.obstacleList = realloc(myForce.obstacleList, sizeof(obstacle)*myForce.obstacleNumber);
-    fprintf(stderr,"Obstacle removed\n", myForce.obstacleNumber);
+    //fprintf(stderr,"Obstacle removed\n", myForce.obstacleNumber);
 }
 
 void enableObstacle(int obstacleID){
-    printf("Enabling obstacle #%d \n",obstacleID);
+    //printf("Enabling obstacle #%d \n",obstacleID);
     int j = 0;
     while (myForce.obstacleList[j].obstacleID != obstacleID) {
         /*for (int k = myForce.movingIndexes[j]; k < myForce.obstacleNumber-1; ++k) {
@@ -371,7 +371,7 @@ void enableObstacle(int obstacleID){
     myForce.obstacleList[j].obstacleEnabled = 1;
     //myForce.movingNumber = 0;
     //myForce.obstacleList = realloc(myForce.obstacleList, sizeof(obstacle)*myForce.obstacleNumber);
-    fprintf(stderr,"Obstacle enabled\n", myForce.obstacleNumber);
+    //fprintf(stderr,"Obstacle enabled\n", myForce.obstacleNumber);
 }
 
 uint8_t turningMove = 0;
