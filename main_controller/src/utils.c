@@ -619,7 +619,7 @@ endZone* computeBestEndZone(){
     for (int i = 0; i < 3; i++) {
         float tempoDistance = computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY);
         if(( tempoDistance < smallestDistance) && (endZones[3*myTeamColor+i].zoneID != startingPoint - 1)){
-           bestEndZone = &endZones[i];
+           bestEndZone = &endZones[3*myTeamColor+i];
            smallestDistance = tempoDistance;
         }
     }
