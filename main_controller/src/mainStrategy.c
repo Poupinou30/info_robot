@@ -30,8 +30,7 @@ void mainStrategy(){
         returnToBaseStrategy();
         break;
     case GAME_OVER:
-        setUpperFork(0);
-        myControllerState = STOPPED;
+        gameOverStrategy();
 
     default:
         break;
