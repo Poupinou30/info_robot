@@ -257,7 +257,7 @@ void addRoundObstacle(double posX, double posY, double size, uint8_t moving, int
 
 void addOpponentObstacle(){
     obstacle myObstacle;
-    myObstacle.size = 0.22;
+    myObstacle.size = 0.25;
     myObstacle.isRectangle = 0;
     myObstacle.obstacleEnabled = 1;
     myObstacle.moving = 1;
@@ -398,7 +398,7 @@ void computeForceVector(){
     float k_att_xy = 0.4;
     float k_att_tang = 0.1;
     if(myGrabState == MOVE_FRONT_JARDINIERE && mySupremeState == EARNING_POINTS) k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest/1)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination POUR FRONT JARDINIERE   
-    else k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    else k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
     float k_repul =0.000005 ;
