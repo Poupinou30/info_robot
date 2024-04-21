@@ -8,10 +8,11 @@ struct timeval now;
 
 void mainStrategy(){
     gettimeofday(&now, NULL);
-    if(startOfMatch.tv_sec == 0 && startOfMatch.tv_usec == 0){
+    /*if(startOfMatch.tv_sec == 0 && startOfMatch.tv_usec == 0){
         gettimeofday(&startOfMatch, NULL);
-        timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
-    }
+        
+    }*/
+    timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     
     if(timeFromStartOfMatch > matchDuration){
         mySupremeState = GAME_OVER;

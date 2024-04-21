@@ -351,3 +351,5 @@ uint8_t solarDone;
 extern uint8_t nbrOfPots;
 
 void resetErrorLists();
+
+double computeTimeElapsed(struct timeval start, struct timeval end);

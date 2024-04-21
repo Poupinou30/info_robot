@@ -3,6 +3,8 @@
 #define HEADERS
 #endif
 
+#define COMMAND_TIMEOUT 500
+
 char dataToSend[255];
 char setArmDeployedAngleBuffer[100];
 char setForksDeployedAngleBuffer[100];
@@ -30,6 +32,20 @@ int deployArmCommandReceivedFlag = 0;
 int setWheelSpeedCommandReceivedFlag = 0;
 int setGripperPositionCommandReceivedFlag = 0;
 
+struct timeval armDeployedTime;
+struct timeval forksDeployedTime;
+struct timeval stepperMotorDisabledTime;
+struct timeval forkCalibratedTime;
+struct timeval stepperMotorEnabledTime;
+struct timeval lowerForkSetTime;
+struct timeval upperForkSetTime;
+struct timeval forksRetractedTime;
+struct timeval forksDeployedTime;
+struct timeval armDeployedTime;
+struct timeval wheelSpeedSetTime;
+struct timeval gripperPositionSetTime;
+struct timeval currentTime;
+
 int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag) {
     printf("Dans checkCommand et expected = %s", expected);
     char expectedData[255];
@@ -56,9 +72,15 @@ int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag)
 
 int setArmDeployedAngle(int angle) { //Bras du panneau solaire
     sprintf(dataToSend, "<A-%d>", (int)angle);
+    
     if (armDeployedAngleCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         armDeployedAngleCommandReceivedFlag = 1; // Set flag to 1
+        gettimeofday(&armDeployedTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if(computeTimeElapsed(armDeployedTime, currentTime) > COMMAND_TIMEOUT){
+        armDeployedAngleCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, setArmDeployedAngleBuffer) || !checkCommandReceived(dataToSend,setArmDeployedAngleBuffer, &armDeployedAngleCommandReceivedFlag)) {
         return 0;
@@ -70,37 +92,47 @@ int setArmDeployedAngle(int angle) { //Bras du panneau solaire
     
 }
 
-int setForksDeployedAngle(int angle) { //Bras du panneau solaire
+int setForksDeployedAngle(int angle) {
     sprintf(dataToSend, "<T-%d>", (int)angle);
     if (forksDeployedAngleCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
-        forksDeployedAngleCommandReceivedFlag = 1; // Set flag to 1
+        forksDeployedAngleCommandReceivedFlag = 1;
+        gettimeofday(&forksDeployedTime, NULL);
     }
-    if (!UART_receive(UART_handle, setForksDeployedAngleBuffer) || !checkCommandReceived(dataToSend,setForksDeployedAngleBuffer, &forksDeployedAngleCommandReceivedFlag)) {
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(forksDeployedTime, currentTime) > COMMAND_TIMEOUT) {
+        forksDeployedAngleCommandReceivedFlag = 0;
+    }
+    if (!UART_receive(UART_handle, setForksDeployedAngleBuffer) || !checkCommandReceived(dataToSend, setForksDeployedAngleBuffer, &forksDeployedAngleCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         forksDeployedAngleCommandReceivedFlag = 0;
         return 1;
     }
-    
 }
+
 
 int disableStepperMotor() {
     sprintf(dataToSend, "<D-0>");
     if (disableStepperMotorCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         disableStepperMotorCommandReceivedFlag = 1;
+        gettimeofday(&stepperMotorDisabledTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(stepperMotorDisabledTime, currentTime) > COMMAND_TIMEOUT) {
+        disableStepperMotorCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, disableStepperMotorBuffer) || !checkCommandReceived(dataToSend, disableStepperMotorBuffer, &disableStepperMotorCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         disableStepperMotorCommandReceivedFlag = 0;
         return 1;
     }
-
 }
+
 
 int calibrateFork() {
     sprintf(dataToSend, "<H-0>");
@@ -124,121 +156,165 @@ int enableStepperMotor() {
     if (enableStepperMotorCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         enableStepperMotorCommandReceivedFlag = 1;
+        gettimeofday(&stepperMotorEnabledTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(stepperMotorEnabledTime, currentTime) > COMMAND_TIMEOUT) {
+        enableStepperMotorCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, enableStepperMotorBuffer) || !checkCommandReceived(dataToSend, enableStepperMotorBuffer, &enableStepperMotorCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         enableStepperMotorCommandReceivedFlag = 0;
         return 1;
     }
 }
+
 
 int setLowerFork(int height) {
     sprintf(dataToSend, "<F-%d>", (int)height);
     if (setLowerForkCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         setLowerForkCommandReceivedFlag = 1;
+        gettimeofday(&lowerForkSetTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(lowerForkSetTime, currentTime) > COMMAND_TIMEOUT) {
+        setLowerForkCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, setLowerForkBuffer) || !checkCommandReceived(dataToSend, setLowerForkBuffer, &setLowerForkCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         setLowerForkCommandReceivedFlag = 0;
         return 1;
     }
 }
+
 
 int setUpperFork(int height) {
     sprintf(dataToSend, "<f-%d>", (int)height);
     if (setUpperForkCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         setUpperForkCommandReceivedFlag = 1;
+        gettimeofday(&upperForkSetTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(upperForkSetTime, currentTime) > COMMAND_TIMEOUT) {
+        setUpperForkCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, setUpperForkBuffer) || !checkCommandReceived(dataToSend, setUpperForkBuffer, &setUpperForkCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         setUpperForkCommandReceivedFlag = 0;
         return 1;
     }
-    
 }
 
+
 int retractForks() {
-    forksDeployed = 0;
     sprintf(dataToSend, "<S-0>");
     if (retractForksCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         retractForksCommandReceivedFlag = 1;
+        gettimeofday(&forksRetractedTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(forksRetractedTime, currentTime) > COMMAND_TIMEOUT) {
+        retractForksCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, retractForksBuffer) || !checkCommandReceived(dataToSend, retractForksBuffer, &retractForksCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         retractForksCommandReceivedFlag = 0;
         return 1;
     }
 }
 
+
 int deployForks() {
-    forksDeployed = 1;
     sprintf(dataToSend, "<S-1>");
     if (deployForksCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         deployForksCommandReceivedFlag = 1;
+        gettimeofday(&forksDeployedTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(forksDeployedTime, currentTime) > COMMAND_TIMEOUT) {
+        deployForksCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, deployForksBuffer) || !checkCommandReceived(dataToSend, deployForksBuffer, &deployForksCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         deployForksCommandReceivedFlag = 0;
         return 1;
     }
 }
 
+
 int deployArm() {
-    forksDeployed = 1;
     sprintf(dataToSend, "<S-2>");
     if (deployArmCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         deployArmCommandReceivedFlag = 1;
+        gettimeofday(&armDeployedTime, NULL); // Note: This reuses the variable for arm deployment, ensure it's intended or use a different variable.
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(armDeployedTime, currentTime) > COMMAND_TIMEOUT) {
+        deployArmCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, deployArmBuffer) || !checkCommandReceived(dataToSend, deployArmBuffer, &deployArmCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         deployArmCommandReceivedFlag = 0;
         return 1;
     }
 }
+
 
 int setWheelSpeed(int speed) {
     sprintf(dataToSend, "<W-%d>", speed);
     if (setWheelSpeedCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         setWheelSpeedCommandReceivedFlag = 1;
+        gettimeofday(&wheelSpeedSetTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(wheelSpeedSetTime, currentTime) > COMMAND_TIMEOUT) {
+        setWheelSpeedCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, setWheelSpeedBuffer) || !checkCommandReceived(dataToSend, setWheelSpeedBuffer, &setWheelSpeedCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         setWheelSpeedCommandReceivedFlag = 0;
         return 1;
     }
 }
+
 
 int setGripperPosition(int position) {
     sprintf(dataToSend, "<G-%d>", position);
     if (setGripperPositionCommandReceivedFlag == 0) {
         UART_send(UART_handle, dataToSend);
         setGripperPositionCommandReceivedFlag = 1;
+        gettimeofday(&gripperPositionSetTime, NULL);
+    }
+    gettimeofday(&currentTime, NULL);
+    if (computeTimeElapsed(gripperPositionSetTime, currentTime) > COMMAND_TIMEOUT) {
+        setGripperPositionCommandReceivedFlag = 0;
     }
     if (!UART_receive(UART_handle, setGripperPositionBuffer) || !checkCommandReceived(dataToSend, setGripperPositionBuffer, &setGripperPositionCommandReceivedFlag)) {
         return 0;
     }
-    else{
+    else {
         setGripperPositionCommandReceivedFlag = 0;
         return 1;
     }
 }
+
