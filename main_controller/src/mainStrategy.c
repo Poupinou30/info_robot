@@ -90,6 +90,7 @@ void pointsStrategy(){
         removeObstacle(16);
         destination_set = 0;
         arrivedAtDestination = 0;
+        myMoveType = DISPLACEMENT_MOVE;
         if(VERBOSE)
             printf("Match ending, going to RETURN_TO_BASE mode\n");
             printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
@@ -150,12 +151,12 @@ void actionStrategy(){
 };
 
 void returnToBaseStrategy(){
+    printf(" RETURN TO BASE: destination_set = %d arrivedAtDestination = %d and destination = %f %f\n", destination_set, arrivedAtDestination, *destination.x, *destination.y);
     if(destination_set != 1){
         endZone* bestEndZone = computeBestEndZone();
         defineEndZoneDestination(bestEndZone);
         destination_set = 1;
         myControllerState = MOVING;
-        myMoveType = DISPLACEMENT_MOVE;
         resetErrorLists();
         arrivedAtDestination = 0;
         for(int i = 0; i<6; i++){
@@ -291,9 +292,6 @@ void defineEndZoneDestination(endZone* bestEndZone){
 
 void gameOverStrategy(){
     myControllerState = STOPPED;
-    if(myGrabState != FINISHED){
-        myGrabState = GRAB_PLANTS_INIT;
-        manageGrabbing(NULL);
-    }
+    setUpperFork(0);
     
 }
