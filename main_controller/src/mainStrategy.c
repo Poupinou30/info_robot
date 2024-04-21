@@ -153,6 +153,8 @@ void returnToBaseStrategy(){
         endZone* bestEndZone = computeBestEndZone();
         defineEndZoneDestination(bestEndZone);
         destination_set = 1;
+        myControllerState = MOVING;
+        myMoveType = DISPLACEMENT_MOVE;
         resetErrorLists();
         arrivedAtDestination = 0;
         for(int i = 0; i<6; i++){
@@ -166,7 +168,7 @@ void returnToBaseStrategy(){
     pthread_mutex_lock(&lockFilteredPosition);
     pthread_mutex_lock(&lockDestination);
     float tempoDistance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *destination.x, *destination.y);
-    if(tempoDistance < 0.3){
+    if(tempoDistance < 0.2){
         removeObstacle(1);
         removeObstacle(2);
         removeObstacle(3);
@@ -278,7 +280,7 @@ void defineEndZoneDestination(endZone* bestEndZone){
     pthread_mutex_lock(&lockFilteredPosition);
     *destination.x = bestEndZone->posX;
     *destination.y = bestEndZone->posY;
-    if(*myFilteredPos.y < 1.5) {
+    if(bestEndZone->posY < 1.5) {
         *destination.theta = 0;
     }else{
         *destination.theta = 180;

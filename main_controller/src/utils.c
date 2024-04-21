@@ -281,6 +281,7 @@ void* executeProgram(void* arg){
     fprintf(stderr,"Lidar program correctly launched \n");
     return NULL;*/
 void handle_sigsegv(int sig) {
+    processInstructionNew(0.0,0,0,i2c_handle_front,i2c_handle_rear);
     gpioTerminate();
     fprintf(stderr, "Erreur de segmentation capturée, terminaison du programme.\n");
     if (child_pid > 0) {

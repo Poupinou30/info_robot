@@ -397,7 +397,8 @@ void computeForceVector(){
     
     float k_att_xy = 0.4;
     float k_att_tang = 0.1;
-    k_att_xy = k_att_xy * (1+ 1/(0.15+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    if(myGrabState == MOVE_FRONT_JARDINIERE && mySupremeState == EARNING_POINTS) k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest/1)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination POUR FRONT JARDINIERE   
+    else k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
     float k_repul =0.000005 ;
@@ -422,7 +423,7 @@ void computeForceVector(){
     
     double error = theta-desiredTheta;
 
-    k_att_theta = k_att_theta * (1+ 3/(0.1+fabs(error)/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_theta = k_att_theta * (1+ 3/(0.25+fabs(error)/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
 
     if(error<-180){
         error += 360;
@@ -612,7 +613,7 @@ void computeForceVector(){
                 else sign_f_rep_x = 1;
                 if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
-                if(myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.06) k_reduc_repul = 0;
+                if(myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS) k_reduc_repul = 0;
                 else if(tempoObstacle->obstacleID == 0 && distanceFromDest>0.2) k_reduc_repul = 0.2;
                 else{
                     if(distanceFromDest < 0.20){
@@ -642,6 +643,18 @@ void computeForceVector(){
     f_tot_y = f_att_y + f_repul_y;
     //printf("f_repul_x = %lf f_repul_y = %lf \n",f_repul_x,f_repul_y);
     f_theta = f_att_theta;
+
+    pthread_mutex_lock(&lockFilteredPosition);
+    pthread_mutex_lock(&lockOpponentPosition);
+    float distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
+    pthread_mutex_unlock(&lockFilteredPosition);
+    pthread_mutex_unlock(&lockOpponentPosition);
+
+    if(distanceFromOpponent < 0.4 && myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS){
+        f_tot_x = 0;
+        f_tot_y = 0;
+        f_theta = 0;
+    }
     //fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
     //Calcul de la force de attraction totale
 }
