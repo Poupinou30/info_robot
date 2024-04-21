@@ -30,7 +30,8 @@ void mainStrategy(){
         returnToBaseStrategy();
         break;
     case GAME_OVER:
-        myControllerState = STOPPED;
+        gameOverStrategy();
+        
 
     default:
         break;
@@ -64,7 +65,7 @@ void pointsStrategy(){
     // check if it's time to leave
     float maxSpeed = 0.4;
     //fprintf(stderr,"check1\n");
-    float SafetyFactor = 1.5;
+    float SafetyFactor = 2;
     gettimeofday(&now, NULL);
     //fprintf(stderr,"check1.5\n");
     endZone* bestEndZone = computeBestEndZone();
@@ -76,7 +77,7 @@ void pointsStrategy(){
     pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     //fprintf(stderr,"check3\n");
-    float TimeNeededToGetHome = distToClosestBase * maxSpeed * SafetyFactor;
+    float TimeNeededToGetHome = distToClosestBase / maxSpeed * SafetyFactor;
     //fprintf(stderr,"check10\n");
     timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
@@ -88,6 +89,7 @@ void pointsStrategy(){
         removeObstacle(14);
         removeObstacle(15);
         removeObstacle(16);
+        destination_set = 0;
         if(VERBOSE)
             printf("Match ending, going to RETURN_TO_BASE mode\n");
             printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
@@ -153,12 +155,31 @@ void returnToBaseStrategy(){
         defineEndZoneDestination(bestEndZone);
         destination_set = 1;
         resetErrorLists();
-        arrivedAtDestination = 0;}
+        arrivedAtDestination = 0;
+        for(int i = 0; i<6; i++){
+            if(potZones[i].numberOfPots == 0) removeObstacle(potZones[i].obstacleID);
+            else enableObstacle(potZones[i].obstacleID);
+        }}
     else if(arrivedAtDestination){
         mySupremeState = GAME_OVER;
         printf("--------------ARRIVED, GAME OVER---------------\n");
     }
-    
+    pthread_mutex_lock(&lockFilteredPosition);
+    pthread_mutex_lock(&lockDestination);
+    float tempoDistance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *destination.x, *destination.y);
+    if(tempoDistance < 0.3){
+        removeObstacle(1);
+        removeObstacle(2);
+        removeObstacle(3);
+        removeObstacle(4);
+    }
+    else{
+        enableObstacle(1);
+        enableObstacle(2);
+
+    }
+    pthread_mutex_unlock(&lockFilteredPosition);
+    pthread_mutex_unlock(&lockDestination);
 
 };
 
@@ -167,7 +188,7 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) ){
+    if((bestPlantZone->numberOfPlants > 2 /*&& timeFromStartOfMatch < 20*/) ){
         printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
@@ -259,10 +280,19 @@ void defineEndZoneDestination(endZone* bestEndZone){
     pthread_mutex_lock(&lockFilteredPosition);
     *destination.x = bestEndZone->posX;
     *destination.y = bestEndZone->posY;
-    if(*myFilteredPos.y < bestPlantZone->posY) {
-        *destination.theta = 180;
-    }else{
+    if(*myFilteredPos.y < 1.5) {
         *destination.theta = 0;
+    }else{
+        *destination.theta = 180;
     }
     pthread_mutex_unlock(&lockFilteredPosition);
 };
+
+void gameOverStrategy(){
+    myControllerState = STOPPED;
+    if(myGrabState != FINISHED){
+        myGrabState = GRAB_PLANTS_INIT;
+        manageGrabbing(NULL);
+    }
+    
+}

@@ -57,5 +57,5 @@ float triangulationPierlot(float *x, float *y,
 
 void* beacon_data(void* argument);
 void generateLog();
-void writeLog(float angle, float distance, float distanceFromCenter);
+void writeLog(float angle, float distance, float distanceFromCenter, float debugBalises[3][2], float debugPerimetre, float debugIsoceleCondition);
 void* filteredPositionAcquisition(void* arg);

@@ -126,7 +126,8 @@ void manageGrabbing(plantZone* bestPlantZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = GRAB_PLANTS_MOVE;
+                if(mySupremeState == GAME_OVER) myGrabState = FINISHED;
+                else myGrabState = GRAB_PLANTS_MOVE;
                 destination_set = 0;
                 done1=0; done2=0; done3 = 0;
                 receivedData[0] = '\0';
@@ -235,6 +236,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             resetErrorLists();
             computeBestPotsZone();
             definePotsDestination(bestPotZone);
+            removeObstacle(bestPotZone->obstacleID);
             destination_set = 1;
             myControllerState = MOVING;
             myMoveType = DISPLACEMENT_MOVE;

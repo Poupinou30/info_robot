@@ -292,6 +292,7 @@ void handle_sigsegv(int sig) {
 void handle_sigint(int sig) {
     processInstructionNew(0.0,0,0,i2c_handle_front,i2c_handle_rear);
     setWheelSpeed(0);
+    retractForks();
     gpioTerminate();
     fprintf(stderr,"SIGINT handled \n");
     if (child_pid > 0) {
@@ -517,13 +518,20 @@ potZone* computeBestPotsZone(){
     float smallestDistance = computeEuclidianDistance(x, y, potZones[0].posX, potZones[0].posY);
     printf("smallest distance computed\n");
     for (int i = 1; i < 6; i++) {
+        double distanceFromPot = computeEuclidianDistance(x, y, potZones[i].posX, potZones[i].posY);
+        printf("potzones infos: %f %f %d\n",potZones[i].posX,potZones[i].posY,potZones[i].numberOfPots);
+        printf("distance potzone = %f\n",distanceFromPot);
         if(potZones[i].numberOfPots > numberOfPots){
             bestPotZone = &potZones[i];
-        }else if(potZones[i].numberOfPots = numberOfPots){
-            double distanceFromPot = computeEuclidianDistance(x, y, potZones[i].posX, potZones[i].posY);
+            smallestDistance = distanceFromPot;
+            numberOfPots = potZones[i].numberOfPots;
+        }else if(potZones[i].numberOfPots == numberOfPots){
+            /*distanceFromPotWasHere*/
+            
             if (distanceFromPot < smallestDistance) {
                 bestPotZone = &potZones[i];
                 smallestDistance = distanceFromPot;
+                numberOfPots = potZones[i].numberOfPots;
             }
         }
     }
@@ -604,11 +612,14 @@ endZone* computeBestEndZone(){
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, endZones[3*myTeamColor].posX, endZones[3*myTeamColor].posY);
+    float smallestDistance = INFINITY;
+    
         
-    for (int i = 1; i < 3; i++) {
-        if((computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY) < smallestDistance) && (endZones[3*myTeamColor+i].zoneID != startingPoint - 1)){
+    for (int i = 0; i < 3; i++) {
+        float tempoDistance = computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY);
+        if(( tempoDistance < smallestDistance) && (endZones[3*myTeamColor+i].zoneID != startingPoint - 1)){
            bestEndZone = &endZones[i];
+           smallestDistance = tempoDistance;
         }
     }
     return bestEndZone;
