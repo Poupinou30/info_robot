@@ -7,7 +7,7 @@
 #define POT_SPEED 0.1
 
 float fixActionDistance = 0.2;
-float mobileActionDistance = 0.3;
+float mobileActionDistance = 0.6;
 float myDistanceList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
 float myErrorList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
 
@@ -389,6 +389,7 @@ void printObstacleLists(){
 struct timeval startOfArrival, now;
 
 void computeForceVector(){
+    float distanceFromOpponent;
 
     double nowTime = now.tv_sec + now.tv_usec/1000000;
     
@@ -401,7 +402,7 @@ void computeForceVector(){
     else k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
-    float k_repul =0.000005 ;
+    float k_repul =0.000002 ;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
     pthread_mutex_lock(&lockFilteredPosition); 
@@ -593,11 +594,11 @@ void computeForceVector(){
 
                 
 
-                myClosestRobotPoint = closestPoint(robotCorners,obstaclePosition);
+                //myClosestRobotPoint = closestPoint(robotCorners,obstaclePosition);
                 
                 
                 pthread_mutex_lock(&lockFilteredPosition);
-                distance = fabs(computeEuclidianDistance(tempoX,tempoY,*myClosestRobotPoint.x,*myClosestRobotPoint.y)-myForce.obstacleList[i].size); //Calcule la distance
+                distance = fabs(computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size - robotLengthYDeployed); //Calcule la distance
                 pthread_mutex_unlock(&lockFilteredPosition);
             }
             //printf("distance = %f and actionDistance = %f \n",distance,actionDistance);
@@ -606,24 +607,26 @@ void computeForceVector(){
             free(robotUpperCorner.x);
             free(robotUpperCorner.y);
             
+            if(tempoObstacle->obstacleID == 0) distanceFromOpponent = distance;
             
             if(distance < actionDistance){
+                
                 pthread_mutex_lock(&lockFilteredPosition);
                 if(*myFilteredPos.x > tempoX) sign_f_rep_x = -1;
                 else sign_f_rep_x = 1;
                 if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
-                if((myGrabState == MOVE_FRONT_JARDINIERE) && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS) k_reduc_repul = 0;
-                else if(tempoObstacle->obstacleID == 0 && distanceFromDest>0.2) k_reduc_repul = 0.2;
+                if((myGrabState == MOVE_FRONT_JARDINIERE) && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS && tempoObstacle->obstacleID != 0) k_reduc_repul = 0;
+                else if(tempoObstacle->obstacleID == 0) k_reduc_repul = 5;
                 else{
                     if(distanceFromDest < 0.2){
-                        if(tempoObstacle->obstacleID == 0) k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20)*0.2; 
-                        else  k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
+                        k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
                     }
                     else k_reduc_repul = 1; 
                     
                 } 
-                printf("repul force for obstacle with id = %d is %f and obstacle isEnabled = %d\n",tempoObstacle->obstacleID,k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)),tempoObstacle->obstacleEnabled);
+
+                printf("repul force for obstacle with id = %d is %f and obstacle isEnabled = %d and distance = %f and k reduc repul = %f\n",tempoObstacle->obstacleID,k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)),tempoObstacle->obstacleEnabled,distance,k_reduc_repul);
                 f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
                 f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
 
@@ -646,14 +649,16 @@ void computeForceVector(){
 
     pthread_mutex_lock(&lockFilteredPosition);
     pthread_mutex_lock(&lockOpponentPosition);
-    float distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
+    //distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
     pthread_mutex_unlock(&lockFilteredPosition);
     pthread_mutex_unlock(&lockOpponentPosition);
+    printf("distanceFromOpponent = %f\n",distanceFromOpponent);
 
     if(distanceFromOpponent < 0.4 && myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS){
         f_tot_x = 0;
         f_tot_y = 0;
         f_theta = 0;
+        printf("DANS LE IF DE MERDE\n");
     }
     //fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
     //Calcul de la force de attraction totale

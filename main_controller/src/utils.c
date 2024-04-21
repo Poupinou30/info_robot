@@ -40,6 +40,8 @@ double degToRad(double deg) {
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
     //Speed limitation
+    if(computeEuclidianDistance(*myFilteredOpponent.x,*myFilteredOpponent.y,*myFilteredPos.x,*myFilteredPos.y) < 0.5){
+        v_max = 0.15;}
     double omega_max;
     if(v_x  == 0 && v_y == 0){
         omega_max = omega_max_fixed;
