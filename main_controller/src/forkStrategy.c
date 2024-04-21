@@ -468,7 +468,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myGrabState = MOVE_FORWARD_JARDINIERE;
         }
         else{
-            if (nbrOfPots == 6){
+            if ((nbrOfPots == 6) && (myActionChoice == PLANTS_POTS_ACTION)){
                 myGrabState = DROP_PLANTS;
             }
             else{

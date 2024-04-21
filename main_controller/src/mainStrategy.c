@@ -10,9 +10,10 @@ void mainStrategy(){
     gettimeofday(&now, NULL);
     if(startOfMatch.tv_sec == 0 && startOfMatch.tv_usec == 0){
         gettimeofday(&startOfMatch, NULL);
-        timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
+        
     }
     
+    timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     if(timeFromStartOfMatch > matchDuration){
         mySupremeState = GAME_OVER;
     }
@@ -78,7 +79,7 @@ void pointsStrategy(){
     //fprintf(stderr,"check3\n");
     float TimeNeededToGetHome = distToClosestBase / maxSpeed * SafetyFactor;
     //fprintf(stderr,"check10\n");
-    timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
+    //timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
         //fprintf(stderr,"check11\n");
         mySupremeState = RETURN_TO_BASE;
