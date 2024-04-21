@@ -30,6 +30,7 @@ void mainStrategy(){
         returnToBaseStrategy();
         break;
     case GAME_OVER:
+        setUpperFork(0);
         myControllerState = STOPPED;
 
     default:
@@ -167,11 +168,10 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20) ){
+    if( timeFromStartOfMatch < 20 || timeFromStartOfMatch > 55 ){
         printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
-        
     }
     else{
         bestPlantZone = computeBestPlantsZone();
