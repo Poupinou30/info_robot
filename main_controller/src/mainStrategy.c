@@ -89,6 +89,7 @@ void pointsStrategy(){
         removeObstacle(15);
         removeObstacle(16);
         destination_set = 0;
+        arrived_at_destination = 0;
         if(VERBOSE)
             printf("Match ending, going to RETURN_TO_BASE mode\n");
             printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
