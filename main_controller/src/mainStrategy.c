@@ -83,12 +83,17 @@ void pointsStrategy(){
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
         //fprintf(stderr,"check11\n");
         mySupremeState = RETURN_TO_BASE;
+        //ON SUPPRIME LES OBSTACLES DES PLANTES PCQ OSEF ET ON REACTIVE TOUS LES MURS
         removeObstacle(11);
         removeObstacle(12);
         removeObstacle(13);
         removeObstacle(14);
         removeObstacle(15);
         removeObstacle(16);
+        enableObstacle(100); enableObstacle(101); enableObstacle(102); enableObstacle(103);
+        enableObstacle(200); enableObstacle(201);
+        enableObstacle(300); enableObstacle(301); enableObstacle(302); enableObstacle(303); enableObstacle(304); enableObstacle(305);
+        enableObstacle(400); enableObstacle(401); enableObstacle(402); enableObstacle(403); enableObstacle(404);
         destination_set = 0;
         arrivedAtDestination = 0;
         myMoveType = DISPLACEMENT_MOVE;

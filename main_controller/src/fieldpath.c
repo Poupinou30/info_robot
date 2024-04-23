@@ -39,39 +39,7 @@ position closestPoint(position rect[2], position pos) {
     return closest;
 }
 
-position closestPointBetweenRectangles(position rectA[2], position rectB[2]) {
-    float minDistance = INFINITY;
-    position closestPoint;
-    closestPoint.x = (float*) malloc(sizeof(float));
-    closestPoint.y = (float*) malloc(sizeof(float));
 
-    // Définition des coins des rectangles A et B
-    float cornersAx[4], cornersAy[4], cornersBx[4], cornersBy[4];
-
-    cornersAx[0] = cornersAx[3] = fmin(*rectA[0].x, *rectA[1].x);
-    cornersAx[1] = cornersAx[2] = fmax(*rectA[0].x, *rectA[1].x);
-    cornersAy[0] = cornersAy[1] = fmin(*rectA[0].y, *rectA[1].y);
-    cornersAy[2] = cornersAy[3] = fmax(*rectA[0].y, *rectA[1].y);
-
-    cornersBx[0] = cornersBx[3] = fmin(*rectB[0].x, *rectB[1].x);
-    cornersBx[1] = cornersBx[2] = fmax(*rectB[0].x, *rectB[1].x);
-    cornersBy[0] = cornersBy[1] = fmin(*rectB[0].y, *rectB[1].y);
-    cornersBy[2] = cornersBy[3] = fmax(*rectB[0].y, *rectB[1].y);
-
-    // Comparer chaque coin de A avec chaque coin de B pour trouver le point le plus proche
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            float distance = computeEuclidianDistance(cornersAx[i], cornersAy[i], cornersBx[j], cornersBy[j]);
-            if (distance < minDistance) {
-                minDistance = distance;
-                *closestPoint.x = cornersAx[i];
-                *closestPoint.y = cornersAy[i];
-            }
-        }
-    }
-
-    return closestPoint;
-}
 
 
 
@@ -389,31 +357,36 @@ void printObstacleLists(){
 struct timeval startOfArrival, now;
 
 void computeForceVector(){
+
+    pthre ad_mutex_lock(&lockFilteredPosition);
+    float myPosX = *myFilteredPos.x;
+    float myPosY = *myFilteredPos.y;
+    float myTheta = *myFilteredPos.theta;
+    pthread_mutex_unlock(&lockFilteredPosition);
+
     float distanceFromOpponent;
 
     double nowTime = now.tv_sec + now.tv_usec/1000000;
     
-    double distanceFromDest = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
+    double distanceFromDest = computeEuclidianDistance(myPosX,*myFilteredPos.y,*destination.x,*destination.y);
     double k_mult_att;
     
     float k_att_xy = 0.4;
     float k_att_tang = 0.1;
-    if(myGrabState == MOVE_FRONT_JARDINIERE && mySupremeState == EARNING_POINTS) k_att_xy = k_att_xy * (1+ 1/(0.3+distanceFromDest/1)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination POUR FRONT JARDINIERE   
-    else k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
     float k_repul =0.000002 ;
-    //double theta = *myFilteredPos.theta
+    //double theta = myTheta
     pthread_mutex_lock(&lockDestination);
-    pthread_mutex_lock(&lockFilteredPosition); 
     
 
 
 
-    double f_att_x = -destination_set*k_att_xy * (*myFilteredPos.x- *destination.x);
-    double f_att_y = -destination_set*k_att_xy * (*myFilteredPos.y - *destination.y);
+    double f_att_x = -destination_set*k_att_xy * (myPosX- *destination.x);
+    double f_att_y = -destination_set*k_att_xy * (myPosY - *destination.y);
     
-    double theta = *myFilteredPos.theta;
+    double theta = myTheta;
     double desiredTheta = *destination.theta;
     uint8_t sign_f_rep_x;
     uint8_t sign_f_rep_y;
@@ -424,7 +397,7 @@ void computeForceVector(){
     
     double error = theta-desiredTheta;
 
-    k_att_theta = k_att_theta * (1+ 3/(0.25+fabs(error)/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    
 
     if(error<-180){
         error += 360;
@@ -432,7 +405,7 @@ void computeForceVector(){
     else if(error>180){
         error-=360;
     }
-    if(pow(measuredSpeedX*measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5)< 0.05 && fabs(error) > 15 && (*myFilteredPos.x > 0.25 || *myFilteredPos.x <1.75 || *myFilteredPos.y > 0.25 || *myFilteredPos.y <2.75)){
+    if(pow(measuredSpeedX*measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5)< 0.05 && fabs(error) > 15 && (myPosX > 0.25 || myPosX <1.75 || myPosY > 0.25 || myPosY <2.75)){
         turningMove = 1;
         
     }
@@ -443,6 +416,8 @@ void computeForceVector(){
         f_att_y = 0;
         k_att_theta = 0.8;
     }
+
+    k_att_theta = k_att_theta * (1+ 3/(0.25+fabs(error)/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     
 
     //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
@@ -470,7 +445,6 @@ void computeForceVector(){
         arrivedAtDestination = 1;
         
     }
-    pthread_mutex_unlock(&lockFilteredPosition); 
     pthread_mutex_unlock(&lockDestination);
 
     // Ajustement de l'erreur pour tenir compte de la nature circulaire des angles
@@ -518,20 +492,18 @@ void computeForceVector(){
             robotLowerCorner.y = (float*) malloc(sizeof(float));
             robotUpperCorner.x = (float*) malloc(sizeof(float));
             robotUpperCorner.y = (float*) malloc(sizeof(float));
-            pthread_mutex_lock(&lockFilteredPosition);
             if(forksDeployed){
-            *robotLowerCorner.x = *myFilteredPos.x + (-robotLengthX/2 * cos((*myFilteredPos.theta)*DEG2RAD) + robotLengthYDeployed/2 * sin((*myFilteredPos.theta)*DEG2RAD));
-            *robotLowerCorner.y = *myFilteredPos.y + (-robotLengthX/2 * sin((*myFilteredPos.theta)*DEG2RAD) - robotLengthYDeployed/2 * cos((*myFilteredPos.theta)*DEG2RAD));
-            *robotUpperCorner.x = *myFilteredPos.x + (robotLengthX/2 * cos((*myFilteredPos.theta)*DEG2RAD) - robotLengthYDeployed/2 * sin((*myFilteredPos.theta))*DEG2RAD);
-            *robotUpperCorner.y = *myFilteredPos.y + (robotLengthX/2 * sin((*myFilteredPos.theta)*DEG2RAD) + robotLengthYDeployed/2 * cos((*myFilteredPos.theta)*DEG2RAD));
+            *robotLowerCorner.x = myPosX + (-robotLengthX/2 * cos((myTheta)*DEG2RAD) + robotLengthYDeployed/2 * sin((myTheta)*DEG2RAD));
+            *robotLowerCorner.y = myPosY + (-robotLengthX/2 * sin((myTheta)*DEG2RAD) - robotLengthYDeployed/2 * cos((myTheta)*DEG2RAD));
+            *robotUpperCorner.x = myPosX + (robotLengthX/2 * cos((myTheta)*DEG2RAD) - robotLengthYDeployed/2 * sin((myTheta))*DEG2RAD);
+            *robotUpperCorner.y = myPosY + (robotLengthX/2 * sin((myTheta)*DEG2RAD) + robotLengthYDeployed/2 * cos((myTheta)*DEG2RAD));
             }
             else{
-                *robotLowerCorner.x = *myFilteredPos.x + (-robotLengthX/2 * cos((*myFilteredPos.theta)*DEG2RAD) + robotLengthYUndeployed/2 * sin((*myFilteredPos.theta)*DEG2RAD));
-                *robotLowerCorner.y = *myFilteredPos.y + (-robotLengthX/2 * sin((*myFilteredPos.theta)*DEG2RAD) - robotLengthYUndeployed/2 * cos((*myFilteredPos.theta)*DEG2RAD));
-                *robotUpperCorner.x = *myFilteredPos.x + (robotLengthX/2 * cos((*myFilteredPos.theta)*DEG2RAD) - robotLengthYUndeployed/2 * sin((*myFilteredPos.theta)*DEG2RAD));
-                *robotUpperCorner.y = *myFilteredPos.y + (robotLengthX/2 * sin((*myFilteredPos.theta)*DEG2RAD) + robotLengthYUndeployed/2 * cos((*myFilteredPos.theta)*DEG2RAD));
+                *robotLowerCorner.x = myPosX + (-robotLengthX/2 * cos((myTheta)*DEG2RAD) + robotLengthYUndeployed/2 * sin((myTheta)*DEG2RAD));
+                *robotLowerCorner.y = myPosY + (-robotLengthX/2 * sin((myTheta)*DEG2RAD) - robotLengthYUndeployed/2 * cos((myTheta)*DEG2RAD));
+                *robotUpperCorner.x = myPosX + (robotLengthX/2 * cos((myTheta)*DEG2RAD) - robotLengthYUndeployed/2 * sin((myTheta)*DEG2RAD));
+                *robotUpperCorner.y = myPosY + (robotLengthX/2 * sin((myTheta)*DEG2RAD) + robotLengthYUndeployed/2 * cos((myTheta)*DEG2RAD));
             }
-            pthread_mutex_unlock(&lockFilteredPosition);
             position robotCorners[2] = {robotLowerCorner,robotUpperCorner};
 
 
@@ -559,11 +531,9 @@ void computeForceVector(){
                 *tempoPoint2.y = tempoObstacle->y2;
                 tempoRectangle[0] = tempoPoint1;
                 tempoRectangle[1] = tempoPoint2;
-                pthread_mutex_lock(&lockFilteredPosition);
                 myClosestPoint = closestPoint(tempoRectangle,myFilteredPos);
-                distance = fabs(computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *myClosestPoint.x, *myClosestPoint.y)-robotLengthYUndeployed); //Calcul la distance
+                distance = fabs(computeEuclidianDistance(myPosX, myPosY, *myClosestPoint.x, *myClosestPoint.y)-robotLengthYUndeployed); //Calcul la distance
                 //printf("distance = %f \n",distance);
-                pthread_mutex_unlock(&lockFilteredPosition);
                 tempoX = *myClosestPoint.x; //Calcule la position en x
                 tempoY = *myClosestPoint.y; //Calcule la position en y
                 free(myClosestPoint.x);
@@ -597,9 +567,7 @@ void computeForceVector(){
                 //myClosestRobotPoint = closestPoint(robotCorners,obstaclePosition);
                 
                 
-                pthread_mutex_lock(&lockFilteredPosition);
-                distance = fabs(computeEuclidianDistance(tempoX,tempoY,*myFilteredPos.x,*myFilteredPos.y)-myForce.obstacleList[i].size - robotLengthYDeployed); //Calcule la distance
-                pthread_mutex_unlock(&lockFilteredPosition);
+                distance = fabs(computeEuclidianDistance(tempoX,tempoY,myPosX,myPosY)-myForce.obstacleList[i].size - robotLengthYDeployed); //Calcule la distance
             }
             //printf("distance = %f and actionDistance = %f \n",distance,actionDistance);
             free(robotLowerCorner.x);
@@ -611,26 +579,24 @@ void computeForceVector(){
             
             if(distance < actionDistance){
                 
-                pthread_mutex_lock(&lockFilteredPosition);
-                if(*myFilteredPos.x > tempoX) sign_f_rep_x = -1;
+                if(myPosX > tempoX) sign_f_rep_x = -1;
                 else sign_f_rep_x = 1;
-                if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
+                if(myPosY > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
-                if((myGrabState == MOVE_FRONT_JARDINIERE) && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS && tempoObstacle->obstacleID != 0) k_reduc_repul = 0;
-                else if(tempoObstacle->obstacleID == 0) k_reduc_repul = 5;
+
+                if(tempoObstacle->obstacleID == 0) k_reduc_repul = 5;
                 else{
                     if(distanceFromDest < 0.2){
-                        k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
+                        k_reduc_repul = (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
                     }
                     else k_reduc_repul = 0.1; 
                     
                 } 
 
                 printf("repul force for obstacle with id = %d is %f and obstacle isEnabled = %d and distance = %f and k reduc repul = %f\n",tempoObstacle->obstacleID,k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)),tempoObstacle->obstacleEnabled,distance,k_reduc_repul);
-                f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.x - tempoX);
-                f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)) * (*myFilteredPos.y - tempoY);
+                f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance) - 1/(actionDistance)) * (1/pow(distance, 3)) * (myPosX - tempoX);
+                f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance) - 1/(actionDistance)) * (1/pow(distance, 3)) * (myPosY - tempoY);
 
-                pthread_mutex_unlock(&lockFilteredPosition);
 
             }
     }}
@@ -642,32 +608,40 @@ void computeForceVector(){
     free(myClosestObstaclePoint.y);
     free(myClosestRobotPoint.x);
     free(myClosestRobotPoint.y);
+    //Pour que le robot adverse ou les obstacles ne nous pousse pas dans le mur:
+    
+    if((myPosX < 0.2 && f_repul_x < 0) || (myPosX > 1.8 && f_repul_x > 0)){
+        f_repul_x = 0;
+    }
+    if((myPosY < 0.2 && f_repul_y < 0) || (myPosY > 2.8 && f_repul_y > 0)){
+        f_repul_y = 0;
+    }
+
+
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
     printf("f_repul_x = %lf f_repul_y = %lf f_att_x = %f f_att_y = %f \n",f_repul_x,f_repul_y,f_att_x,f_att_y);
     f_theta = f_att_theta;
 
-    pthread_mutex_lock(&lockFilteredPosition);
     pthread_mutex_lock(&lockOpponentPosition);
-    //distanceFromOpponent = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*myFilteredOpponent.x,*myFilteredOpponent.y);
-    pthread_mutex_unlock(&lockFilteredPosition);
+    //distanceFromOpponent = computeEuclidianDistance(myPosX,myPosY,*myFilteredOpponent.x,*myFilteredOpponent.y);
     pthread_mutex_unlock(&lockOpponentPosition);
     printf("distanceFromOpponent = %f\n",distanceFromOpponent);
 
-    if(distanceFromOpponent < 0.4 && myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS){
+    /*if(distanceFromOpponent < 0.4 && myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS){
         f_tot_x = 0;
         f_tot_y = 0;
         f_theta = 0;
         printf("DANS LE IF DE MERDE\n");
-    }
-    //fprintf(stderr,"fin du calcul de la force de répulsion totale avant boucle \n");
-    //Calcul de la force de attraction totale
+    }*/ //USED TO REMOVE JARDINIERE REPULSION BUT THE LOGIC HAS BEEN CHANGED
+
 }
 
 float xStart;
 float yStart;
 float myX;
 float myY;
+float myTheta;
 float myXOpponent;
 float myYOpponent;
 float opponentDistance;
@@ -685,6 +659,7 @@ void myPotentialFieldController(){
             pthread_mutex_lock(&lockFilteredPosition);
             myX = *myFilteredPos.x;
             myY = *myFilteredPos.y;
+            myTheta = *myFilteredPos.theta;
             myXOpponent = *myFilteredOpponent.x;
             myYOpponent = *myFilteredOpponent.y;
             pthread_mutex_unlock(&lockFilteredOpponent);
@@ -699,7 +674,20 @@ void myPotentialFieldController(){
                 arrivedAtDestination = 0;
             }
 
-            if(opponentDistance < 0.40 /*|| arrivedAtDestination == 1*/){ 
+            double dx = myXOpponent - myX;
+            double dy = myYOpponent - myY;
+
+            // Calcul de l'angle du vecteur par rapport à l'axe x
+            double phi = atan2(dy, dx);
+
+            // Conversion de theta pour l'aligner sur l'axe x
+            double theta_x = M_PI / 2.0 - myTheta*RAD2DEG;
+
+            // Calcul de l'angle relatif
+            double alpha = (phi - theta_x)*rad;
+
+
+            if(opponentDistance < 0.40 /*|| arrivedAtDestination == 1*/ && (alpha > -90||alpha<90)){ 
                 printf("opponent too close\n");
                 //S'arrête si il est bloqué par l'adversaire
                 outputSpeed[0] = 0;
@@ -856,12 +844,36 @@ void myPotentialFieldController(){
 }
 
 void initializeObstacles(){
-    addRectangleObstacle(0,0,2,0,0,1); //Mur du bas
-    addRectangleObstacle(0,0,0,3,0,2); //Mur de gauche
-    addRectangleObstacle(2,0,2,3,0,3); //Mur de droite
-    addRectangleObstacle(0,3,2,3,0,4); //Mur du haut
-    addRectangleObstacle(0,1.05,0.145,3-1.05,0,5); //jardinières gauche
-    //addRectangleObstacle(2,1.05,2-0.145,3-1.05,0,6); //jardinières droite
+
+    //MUR DU BAS
+    addRectangleObstacle(0,0,baseSize,0,0,100); //Mur du bas partie1 base 1
+    addRectangleObstacle(baseSize,0,baseSize+jardiniereLength,0,0,101); // Mur du bas jardiniere 1
+    addRectangleObstacle(baseSize+jardiniereLength,0,2*baseSize+jardiniereLength,0,0,102); // Mur du bas base jaune centre
+    addRectangleObstacle(baseSize+2*jardiniereLength,0,2*baseSize+2*jardiniereLength,0,0,103); //jardiniere2
+    addRectangleObstacle(2-baseSize,0,2,0,0,104); //Base de droite
+
+    //MUR DE DROITE
+    addRectangleObstacle(2,0,2,baseSize,0,200); //0 et base
+    addRectangleObstacle(2,baseSize,2,3-baseSize,0,201); //Entre deux bases
+    addRectangleObstacle(2,3-baseSize,2,3,0,202); //base 2
+
+    //MUR DU GAUCHE
+    addRectangleObstacle(0,0,0,baseSize,0,300); //0 et base
+    addRectangleObstacle(0,baseSize,0,0.6,0,301); //Entre base et jardiniere
+    addRectangleObstacle(0,0.6,0,0.6+jardiniereLength,0,302); //jardiniere1
+    addRectangleObstacle(0,0.6+jardiniereLength,0,3-(0.6+jardiniereLength),0,303); //Entre jardinieres
+    addRectangleObstacle(0,3-(0.6+jardiniereLength),0,3-0.6,0,304); //jardiniere2
+    addRectangleObstacle(0,3-0.6,0,3-baseSize,0,305); //Entre jardinière et base haut gauche
+    addRectangleObstacle(0,3-baseSize,0,3,0,306); //base haut gauche
+
+    //MUR DU HAUT
+    addRectangleObstacle(0,3,baseSize,3,0,400); //Mur du haut base1
+    addRectangleObstacle(baseSize,3,baseSize+jardiniereLength,3,0,401); // Mur du haut jardiniere 1
+    addRectangleObstacle(baseSize+jardiniereLength,3,2*baseSize+jardiniereLength,3,0,402); // Mur du haut base jaune centre
+    addRectangleObstacle(baseSize+2*jardiniereLength,3,2*baseSize+2*jardiniereLength,3,0,403); //MUR DU HAUT JARDINIERE 2
+    addRectangleObstacle(2-baseSize,3,2,3,0,404); //Base de droite
+
+    
     addRoundObstacle(0.5,1.50,0.125,0,11); //Zone plantes f1
     addRoundObstacle(0.7,1,0.125,0,12); //Zone plantes f2
     addRoundObstacle(0.5,2,0.125,0,13); //Zone plantes f3

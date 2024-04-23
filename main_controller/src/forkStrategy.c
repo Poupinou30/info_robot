@@ -447,10 +447,12 @@ void manageGrabbing(plantZone* bestPlantZone){
             myMoveType = DISPLACEMENT_MOVE;
             fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
             myControllerState = MOVING;
+            removeObstacle(bestJardiniere->obstacleID); // On retire l'obstacle de la jardiniere afin de pouvoir s'y rendre
         }
         if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
             myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
             myControllerState = STOPPED;
+            enableObstacle(bestJardiniere->obstacleID); //On reactive la force de répulsion de ce mur
             arrivedAtDestination = 0;
             destination_set = 0;
             printf("move<frontJardiniere> done\n");

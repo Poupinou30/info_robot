@@ -182,31 +182,44 @@ void initializeJardinieres(){
     jardinieres[0].posX = 0.12+marge;
     jardinieres[0].posY = 0.7625;
     jardinieres[0].numberOfPlants = 0;
+    jardinieres[0].obstacleID = 302;
+    jardinieres[0].potZoneID = NULL; //pas de potZone devant
 
     jardinieres[1].zoneID = 1;
     jardinieres[1].posX = 0.6125;
     jardinieres[1].posY = 0.12+marge;
     jardinieres[1].numberOfPlants = 0;
+    jardinieres[1].obstacleID = 101;
+    jardinieres[1].potZoneID = 0; //potZone devant
 
     jardinieres[2].zoneID = 2;
     jardinieres[2].posX = 1.3875;
     jardinieres[2].posY = 2.88-marge;
     jardinieres[2].numberOfPlants = 0;
+    jardinieres[2].obstacleID = 403;
+    jardinieres[2].potZoneID = 3; //pas de potZone devant
+
 
     jardinieres[3].zoneID = 3;
     jardinieres[3].posX = 0.12+marge;
     jardinieres[3].posY = 2.2375;
     jardinieres[3].numberOfPlants = 0;
+    jardinieres[3].obstacleID = 304;
+    jardinieres[3].potZoneID = 0; //pas de potZone devant
 
     jardinieres[4].zoneID = 4;
     jardinieres[4].posX = 0.6125;
     jardinieres[4].posY = 2.88-marge;
     jardinieres[4].numberOfPlants = 0;
+    jardinieres[4].obstacleID = 401;
+    jardinieres[4].potZoneID = 1; //potZone devant
 
     jardinieres[5].zoneID = 5;
     jardinieres[5].posX = 1.3875;
     jardinieres[5].posY = 0.12+marge;
     jardinieres[5].numberOfPlants = 0;
+    jardinieres[5].obstacleID = 103;
+    jardinieres[5].potZoneID = 2; //pas de potZone devant
     
 }
 
@@ -276,30 +289,42 @@ void initializeEndZones(){
     endZones[0].posX =  0.15;
     endZones[0].posY =  0.15;
     endZones[0].numberOfPlants = 0;
+    endZones[0].obstacleIDX = 100;
+    endZones[0].obstacleIDY = 300;
 
     endZones[1].zoneID = 1;
     endZones[1].posX = 1;
     endZones[1].posY = 2.85;
     endZones[1].numberOfPlants = 0;
+    endZones[1].obstacleIDX = 402;
+    endZones[1].obstacleIDY = NULL; // PAS DANS UN COIN 
 
     endZones[2].zoneID = 2;
     endZones[2].posX = 1.85;
     endZones[2].posY = 0.15;
     endZones[2].numberOfPlants = 0;
+    endZones[2].obstacleIDX = 104;
+    endZones[2].obstacleIDY = 200;
 
     endZones[3].zoneID = 3;
     endZones[3].posX = 0.15;
     endZones[3].posY = 2.85;
     endZones[3].numberOfPlants = 0;
+    endZones[3].obstacleIDX = 400;
+    endZones[3].obstacleIDY = 306;
 
     endZones[4].zoneID = 4;
     endZones[4].posX = 1;
     endZones[4].posY = 0.15;
     endZones[4].numberOfPlants = 0;
+    endZones[4].obstacleIDX = 102;
+    endZones[4].obstacleIDY = NULL; // PAS DANS UN COIN
 
     endZones[5].zoneID = 5;
     endZones[5].posX = 1.85;
     endZones[5].posY = 2.85;
     endZones[5].numberOfPlants = 0;
+    endZones[5].obstacleIDX = 404;
+    endZones[5].obstacleIDY = 202;
 }
 
