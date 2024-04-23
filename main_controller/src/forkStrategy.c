@@ -32,53 +32,29 @@ void manageGrabbing(plantZone* bestPlantZone){
     //fprintf(stderr,"myGrabState = %d and actuatorsState = %d \n", myGrabState,myActuatorsState);
     
     switch (myGrabState)
-    {
-    case MOVE_FRONT_PLANTS:
-
-        if(destination_set != 1){
-            definePlantsDestination(bestPlantZone);
-            removeObstacle(bestPlantZone->obstacleID);
-            destination_set = 1;
-            resetErrorLists();
-            myMoveType = DISPLACEMENT_MOVE;
-            fprintf(stderr, "before moving \n");
-            myControllerState = MOVING;
-        }
-        if(arrivedAtDestination && lidarAcquisitionFlag){
-            myGrabState = GRAB_PLANTS_INIT;
-            myControllerState = STOPPED;
-            destination_set = 0;
-            arrivedAtDestination = 0;
-            printf("move<frontPlant> done\n");
-        } 
-        break;
-        
-    case CALIB_FORK:
-        printf("Calibrating\n");
-        switch (myActuatorsState)
-        {
-        case SENDING_INSTRUCTION:
-            done = calibrateFork();
-
-            //sleep(5);
-            if(!timeStarted){
-                timeStarted = 1;
-                gettimeofday(&commandSended,NULL);
-            }
-            else{
-                gettimeofday(&actualTime,NULL);
-                if(computeTimeElapsed(commandSended,actualTime) > 200){
-                    done = 1;
-                    timeStarted = 0;
+    {  
+        case CALIB_FORK:
+            printf("Calibrating\n");
+            switch (myActuatorsState)
+            {
+            case SENDING_INSTRUCTION:
+                done = calibrateFork();
+                if(!timeStarted){
+                    timeStarted = 1;
+                    gettimeofday(&commandSended,NULL);
                 }
-            }
-            if(done) myActuatorsState = WAITING_ACTUATORS;
-            done = 0;
-            break;
+                else{
+                    gettimeofday(&actualTime,NULL);
+                    if(computeTimeElapsed(commandSended,actualTime) > 200){
+                        done = 1;
+                        timeStarted = 0;
+                    }
+                }
+                if(done) myActuatorsState = WAITING_ACTUATORS;
+                done = 0;
+                break;
         
         case WAITING_ACTUATORS:
-
-            
             //fprintf(stderr,"received message = %s \n",receivedData);
             if(!actuator_reception){
                 //printf("dans if actuator reception\n");
@@ -90,17 +66,23 @@ void manageGrabbing(plantZone* bestPlantZone){
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = FINISHED;
                 receivedData[0] = '\0';
-                forksCalibrated = 1;           
+                forksCalibrated = 1;
             } 
             break;
         }
         break;
-    case GRAB_PLANTS_INIT:
-        switch (myActuatorsState)
-        {
-        case SENDING_INSTRUCTION:
-            //if(!done0) done0 = setGripperPosition(0);
-            if(!done1/*&&done0*/) done1 = deployForks();
+    
+    case MOVE_FRONT_PLANTS:
+        if(destination_set != 1){
+            definePlantsDestination(bestPlantZone);
+            removeObstacle(bestPlantZone->obstacleID);
+            destination_set = 1;
+            resetErrorLists();
+            myMoveType = DISPLACEMENT_MOVE;
+            myControllerState = MOVING;
+        }
+        if (myActuatorsState == SENDING_INSTRUCTION){
+            if(!done1) done1 = deployForks();
             if (myActionChoice == PLANTS_ACTION){
                 if(!done2 && done1) done2 = setLowerFork(74);
             }
@@ -113,15 +95,21 @@ void manageGrabbing(plantZone* bestPlantZone){
                 }
             }
             if(!done3 && done2) done3 = done2 && setUpperFork(0);
-            if(/*done0 &&*/ done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
+            if(done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
             break;
-        
-        case WAITING_ACTUATORS:
-        //fprintf(stderr,"actuators reception = %d\n",actuator_reception);
-        
+        }
+        if(arrivedAtDestination && lidarAcquisitionFlag){
+            myGrabState = GRAB_PLANTS_INIT;
+            myControllerState = STOPPED;
+            destination_set = 0;
+            arrivedAtDestination = 0;
+        } 
+        break;
+
+    case GRAB_PLANTS_INIT:
+        if (myActuatorsState == WAITING_ACTUATORS){
             if(!actuator_reception){
                 actuator_reception = UART_receive(UART_handle,receivedData);
-
             }
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
@@ -133,7 +121,6 @@ void manageGrabbing(plantZone* bestPlantZone){
                 receivedData[0] = '\0';
                 actuator_reception = 0;   
             } 
-            break;
         }
         break;
 
