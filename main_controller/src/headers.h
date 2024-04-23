@@ -127,8 +127,10 @@ typedef struct EndZone{
     int zoneID;
     float posX;
     float posY;
+    float posTheta;
     float dropPositionX;
     float dropPositionY;
+    float dropPositionTheta;
     int numberOfPlants;
 } endZone;
 
