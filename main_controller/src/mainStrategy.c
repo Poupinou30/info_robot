@@ -289,11 +289,7 @@ void defineEndZoneDestination(endZone* bestEndZone){
     pthread_mutex_lock(&lockFilteredPosition);
     *destination.x = bestEndZone->posX;
     *destination.y = bestEndZone->posY;
-    if(bestEndZone->posY < 1.5) {
-        *destination.theta = 0;
-    }else{
-        *destination.theta = 180;
-    }
+    *destination.theta = bestEndZone->posTheta;    
     pthread_mutex_unlock(&lockFilteredPosition);
 };
 
