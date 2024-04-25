@@ -64,7 +64,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
         v_max = 0.5*distanceFromOpponent/0.7;
     }
     else if(myMoveType == DISPLACEMENT_MOVE && destination_set && distanceFromDestination < 0.15 ) v_max = 0.15;
-    else v_max = 0.5;
+    else v_max = 0.55; //ALERTEPLUSPLUS
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockFilteredPosition);
 

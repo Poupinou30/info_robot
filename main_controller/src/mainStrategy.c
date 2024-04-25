@@ -65,7 +65,7 @@ void pointsStrategy(){
     // check if it's time to leave
     float maxSpeed = 0.4;
     //fprintf(stderr,"check1\n");
-    float SafetyFactor = 2;
+    float SafetyFactor = 2.5;
     gettimeofday(&now, NULL);
     //fprintf(stderr,"check1.5\n");
     endZone* bestEndZone = computeBestEndZone();
@@ -89,6 +89,13 @@ void pointsStrategy(){
         removeObstacle(14);
         removeObstacle(15);
         removeObstacle(16);
+        removeObstacle(21);
+        removeObstacle(22);
+        removeObstacle(23);
+        removeObstacle(24);
+        removeObstacle(25);
+        removeObstacle(26);
+
         destination_set = 0;
         arrivedAtDestination = 0;
         myMoveType = DISPLACEMENT_MOVE;
@@ -192,7 +199,7 @@ void defineBestAction(){
     
     bestPlantZone = computeBestPlantsZone();
     bestPotZone = computeBestPotsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 43 || timeFromStartOfMatch > 45) ){
+    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 20 || timeFromStartOfMatch > 88) ){
         printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;

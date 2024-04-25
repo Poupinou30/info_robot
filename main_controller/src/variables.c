@@ -32,7 +32,9 @@ double measuredSpeedX = 0;
 double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
-uint8_t startingPoint = 3;
+uint8_t startingPoint = 1; 
+// 1, 2 3 for blue,
+// 4, 5, 6 for yellow
 
 uint8_t changeOfPlan = 1;
 uint8_t forksCalibrated = 0;

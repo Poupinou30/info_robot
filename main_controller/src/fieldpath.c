@@ -402,7 +402,7 @@ void computeForceVector(){
     else k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
-    float k_repul =0.000002 ;
+    float k_repul =0.0000005 ;
     //double theta = *myFilteredPos.theta
     pthread_mutex_lock(&lockDestination);
     pthread_mutex_lock(&lockFilteredPosition); 
@@ -617,7 +617,7 @@ void computeForceVector(){
                 if(*myFilteredPos.y > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
                 if((myGrabState == MOVE_FRONT_JARDINIERE) && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS && tempoObstacle->obstacleID != 0) k_reduc_repul = 0;
-                else if(tempoObstacle->obstacleID == 0) k_reduc_repul = 5;
+                else if(tempoObstacle->obstacleID == 0) k_reduc_repul = 10;
                 else{
                     if(distanceFromDest < 0.2){
                         k_reduc_repul = (distanceFromDest/0.20) * (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION

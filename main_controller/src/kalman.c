@@ -51,7 +51,7 @@ double Q[8][8] = {
     {0, 0, 0, 0, 0, 0, 1, 0},
     {0, 0, 0, 0, 0, 0, 0, 0.1}
 }; // Bruit de processus
-double R[11] = {0.8, 0.8, 1.5,0.7, 0.7, 2, 0.5, 0.5, 0.0001, 0.0001,0.01}; // Bruit de mesure pour chaque variable d'état
+double R[11] = {0.5, 0.5, 1.5,0.7, 0.7, 2, 0.5, 0.5, 0.0001, 0.0001,0.01}; // Bruit de mesure pour chaque variable d'état
 double oldTheta;
 double meanTheta = 0;
 uint8_t thetaForcedFlag = 0;
