@@ -273,33 +273,57 @@ void initializeEndZones(){
 
     endZones = (endZone*)malloc(sizeof(endZone)*6);
     endZones[0].zoneID = 0;
-    endZones[0].posX =  0.15;
-    endZones[0].posY =  0.15;
+    endZones[0].posX =  POTWIDTH + 0.2705; // c'est juste pour etre symétrique avec les zones du bas (2 et 5), qui doivent éviter les panneaux solaires
+    endZones[0].posY =  3*POTWIDTH + 0.1275; // éviter de rentrer dans les plantes qu'on a drop dans cette zone 
+    endZones[0].posTheta = 90; // orientation du robot pour finir dans cette zone = 90
+    endZones[0].dropPositionX = 0.225; // centre de la zone en x
+    endZones[0].dropPositionY = 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches
+    endZones[0].dropPositionTheta = 180; // orientation du robot pour drop dans cette zone = 180
     endZones[0].numberOfPlants = 0;
 
     endZones[1].zoneID = 1;
-    endZones[1].posX = 1;
-    endZones[1].posY = 2.85;
+    endZones[1].posX = 1; // centre de la zone en x
+    endZones[1].posY = 3 - 3*POTWIDTH - 0.1275; 
+    endZones[1].posTheta = 180; // orientation du robot pour finir dans cette zone = 180
+    endZones[1].dropPositionX = 1;
+    endZones[1].dropPositionY = 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches;
+    endZones[1].dropPositionTheta = 180; // orientation du robot pour drop dans cette zone = 180
     endZones[1].numberOfPlants = 0;
 
     endZones[2].zoneID = 2;
-    endZones[2].posX = 1.85;
-    endZones[2].posY = 0.15;
+    endZones[2].posX = 2 - POTWIDTH - 0.2705; // éviter de rentrer dans un panneau solaire mis en bonne position
+    endZones[2].posY = 3*POTWIDTH + 0.1275; // éviter de rentrer dans les plantes qu'on a drop dans cette zone 
+    endZones[2].posTheta = 270; // orientation du robot pour finir dans cette zone = 270 
+    endZones[2].dropPositionX = 2 - 0.225 // centre de la zone en x
+    endZones[2].dropPositionY = 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches
+    endZones[2].dropPositionTheta = 180; // orientation du robot pour drop dans cette zone = 180
     endZones[2].numberOfPlants = 0;
 
     endZones[3].zoneID = 3;
-    endZones[3].posX = 0.15;
-    endZones[3].posY = 2.85;
+    endZones[3].posX = POTWIDTH + 0.2705; // c'est juste pour etre symétrique avec les zones du bas (2 et 5), qui doivent éviter les panneaux solaires
+    endZones[3].posY = 3 - 3*POTWIDTH - 0.1275; // éviter de rentrer dans les plantes qu'on a drop dans cette zone
+    endZones[3].posTheta = 90; // orientation du robot pour finir dans cette zone = 90
+    endZones[3].dropPositionX = 0.225; // centre de la zone en x
+    endZones[3].dropPositionY = 3 - 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches
+    endZones[3].dropPositionTheta = 0; // orientation du robot pour drop dans cette zone = 0
     endZones[3].numberOfPlants = 0;
 
     endZones[4].zoneID = 4;
     endZones[4].posX = 1;
-    endZones[4].posY = 0.15;
+    endZones[4].posY = 3 - 3*POTWIDTH - 0.1275; // éviter de rentrer dans les plantes qu'on a drop dans cette zone
+    endZones[4].posTheta = 0; // orientation du robot pour finir dans cette zone = 0
+    endZones[4].dropPositionX = 1; // centre de la zone en x
+    endZones[4].dropPositionY = 3 - 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches
+    endZones[4].dropPositionTheta = 0; // orientation du robot pour drop dans cette zone = 0
     endZones[4].numberOfPlants = 0;
 
     endZones[5].zoneID = 5;
-    endZones[5].posX = 1.85;
-    endZones[5].posY = 2.85;
+    endZones[5].posX = 2 - POTWIDTH - 0.2705; // éviter de rentrer dans un panneau solaire mis en bonne position
+    endZones[5].posY = 3 - 3*POTWIDTH - 0.1275; // éviter de rentrer dans les plantes qu'on a drop dans cette zone
+    endZones[5].posTheta = 270; // orientation du robot pour finir dans cette zone = 270
+    endZones[5].dropPositionX = 2 - 0.225; // centre de la zone en x
+    endZones[5].dropPositionY = 3 - 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches
+    endZones[5].dropPositionTheta = 0; // orientation du robot pour drop dans cette zone = 0
     endZones[5].numberOfPlants = 0;
 }
 

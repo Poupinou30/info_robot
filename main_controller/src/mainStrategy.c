@@ -136,7 +136,6 @@ void actionStrategy(){
             printf("changeOfPlant 1\n");
              changeOfPlan = 1;
         }
-        //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case PLANTS_POTS_ACTION:
         if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
