@@ -439,7 +439,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             removeObstacle(bestJardiniere->obstacleID+1);
         }
         if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
-            if (actionChoice == PLANTS_ACTION){
+            if (myActionChoice == PLANTS_ACTION){
                 myGrabState = LOWER_PLANTS;
             }
             else{
