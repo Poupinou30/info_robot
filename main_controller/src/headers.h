@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #define _Pi 3.1415927
 #define DEG2RAD     (_Pi/180)
+#define RAD2DEG     (180/_Pi)
 #define POTWIDTH 0.0708
 #ifndef MAIN_CONTROLLER_HEADERS_H
 #define MAIN_CONTROLLER_HEADERS_H
@@ -18,6 +19,8 @@
 #define robotLengthX 0.255
 #define robotLengthYUndeployed 0.240
 #define robotLengthYDeployed 0.340
+#define baseSize 0.45
+#define jardiniereLength 0.325
 
 
 #endif //MAIN_CONTROLLER_HEADERS_H
@@ -38,6 +41,7 @@ typedef struct position{
     float *y;
     float *theta;
 } position;
+
 
 typedef struct obstacle{
     double posX;
@@ -100,6 +104,7 @@ typedef struct jardiniere{
     float posY;
     int numberOfPlants;
     int obstacleID;
+    int potZoneID;
 } jardiniere;
 
 typedef struct solarpanel{
@@ -132,6 +137,8 @@ typedef struct EndZone{
     float dropPositionY;
     float dropPositionTheta;
     int numberOfPlants;
+    int obstacleIDX; //Partie du mur sur l'axe X
+    int obstacleIDY; //Partie du mur sur l'axe Y
 } endZone;
 
 
