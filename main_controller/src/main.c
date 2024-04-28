@@ -212,8 +212,8 @@ int main(){ //TEST LOCAL
     double elapsedTime = 0;
 
     nextionStart = 1; //NE DOIT PAS RESTER!!!
-    *myFilteredPos.x = 0; //On utilise pas le filtre de kalman, on force la position à un endroit pour tester
-    *myFilteredPos.y = 0;
+    *myFilteredPos.x = 0.5; //On utilise pas le filtre de kalman, on force la position à un endroit pour tester
+    *myFilteredPos.y = 0.5;
     *myFilteredPos.theta = 0;
 
     while (1)
