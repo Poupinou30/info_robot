@@ -363,7 +363,7 @@ void computeForceVector(){
     Pour bien faire, il faudrait vérifier l'alignement entre l'obstacle et la destination. Si ils ne sont pas alignés, rien ne sert d'activer une force tangentielle!
     */
 
-    pthre ad_mutex_lock(&lockFilteredPosition);
+    pthread_mutex_lock(&lockFilteredPosition);
     float myPosX = *myFilteredPos.x;
     float myPosY = *myFilteredPos.y;
     float myTheta = *myFilteredPos.theta;
@@ -741,7 +741,7 @@ void myPotentialFieldController(){
             double theta_x = M_PI / 2.0 - myTheta*RAD2DEG;
 
             // Calcul de l'angle relatif
-            double alpha = (phi - theta_x)*rad;
+            double alpha = (phi - theta_x)*RAD2DEG;
 
 
             if(opponentDistance < 0.40 /*|| arrivedAtDestination == 1*/ && (alpha > -90||alpha<90)){ 
