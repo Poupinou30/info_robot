@@ -358,6 +358,11 @@ struct timeval startOfArrival, now;
 
 void computeForceVector(){
 
+    /*Pour la force tangentielle quelles règles va-t-on utiliser?
+    il faudrait quadriller la zone et définir un sens de rotation en fonction. Pour l'évitement d'un même obstacle, il faut que la force reste LA MEME. 
+    Pour bien faire, il faudrait vérifier l'alignement entre l'obstacle et la destination. Si ils ne sont pas alignés, rien ne sert d'activer une force tangentielle!
+    */
+
     pthre ad_mutex_lock(&lockFilteredPosition);
     float myPosX = *myFilteredPos.x;
     float myPosY = *myFilteredPos.y;
@@ -367,12 +372,17 @@ void computeForceVector(){
     float distanceFromOpponent;
 
     double nowTime = now.tv_sec + now.tv_usec/1000000;
+
+    float f_repul_tan_x = 0;
+    float f_repul_tan_y = 0;
+    float f_repul_norm_x = 0;
+    float f_repul_norm_y = 0;
     
     double distanceFromDest = computeEuclidianDistance(myPosX,*myFilteredPos.y,*destination.x,*destination.y);
     double k_mult_att;
     
     float k_att_xy = 0.4;
-    float k_att_tang = 0.1;
+    float k_rep_tang = 0.1;
     k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
@@ -592,10 +602,57 @@ void computeForceVector(){
                     else k_reduc_repul = 0.1; 
                     
                 } 
+                //CALCUL FORCE TANGENTIELLE
+                if((tempoObstacle->posX > 0.3&&tempoObstacle->posX < 1.7) && (tempoObstacle->posY>0.3&&tempoObstacle->posY<2.7)){ //Si l'obstacle est un obstacle central, on contourne par le sens le plus "court"
+                    //printf("Calculating tangential force\n");
+                    double angle = atan2(myPosY-tempoY,myPosX-tempoX);
+                    double angleDiff = angle - myTheta*DEG2RAD;
+                    if(angleDiff > M_PI) angleDiff -= 2*M_PI;
+                    if(angleDiff < -M_PI) angleDiff += 2*M_PI;
+                    f_repul_tan_x = f_repul_x + k_rep_tang * k_reduc_repul * sign_f_rep_x * sin(angleDiff) * (1/(distance) - 1/(actionDistance));
+                    f_repul_tan_y = f_repul_y + k_rep_tang * k_reduc_repul * sign_f_rep_y * cos(angleDiff) * (1/(distance) - 1/(actionDistance));
+                }
+                else { // Si l'obstacle est contre un mur, on contourne toujours vers l'intérieur de l'arène
+                    // Calculer la direction du centre de l'arène par rapport à la position actuelle du robot
+                    double centerX = 1.0; // Assurez-vous que ce sont les coordonnées x du centre de l'arène
+                    double centerY = 1.5; // Assurez-vous que ce sont les coordonnées y du centre de l'arène
+                    double directionToCenterX = centerX - myPosX;
+                    double directionToCenterY = centerY - myPosY;
 
-                printf("repul force for obstacle with id = %d is %f and obstacle isEnabled = %d and distance = %f and k reduc repul = %f\n",tempoObstacle->obstacleID,k_reduc_repul * k_repul * (1/(distance*distance) - 1/(actionDistance*actionDistance)) * (1/pow(distance, 3)),tempoObstacle->obstacleEnabled,distance,k_reduc_repul);
-                f_repul_x = f_repul_x + k_reduc_repul * k_repul * (1/(distance) - 1/(actionDistance)) * (1/pow(distance, 3)) * (myPosX - tempoX);
-                f_repul_y = f_repul_y + k_reduc_repul * k_repul * (1/(distance) - 1/(actionDistance)) * (1/pow(distance, 3)) * (myPosY - tempoY);
+                    // Calculer la tangente à la direction de l'obstacle (perpendiculaire au vecteur obstacle-robot)
+                    double obstacleToRobotX = myPosX - tempoX;
+                    double obstacleToRobotY = myPosY - tempoY;
+                    double tangentX = -obstacleToRobotY; // Rotation de 90 degrés pour obtenir un vecteur perpendiculaire
+                    double tangentY = obstacleToRobotX;
+
+                    // Déterminer le signe de la tangente pour qu'elle pointe vers l'intérieur de l'arène
+                    double dotProduct = tangentX * directionToCenterX + tangentY * directionToCenterY;
+                    if (dotProduct < 0) {
+                        tangentX = -tangentX; // Inverser la direction si elle pointe vers l'extérieur
+                        tangentY = -tangentY;
+                    }
+
+                    // Normaliser la tangente (optionnel, dépend de si vous voulez une magnitude constante ou non)
+                    double norm = sqrt(tangentX * tangentX + tangentY * tangentY);
+                    tangentX /= norm;
+                    tangentY /= norm;
+
+                    // Calcul de la magnitude de la force tangentielle
+                    double magnitude = k_rep_tang * (1 / distance - 1 / actionDistance);
+                    // Appliquer la force tangentielle
+                    f_repul_tan_x = magnitude * tangentX;
+                    f_repul_tan_y = magnitude * tangentY;
+                }
+                //FIN CALCUL TAN
+
+                f_repul_norm_x = k_reduc_repul * k_repul * (1/(distance) - 1/(actionDistance)) * (1/pow(distance, 3)) * (myPosX - tempoX);
+                f_repul_norm_y = k_reduc_repul * k_repul * (1/(distance) - 1/(actionDistance)) * (1/pow(distance, 3)) * (myPosY - tempoY);
+                f_repul_x = f_repul_x + f_repul_norm_x + f_repul_tan_x;
+                f_repul_y = f_repul_y + f_repul_norm_y + f_repul_tan_y;
+
+                printf("Repulsion force for obstacle #%d: x_normal = %f y_normal = %f x_tangent = %f y_tangent = %f totalX = %f totalY = %f\n",tempoObstacle->obstacleID,f_repul_norm_x,f_repul_norm_y,f_repul_tan_x,f_repul_tan_y, f_repul_x,f_repul_y);
+
+
 
 
             }
