@@ -210,6 +210,10 @@ int main(){ //TEST LOCAL
     struct timeval lastExecutionTime, currentTime;
     gettimeofday(&lastExecutionTime, NULL);
     double elapsedTime = 0;
+    destination_set = 1;
+    *destination.x = 1.7;
+    *destination.y = 0.2;
+    *destination.theta = 180;
 
     nextionStart = 1; //NE DOIT PAS RESTER!!!
     *myFilteredPos.x = 0.5; //On utilise pas le filtre de kalman, on force la position à un endroit pour tester
