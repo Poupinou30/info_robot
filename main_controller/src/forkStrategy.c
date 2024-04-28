@@ -436,6 +436,12 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = MOVING;
         }
         if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
+            if (actionChoice == PLANTS_ACTION){
+                myGrabState = LOWER_PLANTS;
+            }
+            else{
+                myGrabState = DROP_PLANTS;
+            }
             myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
@@ -507,13 +513,11 @@ void manageGrabbing(plantZone* bestPlantZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                if (nbrOfPots == 6){
+                if (myActionChoice == PLANTS_ACTION){
+                    myGrabState = MOVE_BACK_JARDINIERE;
+                }else{
                     myGrabState = DROP_ALL;
                 }
-                else{
-                    myGrabState = MOVE_BACK_JARDINIERE;
-                }
-                myGrabState = DROP_ALL;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
                 done1 = 0; done2 = 0; done3 = 0;
