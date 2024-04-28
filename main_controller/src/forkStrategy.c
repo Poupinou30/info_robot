@@ -249,19 +249,16 @@ void manageGrabbing(plantZone* bestPlantZone){
     case UNSTACK_POTS_MOVE: // ça c'est de front vers captured sur le ppt
         printf("unstackPotsMove started, destination_set = %d, arrivedAtDestination = %d \n",destination_set,arrivedAtDestination);
         if(destination_set == 0){ 
-            printf("first if \n");
             myMoveType = GRABBING_MOVE;
             myMovingSubState = GO_FORWARD_POTS;
             myControllerState = MOVING;
             
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
-            printf("second if \n");
             myGrabState = UNSTACK_POTS_MOVE;
             
         }
         else{
-            printf("third if \n");
             myGrabState = UNSTACK_POT_TAKE;
             destination_set = 0;
             arrivedAtDestination = 0;
@@ -357,7 +354,6 @@ void manageGrabbing(plantZone* bestPlantZone){
         }
         break;
 
-    // faut ajouter la transistions ALIGN_POTS_MOVE (1st row vers aligned)
     case ALIGN_POTS_MOVE: // 1st row vers aligned sur le ppt
         printf("alignPotsMove started and destination_set = %d arrivedAtDestination = %d\n", destination_set,arrivedAtDestination);
         if(destination_set == 0){
@@ -375,7 +371,6 @@ void manageGrabbing(plantZone* bestPlantZone){
         }
         break;
 
-    // faut ajouter la transistions GRAB_ALL_POTS (aligned vers pots ready)
     case GRAB_ALL_POTS:
         printf("grabAllPots started\n");
         if(destination_set == 0){
@@ -439,13 +434,12 @@ void manageGrabbing(plantZone* bestPlantZone){
             removeObstacle(bestJardiniere->obstacleID+1);
         }
         if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
-            if (actionChoice == PLANTS_ACTION){
+            if (myActionChoice == PLANTS_ACTION){
                 myGrabState = LOWER_PLANTS;
             }
             else{
                 myGrabState = DROP_PLANTS;
-            }
-            myGrabState = DROP_PLANTS; //ON A SKIP MOVE_FORWARD_JARDINIERE mais on peut le rajouter si besoin
+            } 
             myControllerState = STOPPED;
             enableObstacle(bestJardiniere->obstacleID); //On reactive la force de répulsion de ce mur
             enableObstacle(bestJardiniere->obstacleID-1);

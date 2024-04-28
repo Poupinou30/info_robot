@@ -298,7 +298,7 @@ void initializeEndZones(){
 
     endZones[1].zoneID = 1;
     endZones[1].posX = 1; // centre de la zone en x
-    endZones[1].posY = 3 - 3*POTWIDTH - 0.1275; 
+    endZones[1].posY = 3 - 3*POTWIDTH - 0.2705; 
     endZones[1].posTheta = 0; // orientation du robot pour finir dans cette zone = 180
     endZones[1].dropPositionX = 1;
     endZones[1].dropPositionY = 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches;
@@ -331,7 +331,7 @@ void initializeEndZones(){
 
     endZones[4].zoneID = 4;
     endZones[4].posX = 1;
-    endZones[4].posY = 3 - 3*POTWIDTH - 0.1275; // éviter de rentrer dans les plantes qu'on a drop dans cette zone
+    endZones[4].posY = 3*POTWIDTH + 0.2705; // éviter de rentrer dans les plantes qu'on a drop dans cette zone
     endZones[4].posTheta = 180; // orientation du robot pour finir dans cette zone = 0
     endZones[4].dropPositionX = 1; // centre de la zone en x
     endZones[4].dropPositionY = 3 - 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches

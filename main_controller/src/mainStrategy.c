@@ -98,9 +98,10 @@ void pointsStrategy(){
         arrivedAtDestination = 0;
         myMoveType = DISPLACEMENT_MOVE;
         if(VERBOSE)
-            printf("Match ending, going to RETURN_TO_BASE mode\n");
+            printf("=============================Match ending, going to RETURN_TO_BASE mode===========================\n");
             printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
             printf("TimeNeededToGetHome = %f\n", TimeNeededToGetHome);
+            printf("==================================================================================================\n");
     }
     
     else{ // let's earn some points
