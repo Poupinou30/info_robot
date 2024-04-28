@@ -32,12 +32,17 @@ double measuredSpeedX = 0;
 double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
-uint8_t startingPoint = 1; 
+//====================================================//
+uint8_t startingPoint = 4; 
 // 1, 2 3 for blue,
 // 4, 5, 6 for yellow
 
+uint8_t nbrOfPots = 6;
+// 6 if you want to de-stack the 6th pot
+// 5 if you dont
+//====================================================//
+
 uint8_t changeOfPlan = 1;
 uint8_t forksCalibrated = 0;
-float timeFromStartOfMatch = 0;
-uint8_t nbrOfPots = 6;
 uint8_t solarDone = 0;
+float timeFromStartOfMatch = 0;
