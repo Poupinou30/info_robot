@@ -36,7 +36,7 @@ float perimetre = 8.6; /*8.4 sur l'arène!!!!*/
 float limit_of_detection = 3.6;
 double objectMaxStep = 0.12; //ETAIT A 0.9 JE LAI CHANGE AJD
 double max_object_width = 0.2;
-uint16_t angleTolerance = 20;
+int angleTolerance = 30;
 float triangleErrorTolerance = 0.1;//il est à 0.08 par défaut
 float isoceleTolerance = 0.1; //ETAIT A 0.08
 float longSideLength = 3.326; //Longueur des deux grands côtés du triangle
@@ -383,7 +383,7 @@ void* beacon_data(void* argument){
                     uint8_t condition = (beaconTab[0].angle > (angle_horlogique0 - angleTolerance) && beaconTab[0].angle < (angle_horlogique0 + angleTolerance)) && (beaconTab[1].angle > (angle_horlogique1 - angleTolerance) && beaconTab[1].angle < (angle_horlogique1 + angleTolerance)) && (beaconTab[2].angle > (angle_horlogique2 - angleTolerance) && beaconTab[2].angle < (angle_horlogique2 + angleTolerance))  && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
                     actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
                     //DEBUG ---------------
-                    if(actualError < 0.3){
+                    /*if(actualError < 0.3){
                         debugIsoceleCondition = dij - djk;
                         debugPerimetre = triangle;
                         debugBalises[0][0] = beaconTab[0].angle;
@@ -392,7 +392,7 @@ void* beacon_data(void* argument){
                         debugBalises[1][1] = beaconTab[1].distance;
                         debugBalises[2][0] = beaconTab[2].angle;
                         debugBalises[2][1] = beaconTab[2].distance;
-                    }
+                    }*/
                     //FIN-DEBUG -----------
                     
                     //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);

@@ -155,11 +155,12 @@ void actionStrategy(){
         break;
     }
 };
-
+endZone* bestEndZone;
 void returnToBaseStrategy(){
     printf(" RETURN TO BASE: destination_set = %d arrivedAtDestination = %d and destination = %f %f\n", destination_set, arrivedAtDestination, *destination.x, *destination.y);
     if(destination_set != 1){
-        endZone* bestEndZone = computeBestEndZone();
+        fprintf(stderr,"Dans le if destination!=set \n");
+        bestEndZone = computeBestEndZone();
         defineEndZoneDestination(bestEndZone);
         destination_set = 1;
         myControllerState = MOVING;
@@ -168,7 +169,8 @@ void returnToBaseStrategy(){
         for(int i = 0; i<6; i++){
             if(potZones[i].numberOfPots == 0) removeObstacle(potZones[i].obstacleID);
             else enableObstacle(potZones[i].obstacleID);
-        }}
+        }
+        fprintf(stderr,"Dans le if destination!=set 2\n");}
     else if(arrivedAtDestination){
         mySupremeState = GAME_OVER;
         printf("--------------ARRIVED, GAME OVER---------------\n");
@@ -177,16 +179,10 @@ void returnToBaseStrategy(){
     pthread_mutex_lock(&lockDestination);
     float tempoDistance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, *destination.x, *destination.y);
     if(tempoDistance < 0.2){
-        removeObstacle(1);
-        removeObstacle(2);
-        removeObstacle(3);
-        removeObstacle(4);
+        if(bestEndZone->obstacleIDX != NULL) removeObstacle(bestEndZone->obstacleIDX);
+        if(bestEndZone->obstacleIDY != NULL) removeObstacle(bestEndZone->obstacleIDY);
     }
-    else{
-        enableObstacle(1);
-        enableObstacle(2);
 
-    }
     pthread_mutex_unlock(&lockFilteredPosition);
     pthread_mutex_unlock(&lockDestination);
 

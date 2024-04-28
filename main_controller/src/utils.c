@@ -40,8 +40,7 @@ double degToRad(double deg) {
 
 void convertsVelocity(double v_x, double v_y, double omega, double* output_speed){
     //Speed limitation
-    if(computeEuclidianDistance(*myFilteredOpponent.x,*myFilteredOpponent.y,*myFilteredPos.x,*myFilteredPos.y) < 0.5){
-        v_max = 0.15;}
+
     double omega_max;
     if(v_x  == 0 && v_y == 0){
         omega_max = omega_max_fixed;
@@ -59,11 +58,14 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     double distanceFromDestination;
     if(destination_set) distanceFromDestination = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
 
-    if(lidarElapsedTime > 500) v_max = 0.3;
+    if(lidarElapsedTime > 500){
+        v_max = 0.25;
+        printf("_____ALERT____\n ___NO_LIDAR___\n");
+    } 
     else if (distanceFromOpponent<0.7){
-        v_max = 0.5*distanceFromOpponent/0.7;
+        v_max = 0.5*distanceFromOpponent*distanceFromOpponent/(0.7*0.7);
     }
-    else if(myMoveType == DISPLACEMENT_MOVE && destination_set && distanceFromDestination < 0.15 ) v_max = 0.15;
+    else if(myMoveType == DISPLACEMENT_MOVE && destination_set && distanceFromDestination < 0.15 ) v_max = 0.2;
     else v_max = 0.5;
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockFilteredPosition);
@@ -295,7 +297,7 @@ void handle_sigsegv(int sig) {
 void handle_sigint(int sig) {
     processInstructionNew(0.0,0,0,i2c_handle_front,i2c_handle_rear);
     setWheelSpeed(0);
-    retractForks();
+    //retractForks();
     gpioTerminate();
     fprintf(stderr,"SIGINT handled \n");
     if (child_pid > 0) {

@@ -385,22 +385,22 @@ void computeForceVector(){
     double k_mult_att;
     
     float k_att_xy = 0.2;
-    float k_rep_tang = 0.01;
+    float k_rep_tang = 0.05;
     k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
-    float k_repul =0.0005 ;
+    float k_repul =0.0002 ;
     //double theta = myTheta
     pthread_mutex_lock(&lockDestination);
     
 
 
-    printf("destination_set = %d myDestination: x = %f y = %f theta = %f \n",destination_set,*destination.x,*destination.y,*destination.theta);
+    //printf("destination_set = %d myDestination: x = %f y = %f theta = %f \n",destination_set,*destination.x,*destination.y,*destination.theta);
 
     double f_att_x = -destination_set*k_att_xy * (myPosX- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (myPosY - *destination.y);
 
-    printf("f_att_x = %f f_att_y = %f \n",f_att_x,f_att_y);
+    //printf("f_att_x = %f f_att_y = %f \n",f_att_x,f_att_y);
     
     double theta = myTheta;
     double desiredTheta = *destination.theta;
@@ -433,7 +433,7 @@ void computeForceVector(){
         k_att_theta = 0.8;
     }
 
-    k_att_theta = k_att_theta * (1+ 3/(0.25+fabs(error)/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_theta = k_att_theta * (1+ 3/(0.35+fabs(error)/2)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     
 
     //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
@@ -548,7 +548,7 @@ void computeForceVector(){
                 tempoRectangle[0] = tempoPoint1;
                 tempoRectangle[1] = tempoPoint2;
                 myClosestPoint = closestPoint(tempoRectangle,myFilteredPos);
-                distance = fabs(computeEuclidianDistance(myPosX, myPosY, *myClosestPoint.x, *myClosestPoint.y)-robotLengthYUndeployed); //Calcul la distance
+                distance = fabs(computeEuclidianDistance(myPosX, myPosY, *myClosestPoint.x, *myClosestPoint.y)-robotLengthYUndeployed/2); //Calcul la distance
                 //printf("distance = %f \n",distance);
                 tempoX = *myClosestPoint.x; //Calcule la position en x
                 tempoY = *myClosestPoint.y; //Calcule la position en y
@@ -583,7 +583,7 @@ void computeForceVector(){
                 //myClosestRobotPoint = closestPoint(robotCorners,obstaclePosition);
                 
                 
-                distance = fabs(computeEuclidianDistance(tempoX,tempoY,myPosX,myPosY)-myForce.obstacleList[i].size - robotLengthYDeployed); //Calcule la distance
+                distance = fabs(computeEuclidianDistance(tempoX,tempoY,myPosX,myPosY)-myForce.obstacleList[i].size - robotLengthYDeployed/2); //Calcule la distance
             }
             //printf("distance = %f and actionDistance = %f \n",distance,actionDistance);
             free(robotLowerCorner.x);
@@ -609,7 +609,7 @@ void computeForceVector(){
                     
                 } 
                 //CALCUL FORCE TANGENTIELLE
-                if((tempoObstacle->posX > 0.3&&tempoObstacle->posX < 1.7) && (tempoObstacle->posY>0.3&&tempoObstacle->posY<2.7)){ //Si l'obstacle est un obstacle central, on contourne par le sens le plus "court"
+                if(/*(tempoObstacle->posX > 0.3&&tempoObstacle->posX < 1.7) && (tempoObstacle->posY>0.3&&tempoObstacle->posY<2.7)*/ 0){ //Si l'obstacle est un obstacle central, on contourne par le sens le plus "court"
                     //printf("Calculating tangential force\n");
                     double angle = atan2(myPosY-tempoY,myPosX-tempoX);
                     double angleDiff = angle - myTheta*DEG2RAD;
@@ -649,6 +649,9 @@ void computeForceVector(){
                     f_repul_tan_x = magnitude * tangentX;
                     f_repul_tan_y = magnitude * tangentY;
                 }
+                if(tempoObstacle->obstacleID >= 100 && tempoObstacle->obstacleID < 500){
+                    f_repul_tan_x = 0; f_repul_tan_y = 0;
+                }
                 //FIN CALCUL TAN
 
                 f_repul_norm_x = k_reduc_repul * k_repul * (1/(distance) - 1/(actionDistance)) * (1/pow(distance, 3)) * (myPosX - tempoX);
@@ -656,7 +659,7 @@ void computeForceVector(){
                 f_repul_x = f_repul_x + f_repul_norm_x + f_repul_tan_x;
                 f_repul_y = f_repul_y + f_repul_norm_y + f_repul_tan_y;
 
-                printf("\n \nRepulsion force for obstacle #%d at distance = %f and position x = %f y = %f : x_normal = %f y_normal = %f x_tangent = %f y_tangent = %f totalX = %f totalY = %f\n",tempoObstacle->obstacleID,distance,tempoObstacle->posX,tempoObstacle->posY,f_repul_norm_x,f_repul_norm_y,f_repul_tan_x,f_repul_tan_y, f_repul_x,f_repul_y);
+                //printf("\n \nRepulsion force for obstacle #%d at distance = %f and position x = %f y = %f : x_normal = %f y_normal = %f x_tangent = %f y_tangent = %f totalX = %f totalY = %f\n",tempoObstacle->obstacleID,distance,tempoObstacle->posX,tempoObstacle->posY,f_repul_norm_x,f_repul_norm_y,f_repul_tan_x,f_repul_tan_y, f_repul_x,f_repul_y);
 
 
 
@@ -673,23 +676,25 @@ void computeForceVector(){
     free(myClosestRobotPoint.y);
     //Pour que le robot adverse ou les obstacles ne nous pousse pas dans le mur:
     
-    if((myPosX < 0.2 && f_repul_x < 0) || (myPosX > 1.8 && f_repul_x > 0)){
-        f_repul_x = 0;
-    }
-    if((myPosY < 0.2 && f_repul_y < 0) || (myPosY > 2.8 && f_repul_y > 0)){
-        f_repul_y = 0;
-    }
+    
 
 
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
-    printf("f_repul_x = %lf f_repul_y = %lf f_att_x = %f f_att_y = %f \n",f_repul_x,f_repul_y,f_att_x,f_att_y);
+    //printf("f_repul_x = %lf f_repul_y = %lf f_att_x = %f f_att_y = %f \n",f_repul_x,f_repul_y,f_att_x,f_att_y);
     f_theta = f_att_theta;
+
+    if((myPosX < 0.25 && f_repul_x < 0) || (myPosX > 1.75 && f_repul_x > 0)){
+        f_tot_x = 0;
+    }
+    if((myPosY < 0.25 && f_repul_y < 0) || (myPosY > 2.75 && f_repul_y > 0)){
+        f_tot_y = 0;
+    }
 
     pthread_mutex_lock(&lockOpponentPosition);
     //distanceFromOpponent = computeEuclidianDistance(myPosX,myPosY,*myFilteredOpponent.x,*myFilteredOpponent.y);
     pthread_mutex_unlock(&lockOpponentPosition);
-    printf("distanceFromOpponent = %f\n",distanceFromOpponent);
+    //printf("distanceFromOpponent = %f\n",distanceFromOpponent);
 
     /*if(distanceFromOpponent < 0.4 && myGrabState == MOVE_FRONT_JARDINIERE && distanceFromDest < 0.5 && mySupremeState == EARNING_POINTS){
         f_tot_x = 0;
