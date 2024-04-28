@@ -583,18 +583,17 @@ solarZone* computeBestSolarZone(){
 }
 
 jardiniere* computeBestJardiniere(){
-    //fprintf(stderr,"Dans computeBestJardiniere ");
-    jardiniere* bestJardiniere = &jardinieres[3*myTeamColor];
+    jardiniere* bestJardiniere = &jardinieres[3*myTeamColor]; // ######### faut changer ça, genre on regarde jamais si elle est pas déjà occupée ou si y'a des pots devant
     int number_of_plants = jardinieres[3*myTeamColor].numberOfPlants;
     pthread_mutex_lock(&lockFilteredPosition);
-    //fprintf(stderr,"Dans computeBestJardiniere1 ");
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
     float smallestDistance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor].posX, jardinieres[3*myTeamColor].posY);
-    //fprintf(stderr,"Dans computeBestJardinier3 ");
-
     for (int i = 1; i < 3; i++) {
+        if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
+            continue;
+        }
         if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
             bestJardiniere = &jardinieres[3*myTeamColor+i];
         }else if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
@@ -605,7 +604,6 @@ jardiniere* computeBestJardiniere(){
             }
         }
     }
-    //fprintf(stderr,"Dans computeBestJardiniere4\n");
     return bestJardiniere;
 }
 

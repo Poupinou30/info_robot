@@ -87,6 +87,7 @@ typedef struct plantZone{
 } plantZone;
 
 typedef struct potZone{
+    int numberOfPots;
     int zoneID;
     float posX;
     float posY;
@@ -94,15 +95,14 @@ typedef struct potZone{
     float pos5Y;
     float pos6X;
     float pos6Y;
-    int numberOfPots;
     int obstacleID;
 } potZone;
 
 typedef struct jardiniere{
+    int numberOfPlants;
     int zoneID;
     float posX;
     float posY;
-    int numberOfPlants;
     int obstacleID;
     int potZoneID;
 } jardiniere;

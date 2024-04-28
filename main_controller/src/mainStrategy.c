@@ -210,22 +210,6 @@ void defineBestAction(){
     //fprintf(stderr,"check7\n");
 };
 
-void defineJardiniereDestination(jardiniere* bestJardiniere){
-    pthread_mutex_lock(&lockFilteredPosition);
-    *destination.x = bestJardiniere->posX;
-    *destination.y = bestJardiniere->posY;
-    if((bestJardiniere->zoneID == 0) || ( bestJardiniere->zoneID == 3)){
-        *destination.theta = 90;
-    }else{
-        if(*myFilteredPos.y < bestJardiniere->posY){
-            *destination.theta = 0;
-        } 
-        else *destination.theta = 180;
-    }
-    pthread_mutex_unlock(&lockFilteredPosition);
-};
-
-
 void definePlantsDestination(plantZone* bestPlantZone){
     pthread_mutex_lock(&lockFilteredPosition);
     if(*myFilteredPos.y < bestPlantZone->posY) {
@@ -258,6 +242,21 @@ void definePotsDestination(potZone* bestPotZone){
     }
     pthread_mutex_unlock(&lockFilteredPosition);
 }
+
+void defineJardiniereDestination(jardiniere* bestJardiniere){
+    pthread_mutex_lock(&lockFilteredPosition);
+    *destination.x = bestJardiniere->posX;
+    *destination.y = bestJardiniere->posY;
+    if((bestJardiniere->zoneID == 0) || ( bestJardiniere->zoneID == 3)){
+        *destination.theta = 90;
+    }else{
+        if(*myFilteredPos.y < bestJardiniere->posY){
+            *destination.theta = 0;
+        } 
+        else *destination.theta = 180;
+    }
+    pthread_mutex_unlock(&lockFilteredPosition);
+};
 
 void defineSolarDestination(solarZone* bestSolarZone){
     printf("before targetPositon\n");
