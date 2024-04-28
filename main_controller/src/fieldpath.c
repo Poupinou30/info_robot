@@ -384,12 +384,12 @@ void computeForceVector(){
     float tempoDestTheta = *destination.theta;
     double k_mult_att;
     
-    float k_att_xy = 0.4;
+    float k_att_xy = 0.2;
     float k_rep_tang = 0.01;
     k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
-    float k_repul =0.00005 ;
+    float k_repul =0.0005 ;
     //double theta = myTheta
     pthread_mutex_lock(&lockDestination);
     
