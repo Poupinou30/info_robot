@@ -427,7 +427,7 @@ void computeForceVector(){
     }
     if(fabs(error) < 2) turningMove = 0;
 
-    if(turningMove){
+    if(turningMove){ //ATTENTION ICI ON METS UNIQUEMENT LA FORCE DATTRACTION A 0 PAS LA REPULSION
         f_att_x = 0;
         f_att_y = 0;
         k_att_theta = 0.8;
