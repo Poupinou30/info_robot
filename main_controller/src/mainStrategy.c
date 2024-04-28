@@ -65,7 +65,7 @@ void pointsStrategy(){
     // check if it's time to leave
     float maxSpeed = 0.4;
     //fprintf(stderr,"check1\n");
-    float SafetyFactor = 2.5;
+    float SafetyFactor = 4.5;
     gettimeofday(&now, NULL);
     //fprintf(stderr,"check1.5\n");
     endZone* bestEndZone = computeBestEndZone();
@@ -158,7 +158,7 @@ void actionStrategy(){
 };
 
 void returnToBaseStrategy(){
-    printf(" RETURN TO BASE: destination_set = %d arrivedAtDestination = %d and destination = %f %f\n", destination_set, arrivedAtDestination, *destination.x, *destination.y);
+    printf(" RETURN TO BASE: destination_set = %d arrivedAtDestination = %d and destination = %f %f %f\n", destination_set, arrivedAtDestination, *destination.x, *destination.y, *destination.theta);
     if(destination_set != 1){
         endZone* bestEndZone = computeBestEndZone();
         defineEndZoneDestination(bestEndZone);
