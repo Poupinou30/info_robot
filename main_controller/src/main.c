@@ -94,7 +94,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int mainREAL(){//VRAI MAIN STRATEGY UTILE
+int main(){//VRAI MAIN STRATEGY UTILE
     initializeMainController();
 
     int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
@@ -187,7 +187,7 @@ int mainREAL(){//VRAI MAIN STRATEGY UTILE
 
 }
 
-int main(){ //TEST LOCAL
+int mainLOCALTEST(){ //TEST LOCAL
     initializeMainController();
 
     int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
