@@ -379,10 +379,13 @@ void computeForceVector(){
     float f_repul_norm_y = 0;
     
     double distanceFromDest = computeEuclidianDistance(myPosX,*myFilteredPos.y,*destination.x,*destination.y);
+    float tempoDestX = *destination.x;
+    float tempoDestY = *destination.y;
+    float tempoDestTheta = *destination.theta;
     double k_mult_att;
     
     float k_att_xy = 0.4;
-    float k_rep_tang = 0.1;
+    float k_rep_tang = 0.01;
     k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
@@ -614,8 +617,8 @@ void computeForceVector(){
                 }
                 else { // Si l'obstacle est contre un mur, on contourne toujours vers l'intérieur de l'arène
                     // Calculer la direction du centre de l'arène par rapport à la position actuelle du robot
-                    double centerX = 1.0; // Assurez-vous que ce sont les coordonnées x du centre de l'arène
-                    double centerY = 1.5; // Assurez-vous que ce sont les coordonnées y du centre de l'arène
+                    double centerX = tempoDestX; // Assurez-vous que ce sont les coordonnées x du centre de l'arène //FINALEMENT j'essaie de me contourner vers la destination, plus smart
+                    double centerY = tempoDestY; // Assurez-vous que ce sont les coordonnées y du centre de l'arène
                     double directionToCenterX = centerX - myPosX;
                     double directionToCenterY = centerY - myPosY;
 
