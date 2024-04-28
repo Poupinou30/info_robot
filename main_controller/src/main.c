@@ -227,9 +227,7 @@ int main(){ //TEST LOCAL
             if(makeLog) writeLog();
             
             printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
-            mainStrategy();
-            
-            myPotentialFieldController();
+            computeForceVector();
             myOdometry();
             //updateKalman(NULL); //Car je force la valeur de la position
             if(mySupremeState != WAITING_FOR_START) sendFilteredPos(pipefdCL[1]);
