@@ -233,6 +233,7 @@ int main(){ //TEST LOCAL
             if(makeLog) writeLog();
             
             printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
+            destination_set = 1;
             computeForceVector();
             myOdometry();
             //updateKalman(NULL); //Car je force la valeur de la position
