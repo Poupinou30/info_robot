@@ -399,6 +399,8 @@ void computeForceVector(){
 
     double f_att_x = -destination_set*k_att_xy * (myPosX- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (myPosY - *destination.y);
+
+    printf("f_att_x = %f f_att_y = %f \n",f_att_x,f_att_y);
     
     double theta = myTheta;
     double desiredTheta = *destination.theta;
