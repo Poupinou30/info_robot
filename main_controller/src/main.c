@@ -213,8 +213,10 @@ int main(){ //TEST LOCAL
 
     nextionStart = 1; //NE DOIT PAS RESTER!!!
     *myFilteredPos.x = 0.5; //On utilise pas le filtre de kalman, on force la position à un endroit pour tester
-    *myFilteredPos.y = 0.5;
+    *myFilteredPos.y = 0.7;
     *myFilteredPos.theta = 0;
+    *myFilteredOpponent.x = 0.5;
+    *myFilteredOpponent.y = 0.0;
 
     while (1)
     {
