@@ -395,6 +395,7 @@ void computeForceVector(){
     
 
 
+    printf("destination_set = %d myDestination: x = %f y = %f theta = %f \n",destination_set,*destination.x,*destination.y,*destination.theta);
 
     double f_att_x = -destination_set*k_att_xy * (myPosX- *destination.x);
     double f_att_y = -destination_set*k_att_xy * (myPosY - *destination.y);
