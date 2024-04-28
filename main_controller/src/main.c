@@ -156,14 +156,13 @@ int main(){//VRAI MAIN STRATEGY UTILE
                     printf("forksDeployed = %d\n",forksDeployed);
                     //printf("obstacle 14 enabled? = %d\n",myObstacleList[14].enabled);
                 }
-
                 elapsedTime = 0;
             }
 
             gettimeofday(&lastExecutionTime, NULL);
             //ON EST ARRIVE A DESTINATION?
             //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
-
+            
             pthread_mutex_lock(&lidarTimeLock);
             double lidarElapsedTime = -(lidarAcquisitionTime.tv_sec - currentTime.tv_sec) * 1000.0; // Convert to milliseconds
             lidarElapsedTime -= (lidarAcquisitionTime.tv_usec - currentTime.tv_usec) / 1000.0; // Convert to milliseconds
@@ -173,6 +172,8 @@ int main(){//VRAI MAIN STRATEGY UTILE
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
+            // faut une fonction qui check si l'ennemi change le status d'une zone de pots, de plantes, etc
+            // updateObstaclesStatus(); //Mets a jour les obstacles en fonction de la position de l'ennemi
             pthread_mutex_lock(&lidarFlagLock);
             if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<1) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
