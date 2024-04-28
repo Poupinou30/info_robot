@@ -15,6 +15,9 @@ void mainStrategy(){
     timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     
     if(timeFromStartOfMatch > matchDuration){
+        printf("======================================================================================\n");
+        printf("-------------------------------------MATCH OVER---------------------------------------\n");
+        printf("======================================================================================\n");
         mySupremeState = GAME_OVER;
     }
     switch (mySupremeState)
@@ -98,10 +101,10 @@ void pointsStrategy(){
         arrivedAtDestination = 0;
         myMoveType = DISPLACEMENT_MOVE;
         if(VERBOSE)
-            printf("=============================Match ending, going to RETURN_TO_BASE mode===========================\n");
+            printf("======================Match ending, switch to RETURN_TO_BASE mode=====================\n");
             printf("Timer = %f\n", now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000);
             printf("TimeNeededToGetHome = %f\n", TimeNeededToGetHome);
-            printf("==================================================================================================\n");
+            printf("======================================================================================\n");
     }
     
     else{ // let's earn some points
@@ -159,7 +162,6 @@ endZone* bestEndZone;
 void returnToBaseStrategy(){
     printf(" RETURN TO BASE: destination_set = %d arrivedAtDestination = %d and destination = %f %f %f\n", destination_set, arrivedAtDestination, *destination.x, *destination.y, *destination.theta);
     if(destination_set != 1){
-        fprintf(stderr,"Dans le if destination!=set \n");
         bestEndZone = computeBestEndZone();
         defineEndZoneDestination(bestEndZone);
         destination_set = 1;
@@ -170,10 +172,12 @@ void returnToBaseStrategy(){
             if(potZones[i].numberOfPots == 0) removeObstacle(potZones[i].obstacleID);
             else enableObstacle(potZones[i].obstacleID);
         }
-        fprintf(stderr,"Dans le if destination!=set 2\n");}
+    }
     else if(arrivedAtDestination){
         mySupremeState = GAME_OVER;
-        printf("--------------ARRIVED, GAME OVER---------------\n");
+        printf("======================================================================================\n");
+        printf("----------------------------------ARRIVED, GAME OVER----------------------------------\n");
+        printf("======================================================================================\n");
     }
     pthread_mutex_lock(&lockFilteredPosition);
     pthread_mutex_lock(&lockDestination);
