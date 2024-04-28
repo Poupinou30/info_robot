@@ -386,7 +386,7 @@ void computeForceVector(){
     k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.3;
     
-    float k_repul =0.000002 ;
+    float k_repul =0.00005 ;
     //double theta = myTheta
     pthread_mutex_lock(&lockDestination);
     
@@ -594,12 +594,12 @@ void computeForceVector(){
                 if(myPosY > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
 
-                if(tempoObstacle->obstacleID == 0) k_reduc_repul = 5;
+                if(tempoObstacle->obstacleID == 0) k_reduc_repul = 2;
                 else{
                     if(distanceFromDest < 0.2){
                         k_reduc_repul = (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
                     }
-                    else k_reduc_repul = 0.1; 
+                    else k_reduc_repul = 1; 
                     
                 } 
                 //CALCUL FORCE TANGENTIELLE
