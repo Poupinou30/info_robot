@@ -344,7 +344,7 @@ solarZone* computeBestSolarZone();
 endZone* computeBestEndZone();
 void definePlantsDestination(plantZone* bestPlantZone);
 void definePotsDestination(potZone* bestPotZone);
-void definedropZoneDestination(endZone* bestDropZone);
+void defineDropDestination(jardiniere* bestJardiniere, endZone* bestEndZone);
 void defineJardiniereDestination(jardiniere* bestJardiniere);
 void defineSolarDestination(solarZone* bestSolarZone);
 void defineEndZoneDestination(endZone* bestEndZone);
