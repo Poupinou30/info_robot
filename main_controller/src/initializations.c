@@ -299,7 +299,7 @@ void initializeEndZones(){
     endZones[1].posY = 3 - 3*POTWIDTH - 0.2705; 
     endZones[1].posTheta = 0; // orientation du robot pour finir dans cette zone = 180
     endZones[1].dropPositionX = 1;
-    endZones[1].dropPositionY = 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches;
+    endZones[1].dropPositionY = 3 - 0.2805; // j'ai mis 1 cm de marge pour épargner les fourches;
     endZones[1].dropPositionTheta = 180; // orientation du robot pour drop dans cette zone = 180
     endZones[1].numberOfPlants = 0;
     endZones[1].obstacleIDX = 402;

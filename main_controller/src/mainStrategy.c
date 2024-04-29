@@ -15,9 +15,12 @@ void mainStrategy(){
     timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     
     if(timeFromStartOfMatch > matchDuration){
-        printf("======================================================================================\n");
-        printf("-------------------------------------MATCH OVER---------------------------------------\n");
-        printf("======================================================================================\n");
+        if(mySupremeState != 3){
+            printf("======================================================================================\n");
+            printf("-------------------------------------MATCH OVER---------------------------------------\n");
+            printf("======================================================================================\n");
+            mySupremeState = GAME_OVER;
+        }
         mySupremeState = GAME_OVER;
     }
     switch (mySupremeState)
@@ -261,6 +264,8 @@ void defineJardiniereDestination(jardiniere* bestJardiniere){
     }
     pthread_mutex_unlock(&lockFilteredPosition);
 };
+
+
 
 void defineSolarDestination(solarZone* bestSolarZone){
     printf("before targetPositon\n");

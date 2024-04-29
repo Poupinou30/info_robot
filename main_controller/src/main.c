@@ -171,7 +171,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
             //printf("time elapsed = %lf \n",lidarElapsedTime);
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
 
-            updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field
+            updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field            
             // faut une fonction qui check si l'ennemi change le status d'une zone de pots, de plantes, etc
             // updateObstaclesStatus(); //Mets a jour les obstacles en fonction de la position de l'ennemi
             pthread_mutex_lock(&lidarFlagLock);
