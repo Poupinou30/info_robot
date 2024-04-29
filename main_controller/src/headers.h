@@ -205,6 +205,8 @@ void initializeObstacles();
 void initializeMainController();
 void addOpponentObstacle();
 void updateOpponentObstacle();
+void updateObstaclesStatus(); 
+
 
 
 
