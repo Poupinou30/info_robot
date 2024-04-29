@@ -601,7 +601,7 @@ void computeForceVector(){
                 if(myPosY > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
 
-                if(distanceFromDest < 0.3){
+                if(distanceFromDest < 0.3){ //ATTENTION A TESTER SI CA FONCTIONNE QUAND MEME LORSQUIL ARRIVE A DESTINATION
                     k_reduc_repul = 2*(distanceFromDest/0.30); //JAI CHANGE ICI APRES HOMOLOGATION
                 }
                 else k_reduc_repul = 1; 
