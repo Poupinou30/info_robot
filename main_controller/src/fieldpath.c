@@ -601,14 +601,13 @@ void computeForceVector(){
                 if(myPosY > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
 
-                if(tempoObstacle->obstacleID == 0) k_reduc_repul = 2;
-                else{
-                    if(distanceFromDest < 0.2){
-                        k_reduc_repul = (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
-                    }
-                    else k_reduc_repul = 1; 
-                    
-                } 
+                if(distanceFromDest < 0.2){
+                    k_reduc_repul = (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
+                }
+                else k_reduc_repul = 1; 
+                
+            
+                if(tempoObstacle->obstacleID == 0) k_reduc_repul *= 2;
                 //CALCUL FORCE TANGENTIELLE
                 if(/*(tempoObstacle->posX > 0.3&&tempoObstacle->posX < 1.7) && (tempoObstacle->posY>0.3&&tempoObstacle->posY<2.7)*/ 0){ //Si l'obstacle est un obstacle central, on contourne par le sens le plus "court"
                     //printf("Calculating tangential force\n");
