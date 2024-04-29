@@ -601,8 +601,8 @@ void computeForceVector(){
                 if(myPosY > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
 
-                if(distanceFromDest < 0.2){
-                    k_reduc_repul = (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
+                if(distanceFromDest < 0.3){
+                    k_reduc_repul = 2*(distanceFromDest/0.30); //JAI CHANGE ICI APRES HOMOLOGATION
                 }
                 else k_reduc_repul = 1; 
                 
