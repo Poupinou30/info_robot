@@ -243,11 +243,6 @@ void definePotsDestination(potZone* bestPotZone){
     pthread_mutex_unlock(&lockFilteredPosition);
 }
 
-void defineDropDestination(jardiniere* bestJardiniere, endZone* bestEndZone){
-    float jardistance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, bestJardiniere->posX, bestJardiniere->posY);
-    float endistance = computeEuclidianDistance(*myFilteredPos.x, *myFilteredPos.y, bestEndZone->posX, bestEndZone->posY);
-}
-
 void defineJardiniereDestination(jardiniere* bestJardiniere){
     pthread_mutex_lock(&lockFilteredPosition);
     *destination.x = bestJardiniere->posX;

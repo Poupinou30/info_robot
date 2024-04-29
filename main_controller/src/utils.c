@@ -639,14 +639,14 @@ void updateObstaclesStatus(){
         // plantesZones
         if((computeEuclidianDistance(opponentX, opponentY, plantZones[i].posX, plantZones[i].posY) < myObstacle.size + 0.1) && (plantZones[i].numberOfPlants > 0)){
             plantZones[i].numberOfPlants = 0;
-            printf("==============================================================\n");
+            printf("==============================================================\n")
             printf("plantZones[%d].numberOfPlants = %d\n",i,plantZones[i].numberOfPlants);
         }
 
         // potZones
         if((computeEuclidianDistance(opponentX, opponentY, potZones[i].posX, potZones[i].posY) < myObstacle.size + 0.1) && (potZones[i].numberOfPots > 0)){
             potZones[i].numberOfPots = 0;
-            printf("==============================================================\n");
+            printf("==============================================================\n")
             printf("potZones[%d].numberOfPots = %d\n",i,potZones[i].numberOfPots);
         }
 
@@ -654,13 +654,13 @@ void updateObstaclesStatus(){
         if(computeEuclidianDistance(opponentX, opponentY, dropZones[i].posX, dropZones[i].posY) < myObstacle.size + 0.1){
             if(dropZones[i].zoneID / 3 == myTeamColor) && (dropZones[i].numberOfPlants > 0){
                 dropZones[i].numberOfPlants = 0;  
-                printf("==============================================================\n");
+                printf("==============================================================\n")
                 printf("dropZones[%d].numberOfPlants = %d\n",i,dropZones[i].numberOfPlants);
             }
             else{
                 if(dropZones[i].numberOfPlants == 0){
                     dropZones[i].numberOfPlants = 6;
-                    printf("==============================================================\n");
+                    printf("==============================================================\n")
                     printf("dropZones[%d].numberOfPlants = %d\n",i,dropZones[i].numberOfPlants);
                 }
             }
@@ -671,12 +671,12 @@ void updateObstaclesStatus(){
         if(computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY) < myObstacle.size + 0.1){
             if(endZones[i].zoneID / 3 == myTeamColor){
                 endZones[i].numberOfPlants = 0;
-                printf("==============================================================\n");
+                printf("==============================================================\n")
                 printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
             }
             else{
                 endZones[i].numberOfPlants = 6;
-                printf("==============================================================\n");
+                printf("==============================================================\n")
                 printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
             }
             
@@ -685,27 +685,15 @@ void updateObstaclesStatus(){
 
     for(int i = 0; i<3; i++){
         // solarZones
-        if(opponentX > 1.7){
-            if(computeEuclidianDistance(opponentX, opponentY, solarZones[i].posX, solarZones[i].posY - 0.225) < myObstacle.size + 0.1){
-                solarZones[i].stateLeft = (myTeamColor+1) % 2;
-                printf("==============================================================\n");
-                printf("solazones[%d].stateLeft = %d\n",i,solarZones[i].stateLeft);  
-            }
-            if(computeEuclidianDistance(opponentX, opponentY, solarZones[i].posX, solarZones[i].posY) < myObstacle.size + 0.1){
-                solarZones[i].stateCenter = (myTeamColor+1) % 2;
-                printf("==============================================================\n");
-                printf("solazones[%d].stateCenter = %d\n",i,solarZones[i].stateCenter);
-            }
-            if(computeEuclidianDistance(opponentX, opponentY, solarZones[i].posX, solarZones[i].posY + 0.225) < myObstacle.size + 0.1){
-                solarZones[i].stateRight = (myTeamColor+1) % 2;
-                printf("==============================================================\n");
-                printf("solazones[%d].stateRight = %d\n",i,solarZones[i].stateRight);
-            }
+        if(computeEuclidianDistance(opponentX, opponentY, solarZones[i].posX, solarZones[i].posY) < myObstacle.size + 0.1){
+            // tout ça faut changer c'est nimporte quoi là, check chaque panneau
+
+            solarZones[i].stateLeft = 2;
+            solarZones[i].stateCenter = 2;
+            solarZones[i].stateRight = 2;
         }
-        
     }
 }
-
 
 
 
