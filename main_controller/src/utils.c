@@ -583,7 +583,7 @@ solarZone* computeBestSolarZone(){
 }
 
 jardiniere* computeBestJardiniere(){
-    jardiniere* bestJardiniere = NULL; // ######### faut changer ça, genre on regarde jamais si elle est pas déjà occupée ou si y'a des pots devant
+    jardiniere* bestJardiniere = NULL; 
     int number_of_plants = INFINITY;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
@@ -593,12 +593,11 @@ jardiniere* computeBestJardiniere(){
     int tempoPotZoneID;
     for (int i = 0; i < 3; i++) {
         tempoPotZoneID = jardinieres[3*myTeamColor+i].potZoneID;
-        if (tempoPotZoneID == NULL){
+        if (tempoPotZoneID != NULL){
+            if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
             continue;
-        }
-        if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
-            continue;
-        }
+            }
+        }        
         if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
             bestJardiniere = &jardinieres[3*myTeamColor+i];
         }else if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
