@@ -599,6 +599,7 @@ jardiniere* computeBestJardiniere(){
             }
         }        
         if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
+            number_of_plants = jardinieres[3*myTeamColor+i].numberOfPlants;
             bestJardiniere = &jardinieres[3*myTeamColor+i];
         }else if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
             float distance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
