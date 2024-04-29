@@ -405,7 +405,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             if(actuator_reception && strcmp(receivedData,endMessage) == 0){
                 if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
                 myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = MOVE_FRONT_JARDINIERE; // changer vers un Move_Front_jardiniere
+                myGrabState = MOVE_FRONT_JARDINIERE;
                 receivedData[0] = '\0';
                 actuator_reception = 0;
                 done1 = 0; done2 = 0; done3 = 0;
@@ -413,8 +413,6 @@ void manageGrabbing(plantZone* bestPlantZone){
             break;
         }
         break;
-
-    // ajouter le Move_Front_jardiniere (aller jusqu'en jardiniere)
 
     case MOVE_FRONT_JARDINIERE:
         if(destination_set != 1){

@@ -583,14 +583,19 @@ solarZone* computeBestSolarZone(){
 }
 
 jardiniere* computeBestJardiniere(){
-    jardiniere* bestJardiniere = &jardinieres[3*myTeamColor]; // ######### faut changer ça, genre on regarde jamais si elle est pas déjà occupée ou si y'a des pots devant
-    int number_of_plants = jardinieres[3*myTeamColor].numberOfPlants;
+    jardiniere* bestJardiniere = NULL; // ######### faut changer ça, genre on regarde jamais si elle est pas déjà occupée ou si y'a des pots devant
+    int number_of_plants = INFINITY;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor].posX, jardinieres[3*myTeamColor].posY);
-    for (int i = 1; i < 3; i++) {
+    float smallestDistance = INFINITY;
+    int tempoPotZoneID;
+    for (int i = 0; i < 3; i++) {
+        tempoPotZoneID = jardinieres[3*myTeamColor+i].potZoneID;
+        if (tempoPotZoneID == NULL){
+            continue;
+        }
         if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
             continue;
         }
