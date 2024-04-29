@@ -383,16 +383,9 @@ void* beacon_data(void* argument){
                     uint8_t condition = (beaconTab[0].angle > (angle_horlogique0 - angleTolerance) && beaconTab[0].angle < (angle_horlogique0 + angleTolerance)) && (beaconTab[1].angle > (angle_horlogique1 - angleTolerance) && beaconTab[1].angle < (angle_horlogique1 + angleTolerance)) && (beaconTab[2].angle > (angle_horlogique2 - angleTolerance) && beaconTab[2].angle < (angle_horlogique2 + angleTolerance))  && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
                     actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
                     //DEBUG ---------------
-                    /*if(actualError < 0.3){
-                        debugIsoceleCondition = dij - djk;
-                        debugPerimetre = triangle;
-                        debugBalises[0][0] = beaconTab[0].angle;
-                        debugBalises[0][1] = beaconTab[0].distance;
-                        debugBalises[1][0] = beaconTab[1].angle;
-                        debugBalises[1][1] = beaconTab[1].distance;
-                        debugBalises[2][0] = beaconTab[2].angle;
-                        debugBalises[2][1] = beaconTab[2].distance;
-                    }*/
+                        debugBalises[0][0] = angle_horlogique0;
+                        debugBalises[1][0] = angle_horlogique1;
+                        debugBalises[2][0] = angle_horlogique2;
                     //FIN-DEBUG -----------
                     
                     //if(beaconTab[0].angle >270 && beaconTab[0].angle < 320 && triangle > 8.35 && triangle < 8.45)        if(verbose) fprintf(stderr," distances: %f %f %f angles: %f %f %f périmètre: %f \n conditions: %d %d %d %d %d %d %d %d \n",beaconTab[0].distance, beaconTab[1].distance,beaconTab[2].distance,beaconTab[0].angle, beaconTab[1].angle,beaconTab[2].angle,triangle, triangle<=perimetre+triangleErrorTolerance , triangle>=perimetre-triangleErrorTolerance , dij<=3.25+isoceleTolerance , dij>=3.25-isoceleTolerance , djk<=3.25+isoceleTolerance ,djk<=3.25-isoceleTolerance , dik>=1.9-isoceleTolerance , dik<=1.9+isoceleTolerance);
@@ -402,12 +395,7 @@ void* beacon_data(void* argument){
                         //DEBUG --------
                         debugIsoceleCondition = dij - djk;
                         debugPerimetre = triangle;
-                        debugBalises[0][0] = beaconTab[0].angle;
-                        debugBalises[0][1] = beaconTab[0].distance;
-                        debugBalises[1][0] = beaconTab[1].angle;
-                        debugBalises[1][1] = beaconTab[1].distance;
-                        debugBalises[2][0] = beaconTab[2].angle;
-                        debugBalises[2][1] = beaconTab[2].distance;
+                        
                         //FIN-DEBUG --------
 
                         beaconFound = 1;
@@ -842,5 +830,5 @@ void generateLog(){
 }
 
 void writeLog(float angle, float distance, float distanceFromCenter, float debugBalises[3][2], float debugPerimetre, float debugIsoceleCondition){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f ; %f ; %f ; %f ; %f %f %f ; %f ; %f \n",filteredPos.x, filteredPos.y, filteredPos.theta,myPos.x,myPos.y,myPos.theta,myOpponent.x,myOpponent.y,angle, distance, distanceFromCenter,debugBalises[0][0],debugBalises[0][1],debugBalises[1][0],debugBalises[1][1],debugBalises[2][0],debugBalises[2][1],debugPerimetre,debugIsoceleCondition);
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f ; %f ; %f ; %f ; %f %f %f ; %f ; %f \n",filteredPos.x, filteredPos.y, filteredPos.theta,myPos.x,myPos.y,myPos.theta,myOpponent.x,myOpponent.y,angle, distance, distanceFromCenter,debugBalises[0][0],debugBalises[1][0],debugBalises[2][0],debugPerimetre,debugIsoceleCondition);
 }
