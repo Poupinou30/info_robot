@@ -682,29 +682,6 @@ int mainFINAL(){
     *myPos.theta = 0;
     double speedTabRobotFrame[3] = {0,0,0};
 
-
-//TEST
-    //addObstacle(0,0.10,0.01,0);
-    
-    /*addRectangleObstacle(0,0,2,0,0); //Mur du bas
-    addRectangleObstacle(0,0,0,3,0); //Mur de gauche
-    addRectangleObstacle(2,0,2,3,0); //Mur de droite
-    addRectangleObstacle(0,3,2,3,0); //Mur du haut
-    addRectangleObstacle(0,1.05,0.145,3-1.05,0); //jardinières gauche
-    addRectangleObstacle(2,1.05,2-0.145,3-1.05,0); //jardinières droite
-    */
-    
-    /*while(1){
-        fprintf(stderr,"Entrer la position du robot: ");
-        scanf("%f %f %f", myPos.x, myPos.y,myPos.theta);
-        computeForceVector();
-        fprintf(stderr,"Initial force X  = %lf \n",f_tot_x);
-        fprintf(stderr,"Initial force Y  = %lf \n",f_tot_y);
-        fprintf(stderr,"Initial force Theta  = %lf \n",f_theta);
-    }*/
-    
-//FIN TEST
-
     //Pipe et thread
     int pipefd[2];
     pipe(pipefd);

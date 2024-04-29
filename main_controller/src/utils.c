@@ -160,7 +160,7 @@ int initializeUART(){
     //int receive_PIN = 16;
     int baud_rate = 115200;
     
-    int UART_handle = serOpen("/dev/ttyS0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
+    int UART_handle = serOpen("/dev/ttyAMA0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
     if (UART_handle < 0)
     {
         fprintf(stderr, "Erreur lors de l'ouverture de la connexion UART.\n");
@@ -583,17 +583,21 @@ solarZone* computeBestSolarZone(){
 }
 
 jardiniere* computeBestJardiniere(){
-    jardiniere* bestJardiniere = &jardinieres[3*myTeamColor]; // ######### faut changer ça, genre on regarde jamais si elle est pas déjà occupée ou si y'a des pots devant
-    int number_of_plants = jardinieres[3*myTeamColor].numberOfPlants;
+    jardiniere* bestJardiniere = NULL; 
+    int number_of_plants = INFINITY;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor].posX, jardinieres[3*myTeamColor].posY);
-    for (int i = 1; i < 3; i++) {
-        if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
+    float smallestDistance = INFINITY;
+    int tempoPotZoneID;
+    for (int i = 0; i < 3; i++) {
+        tempoPotZoneID = jardinieres[3*myTeamColor+i].potZoneID;
+        if (tempoPotZoneID != NULL){
+            if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
             continue;
-        }
+            }
+        }        
         if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
             bestJardiniere = &jardinieres[3*myTeamColor+i];
         }else if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){

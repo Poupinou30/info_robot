@@ -594,20 +594,20 @@ void computeForceVector(){
             if(tempoObstacle->obstacleID == 0) distanceFromOpponent = distance;
             
             if(distance < actionDistance){
+                printf("obstacle #%d at distance = %f and position x = %f y = %f \n",tempoObstacle->obstacleID,distance,tempoX,tempoY);
                 
                 if(myPosX > tempoX) sign_f_rep_x = -1;
                 else sign_f_rep_x = 1;
                 if(myPosY > tempoY) sign_f_rep_y = -1;
                 else sign_f_rep_y = 1;
 
-                if(tempoObstacle->obstacleID == 0) k_reduc_repul = 2;
-                else{
-                    if(distanceFromDest < 0.2){
-                        k_reduc_repul = (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
-                    }
-                    else k_reduc_repul = 1; 
-                    
-                } 
+                if(distanceFromDest < 0.2){
+                    k_reduc_repul = (distanceFromDest/0.20); //JAI CHANGE ICI APRES HOMOLOGATION
+                }
+                else k_reduc_repul = 1; 
+                
+            
+                if(tempoObstacle->obstacleID == 0) k_reduc_repul *= 2;
                 //CALCUL FORCE TANGENTIELLE
                 if(/*(tempoObstacle->posX > 0.3&&tempoObstacle->posX < 1.7) && (tempoObstacle->posY>0.3&&tempoObstacle->posY<2.7)*/ 0){ //Si l'obstacle est un obstacle central, on contourne par le sens le plus "court"
                     //printf("Calculating tangential force\n");
@@ -944,7 +944,7 @@ void initializeObstacles(){
     
     addRoundObstacle(0.5,1.50,0.125,0,11); //Zone plantes f1
     addRoundObstacle(0.7,1,0.125,0,12); //Zone plantes f2
-    addRoundObstacle(0.5,2,0.125,0,13); //Zone plantes f3
+    addRoundObstacle(0.7,2,0.125,0,13); //Zone plantes f3
     addRoundObstacle(1.3,1,0.125,0,14); //Zone plantes f4
     addRoundObstacle(1.3,2,0.125,0,15);  //Zone plantes f5
     addRoundObstacle(1.5,1.5,0.125,0,16); //Zone plantes f6*/
@@ -955,10 +955,6 @@ void initializeObstacles(){
     addRoundObstacle(1.3875,3,0.125,0,24); //Zone pot f4
     addRoundObstacle(2,1,0.125,0,25);  //Zone pot f5
     addRoundObstacle(2,2,0.125,0,26); //Zone pot f6*/
-    /*removeObstacle(11);
-    removeObstacle(12);
-    removeObstacle(13);
-    removeObstacle(14);removeObstacle(15);
-    removeObstacle(16);*/
+    
 
 }

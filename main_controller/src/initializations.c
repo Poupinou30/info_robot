@@ -197,15 +197,14 @@ void initializeJardinieres(){
     jardinieres[2].posY = 2.88-marge;
     jardinieres[2].numberOfPlants = 0;
     jardinieres[2].obstacleID = 403;
-    jardinieres[2].potZoneID = 3; //pas de potZone devant
-
+    jardinieres[2].potZoneID = 3; //potZone devant
 
     jardinieres[3].zoneID = 3;
     jardinieres[3].posX = 0.12+marge;
     jardinieres[3].posY = 2.2375;
     jardinieres[3].numberOfPlants = 0;
     jardinieres[3].obstacleID = 304;
-    jardinieres[3].potZoneID = 0; //pas de potZone devant
+    jardinieres[3].potZoneID = NULL; //pas de potZone devant
 
     jardinieres[4].zoneID = 4;
     jardinieres[4].posX = 0.6125;
@@ -219,8 +218,7 @@ void initializeJardinieres(){
     jardinieres[5].posY = 0.12+marge;
     jardinieres[5].numberOfPlants = 0;
     jardinieres[5].obstacleID = 103;
-    jardinieres[5].potZoneID = 2; //pas de potZone devant
-    
+    jardinieres[5].potZoneID = 2; //potZone devant
 }
 
 void initializeSolarZones(){
