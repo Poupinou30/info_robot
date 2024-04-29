@@ -265,6 +265,8 @@ void defineJardiniereDestination(jardiniere* bestJardiniere){
     pthread_mutex_unlock(&lockFilteredPosition);
 };
 
+
+
 void defineSolarDestination(solarZone* bestSolarZone){
     printf("before targetPositon\n");
     pthread_mutex_lock(&lockFilteredPosition);
