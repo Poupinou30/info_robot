@@ -677,8 +677,10 @@ void computeForceVector(){
     //Pour que le robot adverse ou les obstacles ne nous pousse pas dans le mur:
     
     
-
-
+    if(f_att_x*f_repul_x + f_att_y*f_repul_y > 0){
+        f_repul_x = 0;
+        f_repul_y = 0;
+    }
     f_tot_x = f_att_x+f_repul_x;
     f_tot_y = f_att_y + f_repul_y;
     //printf("f_repul_x = %lf f_repul_y = %lf f_att_x = %f f_att_y = %f \n",f_repul_x,f_repul_y,f_att_x,f_att_y);
@@ -741,7 +743,7 @@ void myPotentialFieldController(){
                 resetErrorLists();
                 arrivedAtDestination = 0;
             }
-
+            //ATTENTION ICI CA FONCTIONNE QUE POUR LES MOVES EN AVANT POUR LES MOVES EN ARRIERE IL VA FALLOIR CHANGER SINON ON FONCE DANS LADVERSAIRE LOL
             double dx = myXOpponent - myX;
             double dy = myYOpponent - myY;
 
