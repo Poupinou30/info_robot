@@ -5,6 +5,7 @@
 
 //#include "matplotlibcpp.h"
 using namespace sl;
+float* myX; float* myY;
 
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
@@ -37,8 +38,8 @@ float limit_of_detection = 3.6;
 double objectMaxStep = 0.12; //ETAIT A 0.9 JE LAI CHANGE AJD
 double max_object_width = 0.2;
 int angleTolerance = 30;
-float triangleErrorTolerance = 0.1;//il est à 0.08 par défaut
-float isoceleTolerance = 0.1; //ETAIT A 0.08
+float triangleErrorTolerance = 0.15;//il est à 0.08 par défaut
+float isoceleTolerance = 0.15; //ETAIT A 0.08
 float longSideLength = 3.326; //Longueur des deux grands côtés du triangle
 float shortSideLength = 1.9; //Longueur des deux petits côtés du triangle
 pthread_mutex_t positionLock = PTHREAD_MUTEX_INITIALIZER;
@@ -55,11 +56,13 @@ PROGRAM_STATE myState;
 
 
 void *safe_malloc(size_t size, int id) {
+    printf("before safe_malloc of id  = %d\n",id);
     void *ptr = malloc(size);
     if (ptr == NULL) {
         fprintf(stderr, "Erreur : l'allocation de mémoire a échoué. ID malloc = %d \n",id);
         exit(EXIT_FAILURE);
     }
+    printf("After safe_malloc of id  = %d\n",id);
     return ptr;
 }
 
@@ -425,8 +428,6 @@ void* beacon_data(void* argument){
                 //fprintf(stderr,"\n Balises: (%f,%f) width = %f, (%f, %f) width = %f, (%f, %f) width = %f perimetre = %f, dij = %f, djk = %f dik = %f  \n",bestBeaconTab[0].angle,bestBeaconTab[0].distance,bestBeaconTab[0].width,bestBeaconTab[1].angle,bestBeaconTab[1].distance,bestBeaconTab[1].width,bestBeaconTab[2].angle,bestBeaconTab[2].distance,bestBeaconTab[2].width, oldPerimetre,distance(bestBeaconTab[0].angle,bestBeaconTab[1].angle,bestBeaconTab[0].distance,bestBeaconTab[1].distance),distance(bestBeaconTab[1].angle,bestBeaconTab[2].angle,bestBeaconTab[1].distance,bestBeaconTab[2].distance),distance(bestBeaconTab[0].angle,bestBeaconTab[2].angle,bestBeaconTab[0].distance,bestBeaconTab[2].distance) );
                 if(verbose) printf("triangle: %f \n", oldPerimetre);
                 pthread_mutex_lock(&positionLock);
-                float* myX = (float*) safe_malloc(sizeof(float),1);
-                float* myY = (float*) safe_malloc(sizeof(float),2);
                 *myX = 0; *myY = 0;
                 
             
@@ -447,8 +448,7 @@ void* beacon_data(void* argument){
             myPos.x = *myX;
             myPos.y = *myY;
             //fprintf(stderr,"position: x = %f y = %f theta = %f \n",*myX,*myY,alpha);
-            if(myX != NULL) free(myX);
-            if(myY != NULL) free(myY);
+            
             //if(verbose) fprintf(stderr,"beacon data\n");
             myPos.theta = alpha;
             
@@ -495,8 +495,9 @@ void* beacon_data(void* argument){
                     if(tempoD < 0.3) printf("chosen Opponent = %f %f \n",tempoX,tempoY);
                     myOpponent.x = tempoX;
                     myOpponent.y = tempoY;
-                    writeLog(tempoA,tempoD,previousDistanceToCenter,debugBalises,debugPerimetre,debugIsoceleCondition);
+                    
                 }
+                writeLog(tempoA,tempoD,previousDistanceToCenter,debugBalises,debugPerimetre,debugIsoceleCondition);
             pthread_mutex_unlock(&filteredPositionLock);
             pthread_mutex_unlock(&lockOpponentPosition);
             }
@@ -533,7 +534,8 @@ int main(int argc, const char * argv[]){
     if(verbose) fprintf(stderr,"Argc  = %d\n",argc);
     int write_fd;
     
-    
+    myX = (float*) safe_malloc(sizeof(float),1);
+    myY = (float*) safe_malloc(sizeof(float),2);
     pthread_t acquisitionThread;
     myColor = BLUE;
     if(argc > 1){ 
