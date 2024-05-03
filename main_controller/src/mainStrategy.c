@@ -257,7 +257,29 @@ void definePotsDestination(potZone* bestPotZone){
     pthread_mutex_unlock(&lockFilteredPosition);
 }
 
+void ChooseDropOrJardiniere(endZone* bestDropZone, jardiniere* bestJardiniere){
+    pthread_mutex_lock(&lockFilteredPosition);
+    float myX = *myFilteredPos.x;
+    float myY = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float distToDrop = computeEuclidianDistance(myX, myY, bestDropZone->dropPositionX, bestDropZone->dropPositionY);
+    float distToJardiniere = computeEuclidianDistance(myX, myY, bestJardiniere->posX, bestJardiniere->posY);
 
+    if (distToDrop < 2 * distToJardiniere){
+        defineDropDestination(bestDropZone); // la jardinère est trop loin, on va poser les plantes
+    }
+    else{
+        defineJardiniereDestination(bestJardiniere); // la jardinère est suffisamment proche, on préfère aller là
+    }
+}
+
+void defineDropDestination(endZone* bestDropZone){
+    pthread_mutex_lock(&lockFilteredPosition);
+    *destination.x = bestDropZone->posX;
+    *destination.y = bestDropZone->posY;
+    *destination.theta = bestDropZone->dropPositionTheta;
+    pthread_mutex_unlock(&lockFilteredPosition);
+}
 void defineJardiniereDestination(jardiniere* bestJardiniere){
     pthread_mutex_lock(&lockFilteredPosition);
     *destination.x = bestJardiniere->posX;
