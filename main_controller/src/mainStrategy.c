@@ -266,9 +266,11 @@ void ChooseDropOrJardiniere(endZone* bestDropZone, jardiniere* bestJardiniere){
     float distToJardiniere = computeEuclidianDistance(myX, myY, bestJardiniere->posX, bestJardiniere->posY);
 
     if (distToDrop < 2 * distToJardiniere){
+        myChoice = DROP;
         defineDropDestination(bestDropZone); // la jardinère est trop loin, on va poser les plantes
     }
     else{
+        myChoice = JARD;
         defineJardiniereDestination(bestJardiniere); // la jardinère est suffisamment proche, on préfère aller là
     }
 }

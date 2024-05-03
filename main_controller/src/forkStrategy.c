@@ -16,6 +16,7 @@ uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0;
 char receivedData[255];
 potZone* bestPotZone;
 jardiniere* bestJardiniere;
+endZone* bestDropZone;
 struct timeval commandSended;
 struct timeval actualTime;
 uint8_t timeStarted = 0;
@@ -416,12 +417,12 @@ void manageGrabbing(plantZone* bestPlantZone){
         }
         break;
 
-    case MOVE_FRONT_JARDINIERE:
+    case MOVE_FRONT_JARDINIERE: // choisis entre une jardiniere ou une zone de dépot !!!!!!
         if(destination_set != 1){
             bestJardiniere = computeBestJardiniere();
-            defineJardiniereDestination(bestJardiniere);
-            pthread_mutex_lock(&lockFilteredPosition);
-            pthread_mutex_unlock(&lockFilteredPosition);
+            bestDropZone = computeBestDropZone();
+            ChooseDropOrJardiniere(bestDropZone,bestJardiniere);
+    
             destination_set = 1;
             resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;
@@ -431,16 +432,21 @@ void manageGrabbing(plantZone* bestPlantZone){
             removeObstacle(bestJardiniere->obstacleID+1);
         }
         if(arrivedAtDestination /*&& lidarAcquisitionFlag*/){
-            if (myActionChoice == PLANTS_ACTION){
-                myGrabState = LOWER_PLANTS;
+            if (myChoice == DROP){
+                myGrabState = LOWER_DROP;
             }
             else{
-                myGrabState = DROP_PLANTS;
-            } 
+                if (myActionChoice == PLANTS_ACTION){
+                    myGrabState = LOWER_PLANTS;
+                }
+                else{
+                    myGrabState = DROP_PLANTS;
+                } 
+                enableObstacle(bestJardiniere->obstacleID); //On reactive la force de répulsion de ce mur
+                enableObstacle(bestJardiniere->obstacleID-1);
+                enableObstacle(bestJardiniere->obstacleID+1);
+            }
             myControllerState = STOPPED;
-            enableObstacle(bestJardiniere->obstacleID); //On reactive la force de répulsion de ce mur
-            enableObstacle(bestJardiniere->obstacleID-1);
-            enableObstacle(bestJardiniere->obstacleID+1);
             arrivedAtDestination = 0;
             destination_set = 0;
             printf("move<frontJardiniere> done\n");
@@ -566,6 +572,71 @@ void manageGrabbing(plantZone* bestPlantZone){
             
         }
         break; 
+
+    case LOWER_DROP:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            printf("lowerDrop started\n");
+            if(!done1) done1 = setUpperFork(0);
+            if(done1) myActuatorsState = WAITING_ACTUATORS;
+            break;
+
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = OPEN_DROP;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
+                done1 = 0; 
+            } 
+            break;
+        }
+        break;
+    case OPEN_DROP:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            printf("openDrop started\n");
+            if(!done1) done1 = setGripperPosition(0);
+            if(done1) myActuatorsState = WAITING_ACTUATORS;
+            break;
+
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(actuator_reception && strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = MOVE_BACK_DROP;
+                receivedData[0] = '\0';
+                actuator_reception = 0;
+                done1 = 0; 
+            } 
+            break;
+        }
+        break;
+
+    case MOVE_BACK_DROP:
+        if(destination_set == 0){
+            printf("moveBackDrop started\n");
+            myMoveType = GRABBING_MOVE;
+            myMovingSubState = GET_BACK_DROP;
+            myControllerState = MOVING;
+        }
+        else if (destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = MOVE_BACK_DROP;
+        }
+        else{
+            myGrabState = FINISHED;
+            destination_set = 0;
+            arrivedAtDestination = 0;
+        }
+        break;
+
 
     case MOVE_FRONT_SOLAR:
         if(destination_set != 1){

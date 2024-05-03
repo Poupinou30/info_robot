@@ -484,7 +484,7 @@ uint8_t checkStartSwitch(){
     return gpioRead(25);
 }
 
-plantZone* computeBestPlantsZone(){
+plantZone* computeBestPlantsZone(){ // attention j'ai eu la flemme, il regarde pas la zone 5 ici, ça fait plus de points comme ça :)
     printf("\nComputing Best Plantzone\n");
     plantZone* bestPlantZone = NULL;
     float smallestDistance = INFINITY;
@@ -495,7 +495,7 @@ plantZone* computeBestPlantsZone(){
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
     
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 5; i++) {
         double distanceFromPlant = computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY);
         printf("  plantZone %d numberOfPlants = %d\n",i,plantZones[i].numberOfPlants);
         printf("  distance from plantzone = %f\n",distanceFromPlant);
@@ -544,47 +544,42 @@ potZone* computeBestPotsZone(){
 }
 
 endZone* computeBestDropZone(){
-    endZone* bestDropZone = &dropZones[3*myTeamColor];
+    printf("\nComputing best dropzone\n");
+    endZone* bestDropZone = NULL;
+    int number_of_plants = 37;
+    float smallestDistance = INFINITY;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, dropZones[3*myTeamColor].posX, dropZones[3*myTeamColor].posY);
-    
+    printf("cpassé\n");
 
-    for (int i = 1; i < 3; i++) {
-        if(computeEuclidianDistance(x, y, dropZones[3*myTeamColor+i].posX, dropZones[3*myTeamColor+i].posY) < smallestDistance){
-            bestDropZone = &dropZones[i];
+    for (int i = 0; i < 3; i++) {
+        printf("evidement\n");
+        double distance = computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY);
+        printf("dropZone %d: %d plants\n", 3*myTeamColor+i,endZones[3*myTeamColor+i].numberOfPlants);
+        printf("distance = %f\n",distance);
+        if(endZones[3*myTeamColor+i].numberOfPlants < number_of_plants){
+            number_of_plants = endZones[3*myTeamColor+i].numberOfPlants;
+            bestDropZone = &endZones[3*myTeamColor+i];
+            smallestDistance = distance;
+        }else{
+            if (endZones[3*myTeamColor+i].numberOfPlants == number_of_plants){
+                if(distance < smallestDistance){
+                    bestDropZone = &endZones[3*myTeamColor+i];
+                    smallestDistance = distance;
+                }
+            }
         }
     }
+    printf("BestDropZone found: zoneID = %d at distance %f\n\n",bestDropZone->zoneID,smallestDistance);
     return bestDropZone;
-}
-
-solarZone* computeBestSolarZone(){
-    solarZone* bestSolarZone = &solarZones[1];
-    pthread_mutex_lock(&lockFilteredPosition);
-    float x = *myFilteredPos.x;
-    float y = *myFilteredPos.y;
-    pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, solarZones[1].posX, solarZones[1].posY);
-    
-    if(myTeamColor == 0){
-        if(computeEuclidianDistance(x, y, solarZones[0].posX, solarZones[0].posY) < smallestDistance){
-            bestSolarZone = &solarZones[0];
-        }
-    }else{
-        if(computeEuclidianDistance(x, y, solarZones[2].posX, solarZones[2].posY) < smallestDistance){
-            bestSolarZone = &solarZones[2];
-        }
-    }    
-    return bestSolarZone;
-
 }
 
 jardiniere* computeBestJardiniere(){
     printf("\nComputing best jardiniere\n");
     jardiniere* bestJardiniere = NULL; 
-    int number_of_plants = INFINITY;
+    int number_of_plants = 37;
     float smallestDistance = INFINITY;
     int tempoPotZoneID;
     pthread_mutex_lock(&lockFilteredPosition);
@@ -606,6 +601,7 @@ jardiniere* computeBestJardiniere(){
         if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
             number_of_plants = jardinieres[3*myTeamColor+i].numberOfPlants;
             bestJardiniere = &jardinieres[3*myTeamColor+i];
+            smallestDistance = distance;
         }else{
             if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
                 if(distance < smallestDistance){
@@ -619,7 +615,25 @@ jardiniere* computeBestJardiniere(){
     return bestJardiniere;
 }
 
-
+solarZone* computeBestSolarZone(){
+    solarZone* bestSolarZone = &solarZones[1];
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    float smallestDistance = computeEuclidianDistance(x, y, solarZones[1].posX, solarZones[1].posY);
+    
+    if(myTeamColor == 0){
+        if(computeEuclidianDistance(x, y, solarZones[0].posX, solarZones[0].posY) < smallestDistance){
+            bestSolarZone = &solarZones[0];
+        }
+    }else{
+        if(computeEuclidianDistance(x, y, solarZones[2].posX, solarZones[2].posY) < smallestDistance){
+            bestSolarZone = &solarZones[2];
+        }
+    }    
+    return bestSolarZone;
+}
 
 endZone* computeBestEndZone(){
     endZone* bestEndZone = &endZones[3*myTeamColor];

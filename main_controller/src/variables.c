@@ -33,7 +33,7 @@ double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
 //====================================================//
-uint8_t startingPoint = 1; 
+uint8_t startingPoint = 3; 
 // 1, 2 3 for blue,
 // 4, 5, 6 for yellow
 
