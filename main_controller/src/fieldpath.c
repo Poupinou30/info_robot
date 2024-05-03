@@ -594,7 +594,7 @@ void computeForceVector(){
             if(tempoObstacle->obstacleID == 0) distanceFromOpponent = distance;
             
             if(distance < actionDistance){
-                printf("obstacle #%d at distance = %f and position x = %f y = %f \n",tempoObstacle->obstacleID,distance,tempoX,tempoY);
+                // printf("obstacle #%d at distance = %f and position x = %f y = %f \n",tempoObstacle->obstacleID,distance,tempoX,tempoY);
                 
                 if(myPosX > tempoX) sign_f_rep_x = -1;
                 else sign_f_rep_x = 1;

@@ -130,7 +130,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
         {
             if(makeLog) writeLog();
             
-            printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
+            // printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
             mainStrategy();
             
             myPotentialFieldController();
@@ -233,7 +233,7 @@ int mainLOCALTEST(){ //TEST LOCAL
         {
             if(makeLog) writeLog();
             
-            printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
+            // printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
             destination_set = 1;
             computeForceVector();
             myOdometry();

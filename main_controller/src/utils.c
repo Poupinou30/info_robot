@@ -585,29 +585,38 @@ solarZone* computeBestSolarZone(){
 jardiniere* computeBestJardiniere(){
     jardiniere* bestJardiniere = NULL; 
     int number_of_plants = INFINITY;
+    float smallestDistance = INFINITY;
+    int tempoPotZoneID;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = INFINITY;
-    int tempoPotZoneID;
+    
     for (int i = 0; i < 3; i++) {
         tempoPotZoneID = jardinieres[3*myTeamColor+i].potZoneID;
-        if (tempoPotZoneID != NULL){
+        if (tempoPotZoneID != -1){
+            printf("obstruable jardiniere %d and corresponding pot ID %d\n", 3*myTeamColor+i, jardinieres[3*myTeamColor+i].potZoneID);
             if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
-            continue;
+            printf("ignored jardiniere %d\n", 3*myTeamColor+i);
+            continue; // on regarde pas les jardinières qui ont encore des pots devant
             }
         }        
         if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
+            printf("new best jardinière: %d \n", 3*myTeamColor+i);
             number_of_plants = jardinieres[3*myTeamColor+i].numberOfPlants;
             bestJardiniere = &jardinieres[3*myTeamColor+i];
-        }else if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
-            float distance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
-            if(distance < smallestDistance){
-                bestJardiniere = &jardinieres[3*myTeamColor+i];
-                smallestDistance = distance;
-            }
+        }else{
+            if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
+                float distance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
+                if(distance < smallestDistance){
+                    printf("new best jardinière: %d \n", 3*myTeamColor+i);
+                    bestJardiniere = &jardinieres[3*myTeamColor+i];
+                    smallestDistance = distance;
+                }
         }
+
+        } 
+        
     }
     return bestJardiniere;
 }

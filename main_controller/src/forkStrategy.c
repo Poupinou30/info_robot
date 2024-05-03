@@ -33,27 +33,27 @@ void manageGrabbing(plantZone* bestPlantZone){
     
     switch (myGrabState)
     {  
-        case CALIB_FORK:
-            printf("Calibrating\n");
-            switch (myActuatorsState)
-            {
-            case SENDING_INSTRUCTION:
-                done = calibrateFork();
-                if(!timeStarted){
-                    timeStarted = 1;
-                    gettimeofday(&commandSended,NULL);
+    case CALIB_FORK:
+        printf("Calibrating\n");
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            done = calibrateFork();
+            if(!timeStarted){
+                timeStarted = 1;
+                gettimeofday(&commandSended,NULL);
+            }
+            else{
+                gettimeofday(&actualTime,NULL);
+                if(computeTimeElapsed(commandSended,actualTime) > 200){
+                    done = 1;
+                    timeStarted = 0;
                 }
-                else{
-                    gettimeofday(&actualTime,NULL);
-                    if(computeTimeElapsed(commandSended,actualTime) > 200){
-                        done = 1;
-                        timeStarted = 0;
-                    }
-                }
-                if(done) myActuatorsState = WAITING_ACTUATORS;
-                done = 0;
-                break;
-        
+            }
+            if(done) myActuatorsState = WAITING_ACTUATORS;
+            done = 0;
+            break;
+    
         case WAITING_ACTUATORS:
             //fprintf(stderr,"received message = %s \n",receivedData);
             if(!actuator_reception){
@@ -71,7 +71,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             break;
         }
         break;
-    
+
     case MOVE_FRONT_PLANTS:
         
         if(destination_set != 1){
@@ -420,14 +420,11 @@ void manageGrabbing(plantZone* bestPlantZone){
         if(destination_set != 1){
             bestJardiniere = computeBestJardiniere();
             defineJardiniereDestination(bestJardiniere);
-            printf("Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
             pthread_mutex_lock(&lockFilteredPosition);
-            printf("my position is x = %f and y = %f \n",*myFilteredPos.x, *myFilteredPos.y);
             pthread_mutex_unlock(&lockFilteredPosition);
             destination_set = 1;
             resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;
-            fprintf(stderr, "Destination jardiniere defined at x = %f and y = %f \n",bestJardiniere->posX,bestJardiniere->posY);
             myControllerState = MOVING;
             removeObstacle(bestJardiniere->obstacleID); // On retire l'obstacle de la jardiniere afin de pouvoir s'y rendre
             removeObstacle(bestJardiniere->obstacleID-1);
