@@ -643,10 +643,10 @@ endZone* computeBestEndZone(){
 }
 
 void updateObstaclesStatus(){
-    pthread_mutex_lock(&lockFilteredPosition);
+    pthread_mutex_lock(&lockFilteredOpponent);
     float opponentX = *myFilteredOpponent.x;
     float opponentY = *myFilteredOpponent.y;
-    pthread_mutex_unlock(&lockFilteredPosition);
+    pthread_mutex_unlock(&lockFilteredOpponent);
     printf("updating obstacles\n");
 
     for(int i = 0; i<6; i++){

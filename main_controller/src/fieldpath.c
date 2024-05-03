@@ -757,7 +757,7 @@ void myPotentialFieldController(){
             double alpha = (phi - theta_x)*RAD2DEG;
 
 
-            if(opponentDistance < 0.40 /*|| arrivedAtDestination == 1*/ && (alpha > -90||alpha<90)){ 
+            if(opponentDistance < 0.40 && (((alpha > -90||alpha<90) && outputSpeed[1] > 0)||((alpha > 90||alpha<-90) && outputSpeed[1] < 0))){ 
                 printf("opponent too close\n");
                 //S'arrête si il est bloqué par l'adversaire
                 outputSpeed[0] = 0;
