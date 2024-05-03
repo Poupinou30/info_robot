@@ -63,7 +63,9 @@ void waitingStrategy(){
         mySupremeState = EARNING_POINTS;
         defineInitialPosition();
         resetOdometry();
-        printf("Match started, going to EARNING_POINTS mode\n");
+        printf("=====================================================\n");
+        printf("---- Match started, going to EARNING_POINTS mode ----\n");
+        printf("=====================================================\n");
     }
 };
 
@@ -163,7 +165,7 @@ void actionStrategy(){
 };
 endZone* bestEndZone;
 void returnToBaseStrategy(){
-    printf(" RETURN TO BASE: destination_set = %d arrivedAtDestination = %d and destination = %f %f %f\n", destination_set, arrivedAtDestination, *destination.x, *destination.y, *destination.theta);
+    printf(" === RETURN TO BASE ===\n");
     if(destination_set != 1){
         bestEndZone = computeBestEndZone();
         defineEndZoneDestination(bestEndZone);
@@ -199,22 +201,21 @@ void defineBestAction(){
     printf("define best action called\n");
     
     bestPlantZone = computeBestPlantsZone();
-    bestPotZone = computeBestPotsZone();
     if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 60) ){
-        printf("ATTENTION, ON REPASSE A MOVE_FRONT_PLANTS\n");
+        printf("ACTION CHOSEN: PLANTS_POTS_ACTION\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;
     }
     else{
-        bestPlantZone = computeBestPlantsZone();
+        printf("ACTION CHOSEN: PLANTS_ACTION\n");
         myActionChoice = PLANTS_ACTION;
-        myGrabState = MOVE_FRONT_PLANTS;
-        
+    }
+    myGrabState = MOVE_FRONT_PLANTS;
+
     /*if(!solarDone){
         myActionChoice = SOLAR_PANELS_ACTION;
-        myGrabState = SOLAR_SET;}*/
-    }
-    //fprintf(stderr,"check7\n");
+        myGrabState = SOLAR_SET;
+    }*/
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){
@@ -242,13 +243,20 @@ void definePotsDestination(potZone* bestPotZone){
         *destination.x = bestPotZone->pos5X;
         *destination.y = bestPotZone->pos5Y;
     }
-    if(*myFilteredPos.y < *destination.y) {
-        *destination.theta = 0;
-    }else{
-        *destination.theta = 180;
+    if (bestPotZone->zoneID == 4 || bestPotZone->zoneID == 5){
+        *destination.theta = 270;
     }
+    else{
+        if(*myFilteredPos.y < *destination.y) {
+            *destination.theta = 0;
+        }else{
+            *destination.theta = 180;
+        }
+    }
+    
     pthread_mutex_unlock(&lockFilteredPosition);
 }
+
 
 void defineJardiniereDestination(jardiniere* bestJardiniere){
     pthread_mutex_lock(&lockFilteredPosition);

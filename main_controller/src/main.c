@@ -143,18 +143,21 @@ int main(){//VRAI MAIN STRATEGY UTILE
                 
                 
                 if(VERBOSE){
-                    printf("x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
-                    printf("opponent x = %f y = %f \n",*myFilteredOpponent.x,*myFilteredOpponent.y);
-                    //printf("x odo = %f y odo = %f theta odo = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
-                    //printf("lidar x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
-                    printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
-                    printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
-                    printf("myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
-                    printf("myDestination x = %f y = %f\n",*destination.x,*destination.y);
+                    printf("====================================================\n");
                     printf("timeElapsed = %f\n",timeFromStartOfMatch);
-                    printf("myTeam = %d\n",myTeamColor);
-                    printf("forksDeployed = %d\n",forksDeployed);
+                    printf("my position: x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
+                    //printf("odo_position: x = %f y = %f theta = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
+                    //printf("lidar_position: x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
+                    printf("myDestination x = %f y = %f\n",*destination.x,*destination.y);
+                    printf("my opponent: x = %f y = %f \n",*myFilteredOpponent.x,*myFilteredOpponent.y);
+                    printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
+                    printf("\n");
+                    printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
+                    printf("          myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
+                    printf("          forksDeployed = %d\n",forksDeployed);
                     //printf("obstacle 14 enabled? = %d\n",myObstacleList[14].enabled);
+                    printf("\n");
+                    
                 }
                 elapsedTime = 0;
             }

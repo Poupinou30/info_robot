@@ -222,7 +222,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         if(destination_set == 0){
             printf("moveFrontPots started\n");
             resetErrorLists();
-            computeBestPotsZone();
+            bestPotZone = computeBestPotsZone();
             definePotsDestination(bestPotZone);
             removeObstacle(bestPotZone->obstacleID);
             destination_set = 1;

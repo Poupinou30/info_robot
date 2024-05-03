@@ -171,11 +171,11 @@ void UART_send(int UART_handle, char* data){
 
     char tempoChar[100] = "";
     char tempoChar2[255] = "";
-    if(VERBOSE) printf("Sending '%s' by UART\n",data);
+    //if(VERBOSE) printf("Sending '%s' by UART\n",data);
     if(serWrite(UART_handle, data, strlen(data))!=0){
         fprintf(stderr,"Error while writing \n");
     }
-    else if(VERBOSE) printf("UART correctly sent\n");
+    //else if(VERBOSE) printf("UART correctly sent\n");
     
 
 }
@@ -191,7 +191,7 @@ uint8_t UART_receive(int UART_handle, char* received){
         bytesRead = serRead(UART_handle, tempoChar, 255);
         if (bytesRead > 0) {
         strcat(received,tempoChar);
-        fprintf(stderr,"%d received bytes : '%s' \n",bytesRead,tempoChar);
+        //fprintf(stderr,"%d received bytes : '%s' \n",bytesRead,tempoChar);
         if(tempoChar[bytesRead-1] == '>') return 1;
 
     }
@@ -485,62 +485,61 @@ uint8_t checkStartSwitch(){
 }
 
 plantZone* computeBestPlantsZone(){
+    printf("\nComputing Best Plantzone\n");
+    plantZone* bestPlantZone = NULL;
+    float smallestDistance = INFINITY;
+    int numberOfPlants = 0;
 
-    plantZone* bestPlantZone = &plantZones[0];
-    int numberOfPlants = bestPlantZone->numberOfPlants;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float smallestDistance = computeEuclidianDistance(x, y, plantZones[0].posX, plantZones[0].posY);
-
-    for (int i = 1; i < 6; i++) {
+    
+    for (int i = 0; i < 6; i++) {
+        double distanceFromPlant = computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY);
+        printf("  plantZone %d numberOfPlants = %d\n",i,plantZones[i].numberOfPlants);
+        printf("  distance from plantzone = %f\n",distanceFromPlant);
         if(plantZones[i].numberOfPlants > numberOfPlants){
             bestPlantZone = &plantZones[i];
+            smallestDistance = distanceFromPlant;
+            numberOfPlants = plantZones[i].numberOfPlants;
         }else if(plantZones[i].numberOfPlants == numberOfPlants){
-            double distanceFromPlant = computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY);
             if (distanceFromPlant < smallestDistance) {
                 bestPlantZone = &plantZones[i];
                 smallestDistance = distanceFromPlant;
+                numberOfPlants = plantZones[i].numberOfPlants;
             }
         }
     }
+    printf("BestPlantZone found: zoneID = %d at distance %f\n\n",bestPlantZone->zoneID,smallestDistance);
     return bestPlantZone;
 }
 
 potZone* computeBestPotsZone(){
-    printf("computing for pots\n");
-    potZone* bestPotZone = &potZones[0];
-    printf("nolwenn a raison\n");
-    printf("bestpozone infos: %f %f %d\n",bestPotZone->posX,bestPotZone->posY,bestPotZone->numberOfPots);
-    int numberOfPots = bestPotZone->numberOfPots;
-    printf("numberofplants\n");
+    printf("\nComputing Best Potzone\n");
+    potZone* bestPotZone = NULL;
+    float smallestDistance = INFINITY;
+    int numberOfPots = 0;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    printf("filterdpositions\n");
-    float smallestDistance = computeEuclidianDistance(x, y, potZones[0].posX, potZones[0].posY);
-    printf("smallest distance computed\n");
-    for (int i = 1; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
         double distanceFromPot = computeEuclidianDistance(x, y, potZones[i].posX, potZones[i].posY);
-        printf("potzones infos: %f %f %d\n",potZones[i].posX,potZones[i].posY,potZones[i].numberOfPots);
-        printf("distance potzone = %f\n",distanceFromPot);
+        printf("  potZone %d numberOfPots = %d\n",i,potZones[i].numberOfPots);
+        printf("  distance from potzone = %f\n",distanceFromPot);
         if(potZones[i].numberOfPots > numberOfPots){
             bestPotZone = &potZones[i];
             smallestDistance = distanceFromPot;
             numberOfPots = potZones[i].numberOfPots;
         }else if(potZones[i].numberOfPots == numberOfPots){
-            /*distanceFromPotWasHere*/
-            
             if (distanceFromPot < smallestDistance) {
                 bestPotZone = &potZones[i];
                 smallestDistance = distanceFromPot;
-                numberOfPots = potZones[i].numberOfPots;
             }
         }
     }
-    printf("returning best pot zone\n");
+    printf("BestPotsZone found: zoneID = %d at distance %f\n\n",bestPotZone->zoneID,smallestDistance);
     return bestPotZone;
 }
 
@@ -583,6 +582,7 @@ solarZone* computeBestSolarZone(){
 }
 
 jardiniere* computeBestJardiniere(){
+    printf("\nComputing best jardiniere\n");
     jardiniere* bestJardiniere = NULL; 
     int number_of_plants = INFINITY;
     float smallestDistance = INFINITY;
@@ -595,29 +595,27 @@ jardiniere* computeBestJardiniere(){
     for (int i = 0; i < 3; i++) {
         tempoPotZoneID = jardinieres[3*myTeamColor+i].potZoneID;
         if (tempoPotZoneID != -1){
-            printf("obstruable jardiniere %d and corresponding pot ID %d\n", 3*myTeamColor+i, jardinieres[3*myTeamColor+i].potZoneID);
             if (potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots > 0){
-            printf("ignored jardiniere %d\n", 3*myTeamColor+i);
-            continue; // on regarde pas les jardinières qui ont encore des pots devant
+                printf("jardiniere %d: %d pots (id%d) in front\n", 3*myTeamColor+i,potZones[jardinieres[3*myTeamColor+i].potZoneID].numberOfPots,potZones[jardinieres[3*myTeamColor+i].potZoneID].zoneID);
+                continue; // on regarde pas les jardinières qui ont encore des pots devant
             }
-        }        
+        }
+        float distance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
+        printf("jardiniere %d: %d plants\n", 3*myTeamColor+i,jardinieres[3*myTeamColor+i].numberOfPlants);
+        printf("distance = %f\n",distance);
         if(jardinieres[3*myTeamColor+i].numberOfPlants < number_of_plants){
-            printf("new best jardinière: %d \n", 3*myTeamColor+i);
             number_of_plants = jardinieres[3*myTeamColor+i].numberOfPlants;
             bestJardiniere = &jardinieres[3*myTeamColor+i];
         }else{
             if (jardinieres[3*myTeamColor+i].numberOfPlants == number_of_plants){
-                float distance = computeEuclidianDistance(x, y, jardinieres[3*myTeamColor+i].posX, jardinieres[3*myTeamColor+i].posY);
                 if(distance < smallestDistance){
-                    printf("new best jardinière: %d \n", 3*myTeamColor+i);
                     bestJardiniere = &jardinieres[3*myTeamColor+i];
                     smallestDistance = distance;
                 }
-        }
-
+            }
         } 
-        
     }
+    printf("BestJardiniere found: zoneID = %d at distance %f\n\n",bestJardiniere->zoneID,smallestDistance);
     return bestJardiniere;
 }
 
