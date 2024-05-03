@@ -218,6 +218,99 @@ void defineBestAction(){
     }*/
 };
 
+void definePlantsPath(){
+
+    // MyStartingPosition
+    pthread_mutex_lock(&lockFilteredPosition);
+    float MyX = *myFilteredPos.x;
+    float MyY = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+
+    int plantsToTake = 0; // highest number of plants found in one zone
+    int potsToTake = 0; // highest number of pots found in one zone
+    int dropingoccuppancy = 7; // lowest number of plants found in one droping zone
+
+    float shortesthPathLength = INFINITY; // shortest full path length found
+    float shortestPathPlantLength = INFINITY; // length of myPos to plantZone in the shortest path
+    float shortestPathPotLength = INFINITY; // length of plantZone to potZone in the shortest path
+    float shortestPathDropingLength = INFINITY; // length of potZone to dropingZone in the shortest path
+    
+    plantDestination = NULL; // plantZone of the shortest path
+    potDestination = NULL; // potZone of the shortest path
+    dropingDestination = NULL; // dropingZone of the shortest path
+
+    float testPathLength = INFINITY; // length of the path being tested
+    float testDropingLength = INFINITY; // length of potZone to dropingZone in the path being tested
+    
+    position* plants; // position of the plantZone of the path being tested
+    float testPlantLength = INFINITY; // length of myPos to plantZone in the path being tested
+    for (int i=0; i < 6; i++){
+        if(plantZones[i]->numberOfPlants < plantsToTake){
+            printf("skipping plantZone %d, numberOfPlants = %d\n", i, plantZones[i]->numberOfPlants);
+            continue; // skip this PlantZone in the search if it has less plants than the best one found so far
+        }
+        plants->x = plantZones[i].posX;
+        plants->y = plantZones[i].posY;
+        if (MyY < plants->y){
+            plants->theta = 0;
+        }else{
+            plants->theta = 180;
+        }
+        testPlantLength = computeEuclidianDistance(MyX, MyY, plants->x, plants->y); // compute the distance from my position to the plantZone
+        plantsToTake = plantZones[i].numberOfPlants; // update the highest number of plants found so far, or keep the same, i dont really mind
+        printf("plantZone %d (%d plants) at distance %f from starting position\n", i, plantZones[i]->numberOfPlants, testPlantLength);
+        
+        position* pots; // position of the potZone of the path being tested
+        float testPotLength = INFINITY; // length of plantZone to potZone in the path being tested
+        for (int j=0; j<6; j++){
+            if(potZones[j]->numberOfPots < potsToTake){
+                printf("    skipping potZone %d, numberOfPots = %d\n", j, potZones[j]->numberOfPots);
+                continue; // skip this PotZone in the search if it has less pots than the best one found so far
+            }
+            if(nbrOfPots == 6){
+                pots->x = potZones[j].pos6X;
+                pots->y = potZones[j].pos6Y;
+            }
+            else{
+                pots->x = potZones[j].pos5X;
+                pots->y = potZones[j].pos5Y;
+            }
+            if (potZones[j].zoneID == 4 || potZones[j].zoneID == 5){
+                pots->theta = 270;
+            }
+            else{
+                if(MyY < pots->y){
+                    pots->theta = 0;
+                }else{
+                    pots->theta = 180;
+                }
+            }
+            testPotLength = computeEuclidianDistance(plants->x, plants->y, pots->x, pots->y); // compute the distance from the plantZone to the potZone
+            potsToTake = potZones[j].numberOfPots; // update the highest number of pots found so far, or keep the same, i dont really mind
+            printf("    potZone %d (%d pots) at distance %f from plantZone %d\n", j, potZones[j]->numberOfPots, testPotLength, i);
+            
+            position* droping; // position of the dropingZone of the path being tested
+            int tempoPotZoneID;
+            for (int k=0; k<3; k++){
+                tempoPotZoneID = jardinieres[3*myTeamColor+i].potZoneID;
+                if (tempoPotZoneID != -1){
+                    if (potZones[jardinieres[3*myTeamColor+k].potZoneID].numberOfPots > 0){
+                        printf("jardiniere %d: %d pots (id%d) in front\n", 3*myTeamColor+k,potZones[jardinieres[3*myTeamColor+k].potZoneID].numberOfPots,potZones[jardinieres[3*myTeamColor+k].potZoneID].zoneID);
+                        continue; // on regarde pas les jardinières qui ont encore des pots devant
+            
+                    }
+                }
+                if ()
+                //TODO faut continuer ici à check si on est ds une bonne zone de départ, 
+                //     faut s'inspirer de computebestjardiniere sauf qu'on doit pas juste regarder la plus proche
+                
+                
+                
+            }
+        }
+    }
+}
+
 void definePlantsDestination(plantZone* bestPlantZone){
     pthread_mutex_lock(&lockFilteredPosition);
     if(*myFilteredPos.y < bestPlantZone->posY) {
@@ -276,15 +369,12 @@ void defineJardiniereDestination(jardiniere* bestJardiniere){
 
 
 void defineSolarDestination(solarZone* bestSolarZone){
-    printf("before targetPositon\n");
     pthread_mutex_lock(&lockFilteredPosition);
     pthread_mutex_lock(&lockDestination);
     if(*myFilteredPos.y < bestSolarZone->posY) {
-        //printf("dans le if 1\n");
         *destination.x = bestSolarZone->targetPositionUpX;
         *destination.y = bestSolarZone->targetPositionUpY;
         *destination.theta = 0;
-        //printf("fin le if 1\n");
     }
     else{
         *destination.x = bestSolarZone->targetPositionLowX;
