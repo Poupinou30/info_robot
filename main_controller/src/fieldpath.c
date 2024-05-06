@@ -811,7 +811,7 @@ void myPotentialFieldController(){
 
                 case (Y_Align_Pots):
                     
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.4*POTWIDTH){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.4*POTWIDTH + 0.01){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
@@ -837,7 +837,7 @@ void myPotentialFieldController(){
                     
                 case (GET_ALL_POTS):
             
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.0708){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > POTWIDTH - 0.01){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
