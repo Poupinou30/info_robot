@@ -355,12 +355,17 @@ void* beacon_data(void* argument){
                     double angle_robot_trigo = filteredPos.theta; // Angle du robot par rapport à l'axe y dans le sens trigonométrique
 
                     // Conversion de l'angle du sens trigonométrique au sens horlogique
-                    // Conversion de l'angle du sens trigonométrique au sens horlogique
                     double angle_balise_robot_horloge0 = fmod((360 - angle_balise_robot0), 360);
                     double angle_balise_robot_horloge1 = fmod((360 - angle_balise_robot1), 360);
                     double angle_balise_robot_horloge2 = fmod((360 - angle_balise_robot2), 360);
+                    // de -180 à 180?
+                    printf("angles absolu du robot vers les balises trigo:   %f, %f, %f\n", angle_balise_robot0, angle_balise_robot1, angle_balise_robot2);
+                    // de 0 à 360 
+                    printf("angles absolu du robot vers les balises horloge: %f, %f, %f\n", angle_balise_robot_horloge0, angle_balise_robot_horloge1, angle_balise_robot_horloge2);
 
                     double angle_robot_trigo_horloge = fmod((360 - angle_robot_trigo), 360);
+                    printf("angle robot trigo: %f\n", angle_robot_trigo);
+                    printf("angle robot horloge: %f\n", angle_robot_trigo_horloge);
 
                     pthread_mutex_unlock(&filteredPositionLock);
 
@@ -376,11 +381,12 @@ void* beacon_data(void* argument){
                     double angle_horlogique2 = 360-fmod((angle_balise_robot_horloge2 - angle_robot_trigo_horloge), 360);
                     if(angle_horlogique2<0) angle_horlogique2+=360;
                     if(angle_horlogique2 > 360) angle_horlogique2+=-360;
-
-                    //printf("Angle horlogique = %f %f %f \n" ,angle_horlogique0, angle_horlogique1, angle_horlogique2);
+                    printf("Angles horlogiques = %f %f %f \n" ,angle_horlogique0, angle_horlogique1, angle_horlogique2);
 
                     //printf("angle horlogique = %f %f %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f\n dx = %f et dy = %f \n",angle_horlogique0,angle_horlogique1,angle_horlogique2,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
-                    //printf("Position actuelle = %f %f %f \n",filteredPos.x,filteredPos.y,filteredPos.theta);
+
+
+                    // printf("Position actuelle = %f %f %f \n",filteredPos.x,filteredPos.y,filteredPos.theta);
 
 
                     uint8_t condition = (beaconTab[0].angle > (angle_horlogique0 - angleTolerance) && beaconTab[0].angle < (angle_horlogique0 + angleTolerance)) && (beaconTab[1].angle > (angle_horlogique1 - angleTolerance) && beaconTab[1].angle < (angle_horlogique1 + angleTolerance)) && (beaconTab[2].angle > (angle_horlogique2 - angleTolerance) && beaconTab[2].angle < (angle_horlogique2 + angleTolerance))  && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;

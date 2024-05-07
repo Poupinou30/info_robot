@@ -328,7 +328,11 @@ void* executeProgram(void* arg){
         int status;
         waitpid(child_pid, &status, 0);
     }
-
+    char filename[] = "../logFiles/logPosition.txt";
+    FILE* file = fopen(filename, "w+");
+    fprintf(filename, "Lidar crashed\n");
+    fclose(file);
+    
     fprintf(stderr,"Lidar program stopped\n");
     return NULL;
 }
