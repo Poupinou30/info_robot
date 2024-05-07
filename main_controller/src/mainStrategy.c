@@ -201,7 +201,7 @@ void defineBestAction(){
     printf("define best action called\n");
     
     bestPlantZone = computeBestPlantsZone();
-    if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 60) ){
+    if((bestPlantZone->numberOfPlants > 2) ){
         printf("ACTION CHOSEN: PLANTS_POTS_ACTION\n");
         myActionChoice = PLANTS_POTS_ACTION;
         myGrabState = MOVE_FRONT_PLANTS;

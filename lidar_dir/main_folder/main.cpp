@@ -355,33 +355,36 @@ void* beacon_data(void* argument){
                     double angle_robot_trigo = filteredPos.theta; // Angle du robot par rapport à l'axe y dans le sens trigonométrique
 
                     // Conversion de l'angle du sens trigonométrique au sens horlogique
-                    double angle_balise_robot_horloge0 = fmod((360 - angle_balise_robot0), 360);
-                    double angle_balise_robot_horloge1 = fmod((360 - angle_balise_robot1), 360);
-                    double angle_balise_robot_horloge2 = fmod((360 - angle_balise_robot2), 360);
+                    // CEST PAS VRAI CEST DES MENSEONGES AZDGAEDGASDGSDGZAEG
+                    //ADGASDFQ DGAEZGA 
+                    // ASDFAZEF
+                    double angle_balise_robot_horloge0 = fmod((360-angle_balise_robot0), 360);
+                    double angle_balise_robot_horloge1 = fmod((360-angle_balise_robot1), 360);
+                    double angle_balise_robot_horloge2 = fmod((360-angle_balise_robot2), 360);
                     // de -180 à 180?
-                    printf("angles absolu du robot vers les balises trigo:   %f, %f, %f\n", angle_balise_robot0, angle_balise_robot1, angle_balise_robot2);
+                    //printf("angles absolu du robot vers les balises 180 horloge:   %f, %f, %f\n", angle_balise_robot0, angle_balise_robot1, angle_balise_robot2);
                     // de 0 à 360 
-                    printf("angles absolu du robot vers les balises horloge: %f, %f, %f\n", angle_balise_robot_horloge0, angle_balise_robot_horloge1, angle_balise_robot_horloge2);
+                    //printf("angles absolu du robot vers les balises 360 non-horloge: %f, %f, %f\n", angle_balise_robot_horloge0, angle_balise_robot_horloge1, angle_balise_robot_horloge2);
 
                     double angle_robot_trigo_horloge = fmod((360 - angle_robot_trigo), 360);
-                    printf("angle robot trigo: %f\n", angle_robot_trigo);
-                    printf("angle robot horloge: %f\n", angle_robot_trigo_horloge);
+                    //printf("angle absolu robot trigo: %f\n", angle_robot_trigo);
+                    //printf("angle absolu robot horloge: %f\n", angle_robot_trigo_horloge);
 
                     pthread_mutex_unlock(&filteredPositionLock);
 
                     // Calcul de l'angle entre le robot et la balise dans le sens horlogique
-                    double angle_horlogique0 = 360-fmod((angle_balise_robot_horloge0 - angle_robot_trigo_horloge), 360);
+                    double angle_horlogique0 = 360-fmod((angle_balise_robot_horloge0 + angle_robot_trigo_horloge), 360);
                     if(angle_horlogique0<0) angle_horlogique0+=360;
                     if(angle_horlogique0 > 360) angle_horlogique0+=-360;
 
-                    double angle_horlogique1 = 360-fmod((angle_balise_robot_horloge1 - angle_robot_trigo_horloge), 360);
+                    double angle_horlogique1 = 360-fmod((angle_balise_robot_horloge1 + angle_robot_trigo_horloge), 360);
                     if(angle_horlogique1<0) angle_horlogique1+=360;
                     if(angle_horlogique1 > 360) angle_horlogique1+=-360;
 
-                    double angle_horlogique2 = 360-fmod((angle_balise_robot_horloge2 - angle_robot_trigo_horloge), 360);
+                    double angle_horlogique2 = 360-fmod((angle_balise_robot_horloge2 + angle_robot_trigo_horloge), 360);
                     if(angle_horlogique2<0) angle_horlogique2+=360;
                     if(angle_horlogique2 > 360) angle_horlogique2+=-360;
-                    printf("Angles horlogiques = %f %f %f \n" ,angle_horlogique0, angle_horlogique1, angle_horlogique2);
+                    //printf("Angles horlogiques = %f %f %f \n" ,angle_horlogique0, angle_horlogique1, angle_horlogique2);
 
                     //printf("angle horlogique = %f %f %f et beaconRefPosition = %f %f  ; %f %f ; %f %f et angle baliseRobot = %f\n dx = %f et dy = %f \n",angle_horlogique0,angle_horlogique1,angle_horlogique2,beaconRefPosition[0].x,beaconRefPosition[0].y,beaconRefPosition[1].x,beaconRefPosition[1].y,beaconRefPosition[2].x,beaconRefPosition[2].y, angle_balise_robot0,dx0,dy0);
 
