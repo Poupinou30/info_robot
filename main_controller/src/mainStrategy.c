@@ -212,10 +212,10 @@ void defineBestAction(){
     }
     myGrabState = MOVE_FRONT_PLANTS;
 
-    /*if(!solarDone){
+    if(!solarDone){
         myActionChoice = SOLAR_PANELS_ACTION;
         myGrabState = SOLAR_SET;
-    }*/
+    }
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){

@@ -548,8 +548,7 @@ void manageGrabbing(plantZone* bestPlantZone){
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = MOVE_BACK_JARDINIERE;
                 receivedData[0] = '\0';
-                actuator_reception = 0;   
-                done = 0;
+                actuator_reception = 0;
                 done1 = 0; done2 = 0; done3 = 0;
             } 
             break;
@@ -579,7 +578,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         case SENDING_INSTRUCTION:
             printf("lowerDrop started\n");
             if(!done1) done1 = setUpperFork(77);
-            if(!done2) done2 = done1 && setLowerFork(30);
+            if(!done2) done2 = done1 && setLowerFork(0);
             if(done1 && done2) myActuatorsState = WAITING_ACTUATORS;
             break;
 

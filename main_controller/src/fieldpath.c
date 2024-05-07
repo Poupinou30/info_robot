@@ -770,7 +770,7 @@ void myPotentialFieldController(){
                 {
                 case GO_FORWARD_PLANTS:
                     //printf("goForwardPlant\n");
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.30){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.32){
                         myControllerState = STOPPED;
                         // destination_set = 0;
                         arrivedAtDestination = 1;
@@ -874,7 +874,7 @@ void myPotentialFieldController(){
                     break;
                     
                 case (GET_BACK_DROP):
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.16){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.20){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
