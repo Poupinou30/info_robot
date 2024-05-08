@@ -16,6 +16,7 @@ uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0;
 char receivedData[255];
 potZone* bestPotZone;
 jardiniere* bestJardiniere;
+solarZone* bestSolarZone;
 endZone* bestDropZone;
 struct timeval commandSended;
 struct timeval actualTime;
@@ -641,11 +642,21 @@ void manageGrabbing(plantZone* bestPlantZone){
     case MOVE_FRONT_SOLAR:
         if(destination_set != 1){
             printf("moveFrontSolar started\n");
-            defineSolarDestination(computeBestSolarZone());
+            bestSolarZone = computeBestSolarZone();
+            defineSolarDestination(bestSolarZone);
+            if (bestSolarZone->zoneID == 2 || bestSolarZone->zoneID == 1){
+                removeObstacle(26);
+                removeObstacle(201);
+                removeObstacle(202);
+            }
+            if (bestSolarZone->zoneID == 0 || bestSolarZone->zoneID == 1){
+                removeObstacle(25);
+                removeObstacle(200);
+                removeObstacle(201);
+            }
             destination_set = 1;
             resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;
-            fprintf(stderr, "before moving \n");
             myControllerState = MOVING;
         }
         if(arrivedAtDestination && lidarAcquisitionFlag){
@@ -682,8 +693,8 @@ void manageGrabbing(plantZone* bestPlantZone){
 
     case WHEEL_TURN:
         if(!done){
-            if (myTeamColor == 0) done = setWheelSpeed(-18); 
-            else done = setWheelSpeed(+18);
+            if (myTeamColor == 0) done = setWheelSpeed(-35); 
+            else done = setWheelSpeed(+35);
         } 
         if(done){
             myGrabState = MOVE_SOLAR;

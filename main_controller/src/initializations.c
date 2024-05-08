@@ -4,7 +4,7 @@
 #endif
 
 float solarOffsetA = 0.32;
-float solarOffsetB = 1;
+float solarOffsetB = 0.26;
 
 void initializePlantZones(){
     /*
@@ -86,7 +86,7 @@ void initializePotZones(){
 
     2                      3
 
-    4                      5
+        4             5
 
 	0 P0 =0. 6125, 0.4305
 	1 P1 = 0.6125, 2.5695
@@ -231,7 +231,7 @@ void initializeSolarZones(){
     */
     solarZones = (solarZone*)malloc(sizeof(solarZone)*3);
     solarZones[0].zoneID = 0;
-    solarZones[0].posX = 1.81;
+    solarZones[0].posX = 1.82;
     solarZones[0].posY = 0.5;
     solarZones[0].stateLeft = 2;
     solarZones[0].stateCenter = 2;
@@ -242,7 +242,7 @@ void initializeSolarZones(){
     solarZones[0].targetPositionUpY = solarZones[0].posY + solarOffsetB;
 
     solarZones[1].zoneID = 1;
-    solarZones[1].posX = 1.81;
+    solarZones[1].posX = 1.82;
     solarZones[1].posY = 1.5;
     solarZones[1].stateLeft = 2;
     solarZones[1].stateCenter = 2;
@@ -253,7 +253,7 @@ void initializeSolarZones(){
     solarZones[1].targetPositionUpY = solarZones[1].posY + solarOffsetB;
 
     solarZones[2].zoneID = 2;
-    solarZones[2].posX = 1.81;
+    solarZones[2].posX = 1.82;
     solarZones[2].posY = 2.5;
     solarZones[2].stateLeft = 2;
     solarZones[2].stateCenter = 2;

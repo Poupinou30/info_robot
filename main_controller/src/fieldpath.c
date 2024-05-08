@@ -4,6 +4,7 @@
 #endif
 
 #define GRAB_SPEED 0.2
+#define SOLAR_SPEED 0.1
 #define POT_SPEED 0.1
 
 float fixActionDistance = 0.2;
@@ -887,7 +888,7 @@ void myPotentialFieldController(){
 
                 case (SOLARMOVE):
                     //printf("euclidian distance = %f\n",computeEuclidianDistance(xStart,yStart,myX,myY));
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 1.32){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.605){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;
@@ -896,13 +897,13 @@ void myPotentialFieldController(){
                         if(myTeamColor == 0)
                         {
                             outputSpeed[0] = 0; 
-                            outputSpeed[1] = - POT_SPEED/2;
+                            outputSpeed[1] = - SOLAR_SPEED;
                             outputSpeed[2] = 0;
                         }
                         else
                         {
                             outputSpeed[0] = 0; 
-                            outputSpeed[1] = +POT_SPEED/2;
+                            outputSpeed[1] = +SOLAR_SPEED;
                             outputSpeed[2] = 0;
                         }
                     }

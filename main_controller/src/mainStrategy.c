@@ -300,22 +300,17 @@ void defineJardiniereDestination(jardiniere* bestJardiniere){
 
 
 void defineSolarDestination(solarZone* bestSolarZone){
-    printf("before targetPositon\n");
     pthread_mutex_lock(&lockFilteredPosition);
-    pthread_mutex_lock(&lockDestination);
     if(*myFilteredPos.y < bestSolarZone->posY) {
-        //printf("dans le if 1\n");
         *destination.x = bestSolarZone->targetPositionUpX;
         *destination.y = bestSolarZone->targetPositionUpY;
         *destination.theta = 0;
-        //printf("fin le if 1\n");
     }
     else{
         *destination.x = bestSolarZone->targetPositionLowX;
         *destination.y = bestSolarZone->targetPositionLowY;
         *destination.theta = 0;
     }
-    pthread_mutex_unlock(&lockDestination);
     pthread_mutex_unlock(&lockFilteredPosition);
 
 };
