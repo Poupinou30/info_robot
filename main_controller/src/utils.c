@@ -552,10 +552,8 @@ endZone* computeBestDropZone(){
     float x = *myFilteredPos.x;
     float y = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    printf("cpassé\n");
-
+    
     for (int i = 0; i < 3; i++) {
-        printf("evidement\n");
         double distance = computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY);
         printf("dropZone %d: %d plants\n", 3*myTeamColor+i,endZones[3*myTeamColor+i].numberOfPlants);
         printf("distance = %f\n",distance);

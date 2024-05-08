@@ -888,7 +888,7 @@ void myPotentialFieldController(){
 
                 case (SOLARMOVE):
                     //printf("euclidian distance = %f\n",computeEuclidianDistance(xStart,yStart,myX,myY));
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.605){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.615){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;

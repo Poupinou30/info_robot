@@ -574,6 +574,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break; 
 
     case LOWER_DROP:
+        printf("lowerDrop\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -598,6 +599,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         }
         break;
     case OPEN_DROP:
+        printf("openDrop\n");
         switch (myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -622,6 +624,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case MOVE_BACK_DROP:
+        printf("moveBackDrop\n");
         if(destination_set == 0){
             printf("moveBackDrop started\n");
             myMoveType = GRABBING_MOVE;
@@ -692,14 +695,32 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case WHEEL_TURN:
-        if(!done){
-            if (myTeamColor == 0) done = setWheelSpeed(-35); 
-            else done = setWheelSpeed(+35);
-        } 
-        if(done){
-            myGrabState = MOVE_SOLAR;
-            done = 0;
-        } 
+        switch(myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            printf("wheelTurn started\n");
+            if(!done){
+                if (myTeamColor == 0) done = setWheelSpeed(-35); 
+                else done = setWheelSpeed(+35);
+            }
+            if(done) myActuatorsState = WAITING_ACTUATORS;
+            break;
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                printf("waiting actuators\n");
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(strcmp(receivedData,endMessage) == 0){
+                printf("End message received from actuator\n");
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                actuator_reception = 0;
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = MOVE_SOLAR;
+                receivedData[0] = '\0';
+                done = 0;
+            } 
+            break;
+
+        }
         break;
 
     case MOVE_SOLAR:

@@ -4,7 +4,7 @@
 #endif
 
 float solarOffsetA = 0.32;
-float solarOffsetB = 0.26;
+float solarOffsetB = 0.27;
 
 void initializePlantZones(){
     /*

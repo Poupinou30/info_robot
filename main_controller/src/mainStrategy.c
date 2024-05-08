@@ -199,23 +199,28 @@ void returnToBaseStrategy(){
 
 void defineBestAction(){
     printf("define best action called\n");
-    
-    bestPlantZone = computeBestPlantsZone();
-    if((bestPlantZone->numberOfPlants > 2) ){
-        printf("ACTION CHOSEN: PLANTS_POTS_ACTION\n");
-        myActionChoice = PLANTS_POTS_ACTION;
-        myGrabState = MOVE_FRONT_PLANTS;
-    }
-    else{
-        printf("ACTION CHOSEN: PLANTS_ACTION\n");
-        myActionChoice = PLANTS_ACTION;
-    }
-    myGrabState = MOVE_FRONT_PLANTS;
-
     if(!solarDone){
+        printf("ACTION CHOSEN: SOLAR_PANELS\n");
         myActionChoice = SOLAR_PANELS_ACTION;
         myGrabState = SOLAR_SET;
     }
+    else{
+        bestPlantZone = computeBestPlantsZone();
+        if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 60) ){
+            printf("ACTION CHOSEN: PLANTS_POTS_ACTION\n");
+            myActionChoice = PLANTS_POTS_ACTION;
+            myGrabState = MOVE_FRONT_PLANTS;
+        }
+        else{
+            printf("ACTION CHOSEN: PLANTS_ACTION\n");
+            myActionChoice = PLANTS_ACTION;
+        }
+        myGrabState = MOVE_FRONT_PLANTS;
+    }
+    
+    
+    
+    
 };
 
 void definePlantsDestination(plantZone* bestPlantZone){
