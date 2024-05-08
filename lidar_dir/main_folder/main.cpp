@@ -365,15 +365,15 @@ void* beacon_data(void* argument){
                     pthread_mutex_unlock(&filteredPositionLock);
 
                     // Calcul de l'angle entre le robot et la balise dans le sens horlogique
-                    double angle_horlogique0 = 360-fmod((angle_balise_robot_horloge0 - angle_robot_trigo_horloge), 360);
+                    double angle_horlogique0 = 360-fmod((angle_balise_robot_horloge0 + angle_robot_trigo_horloge), 360);
                     if(angle_horlogique0<0) angle_horlogique0+=360;
                     if(angle_horlogique0 > 360) angle_horlogique0+=-360;
 
-                    double angle_horlogique1 = 360-fmod((angle_balise_robot_horloge1 - angle_robot_trigo_horloge), 360);
+                    double angle_horlogique1 = 360-fmod((angle_balise_robot_horloge1 + angle_robot_trigo_horloge), 360);
                     if(angle_horlogique1<0) angle_horlogique1+=360;
                     if(angle_horlogique1 > 360) angle_horlogique1+=-360;
 
-                    double angle_horlogique2 = 360-fmod((angle_balise_robot_horloge2 - angle_robot_trigo_horloge), 360);
+                    double angle_horlogique2 = 360-fmod((angle_balise_robot_horloge2 + angle_robot_trigo_horloge), 360);
                     if(angle_horlogique2<0) angle_horlogique2+=360;
                     if(angle_horlogique2 > 360) angle_horlogique2+=-360;
 
