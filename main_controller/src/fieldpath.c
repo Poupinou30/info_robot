@@ -875,7 +875,7 @@ void myPotentialFieldController(){
                     break;
                     
                 case (GET_BACK_DROP):
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.20){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.25){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;

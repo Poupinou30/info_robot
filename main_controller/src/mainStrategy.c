@@ -73,7 +73,7 @@ void pointsStrategy(){
     // check if it's time to leave
     float maxSpeed = 0.4;
     //fprintf(stderr,"check1\n");
-    float SafetyFactor = 4.5;
+    float SafetyFactor = 3.6; // 3.5-3.8 bonne valeur pour 6_pots en zone + 6 en jard + 6en zone
     gettimeofday(&now, NULL);
     //fprintf(stderr,"check1.5\n");
     endZone* bestEndZone = computeBestEndZone();
@@ -164,6 +164,7 @@ void actionStrategy(){
     }
 };
 endZone* bestEndZone;
+
 void returnToBaseStrategy(){
     printf(" === RETURN TO BASE ===\n");
     if(destination_set != 1){
@@ -206,7 +207,7 @@ void defineBestAction(){
     }
     else{
         bestPlantZone = computeBestPlantsZone();
-        if((bestPlantZone->numberOfPlants > 2 && timeFromStartOfMatch < 60) ){
+        if((bestPlantZone->numberOfPlants > 2 /*&& timeFromStartOfMatch < 30*/) ){
             printf("ACTION CHOSEN: PLANTS_POTS_ACTION\n");
             myActionChoice = PLANTS_POTS_ACTION;
             myGrabState = MOVE_FRONT_PLANTS;
@@ -270,7 +271,7 @@ void ChooseDropOrJardiniere(endZone* bestDropZone, jardiniere* bestJardiniere){
     float distToDrop = computeEuclidianDistance(myX, myY, bestDropZone->dropPositionX, bestDropZone->dropPositionY);
     float distToJardiniere = computeEuclidianDistance(myX, myY, bestJardiniere->posX, bestJardiniere->posY);
 
-    if (distToDrop < 2 * distToJardiniere){
+    if (distToDrop * 2  < distToJardiniere){
         myChoice = DROP;
         defineDropDestination(bestDropZone); // la jardinère est trop loin, on va poser les plantes
     }
@@ -331,5 +332,5 @@ void defineEndZoneDestination(endZone* bestEndZone){
 void gameOverStrategy(){
     myControllerState = STOPPED;
     setUpperFork(0);
-    
+    setGripperPosition(0);
 }

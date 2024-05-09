@@ -5,6 +5,7 @@
 
 float solarOffsetA = 0.32;
 float solarOffsetB = 0.27;
+float correction = 0.02;
 
 void initializePlantZones(){
     /*
@@ -20,7 +21,7 @@ void initializePlantZones(){
     
     plantZones[0].zoneID = 0;
     plantZones[0].numberOfPlants = 6;
-    plantZones[0].posX = 0.5;
+    plantZones[0].posX = 0.5 + correction;
     plantZones[0].posY = 1.5;
     plantZones[0].targetPositionLowX = plantZones[0].posX;
     plantZones[0].targetPositionLowY = plantZones[0].posY - 0.405;
@@ -30,7 +31,7 @@ void initializePlantZones(){
 
     plantZones[1].zoneID = 1;
     plantZones[1].numberOfPlants = 6;
-    plantZones[1].posX = 0.7;
+    plantZones[1].posX = 0.7+ correction;
     plantZones[1].posY = 1;
     plantZones[1].targetPositionLowX = plantZones[1].posX;
     plantZones[1].targetPositionLowY = plantZones[1].posY - 0.405;
@@ -40,7 +41,7 @@ void initializePlantZones(){
 
     plantZones[2].zoneID = 2;
     plantZones[2].numberOfPlants = 6;
-    plantZones[2].posX = 0.7;
+    plantZones[2].posX = 0.7+ correction;
     plantZones[2].posY = 2;
     plantZones[2].targetPositionLowX = plantZones[2].posX;
     plantZones[2].targetPositionLowY = plantZones[2].posY - 0.405;
@@ -50,7 +51,7 @@ void initializePlantZones(){
 
     plantZones[3].zoneID = 3;
     plantZones[3].numberOfPlants = 6;
-    plantZones[3].posX = 1.3;
+    plantZones[3].posX = 1.3+ correction;
     plantZones[3].posY = 1;
     plantZones[3].targetPositionLowX = plantZones[3].posX;
     plantZones[3].targetPositionLowY = plantZones[3].posY - 0.405;
@@ -60,7 +61,7 @@ void initializePlantZones(){
 
     plantZones[4].zoneID = 4;
     plantZones[4].numberOfPlants = 6;
-    plantZones[4].posX = 1.3;
+    plantZones[4].posX = 1.3+ correction;
     plantZones[4].posY = 2;
     plantZones[4].targetPositionLowX = plantZones[4].posX;
     plantZones[4].targetPositionLowY = plantZones[4].posY - 0.405;
@@ -70,7 +71,7 @@ void initializePlantZones(){
 
     plantZones[5].zoneID = 5;
     plantZones[5].numberOfPlants = 6;
-    plantZones[5].posX = 1.5;
+    plantZones[5].posX = 1.5+ correction;
     plantZones[5].posY = 1.5;
     plantZones[5].targetPositionLowX = plantZones[5].posX;
     plantZones[5].targetPositionLowY = plantZones[5].posY - 0.405;
@@ -141,7 +142,7 @@ void initializePotZones(){
 
 
     potZones[4].zoneID = 4;
-    potZones[4].posX = 1.5695;
+    potZones[4].posX = 1.59;
     potZones[4].posY = 1;
     potZones[4].pos5X = potZones[4].posX - POTWIDTH*0.9;
     potZones[4].pos5Y = potZones[4].posY - (POTWIDTH)/2;
@@ -151,7 +152,7 @@ void initializePotZones(){
     potZones[4].obstacleID = 25;
 
     potZones[5].zoneID = 5;
-    potZones[5].posX = 1.5695;
+    potZones[5].posX = 1.59;
     potZones[5].posY = 2;
     potZones[5].pos5X = potZones[5].posX - POTWIDTH*0.9;
     potZones[5].pos5Y = potZones[5].posY - (POTWIDTH)/2;

@@ -579,7 +579,11 @@ void manageGrabbing(plantZone* bestPlantZone){
         {
         case SENDING_INSTRUCTION:
             printf("lowerDrop started\n");
-            if(!done1) done1 = setUpperFork(77);
+            if(nbrOfPots == 6){
+                if(!done1) done1 = setUpperFork(58);
+            }else{
+                if(!done1) done1 = setUpperFork(68);
+            }
             if(!done2) done2 = done1 && setLowerFork(0);
             if(done1 && done2) myActuatorsState = WAITING_ACTUATORS;
             break;
@@ -598,6 +602,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             break;
         }
         break;
+        
     case OPEN_DROP:
         printf("openDrop\n");
         switch (myActuatorsState)
