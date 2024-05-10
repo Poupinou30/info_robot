@@ -31,6 +31,7 @@ void mainStrategy(){
         break;
     case EARNING_POINTS:
         pointsStrategy();
+        updateObstaclesStatus(); //Mets a jour les obstacles en fonction de la position de l'ennemi
         break;
     case RETURN_TO_BASE:
         printf("returnToBase\n");

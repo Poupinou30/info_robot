@@ -175,8 +175,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
             //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
 
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field            
-            // faut une fonction qui check si l'ennemi change le status d'une zone de pots, de plantes, etc
-            updateObstaclesStatus(); //Mets a jour les obstacles en fonction de la position de l'ennemi
+
             pthread_mutex_lock(&lidarFlagLock);
             if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<1) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
