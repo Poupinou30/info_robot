@@ -9,6 +9,10 @@
 #include <pthread.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <stdbool.h>			  				
+
 #define _Pi 3.1415927
 #define DEG2RAD     (_Pi/180)
 #define RAD2DEG     (180/_Pi)
@@ -29,6 +33,7 @@
 #define makeLog 1
 
 #define matchDuration 600 //seconds 
+#define NUM_CHARS 100 // for the nextion									
 
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
@@ -214,7 +219,7 @@ void resetOdometry();
 void myOdometry();
 
 //UART ET SPI et I2C
-void UART_send(int UART_handle, char* data);
+uint8_t UART_send(int UART_handle, char* data);
 uint8_t UART_receive(int UART_handle, char* received);
 extern int UARTReception;
 extern uint8_t waitingForReception;
@@ -304,9 +309,9 @@ extern position myFilteredOpponent;
 
 //KALMAN
 void defineOpponentPosition(float posX, float posY);
-
+						
 // STRATEGY
-
+							   
 void mainStrategy();
 void waitingStrategy();
 void pointsStrategy();
@@ -330,7 +335,7 @@ extern uint8_t changeOfPlan;
 teamColor myTeamColor;
 
 struct timeval startOfMatch;
-uint8_t nextionStart;
+extern uint8_t nextionStart;
 
 // fonctions de Jeu
 void initializePlantZones();
@@ -369,3 +374,43 @@ extern uint8_t nbrOfPots;
 void resetErrorLists();
 
 double computeTimeElapsed(struct timeval start, struct timeval end);
+									 
+////////////////////////////////////
+//Nextion
+////////////////////////////////////
+
+extern int UART_handle_nextion;
+
+// Serial input variables
+extern char receivedChars[NUM_CHARS];
+
+extern char myTeam[10];
+extern char myPage[25];
+int startY;
+int startB;
+extern int go;
+extern bool finish;
+
+typedef struct Node {
+    char* data;
+    struct Node* next;
+} Node;
+
+typedef struct Queue {
+    Node* front;
+    Node* rear;
+} Queue;
+
+extern Queue* q;
+
+extern struct timeval startInitialization, endQueue;
+
+int initializeUART_nextion();
+uint8_t UART_send_commands(int UART_handle, char* data);
+void handleCommand(int UART_handle, char *string);
+Queue* createQueue();
+void enqueue(Queue* q, const char* value);
+char* dequeue(Queue* q);
+void display(Queue* q);
+void map_coordinates(float x_meters, float y_meters, char* x_map, char* y_map, int player);
+void nextion_communication(int UART_handle);																												 																														 
