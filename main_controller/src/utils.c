@@ -318,6 +318,8 @@ void* executeProgram(void* arg){
     child_pid = fork();
     if (child_pid == 0) {
         setpgid(0, 0);
+        fprintf(stderr, "Waiting for gdb to attach (PID: %d)\n", getpid());
+        sleep(10);
         execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
         _exit(EXIT_FAILURE);
     } else if (child_pid < 0) {
@@ -707,6 +709,10 @@ void updateObstaclesStatus(){
         }
     }
     //printf("solars ok\n");
+}
+
+void PrintMapState(){
+    
 }
 
 

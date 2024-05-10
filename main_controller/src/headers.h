@@ -206,6 +206,7 @@ void initializeMainController();
 void addOpponentObstacle();
 void updateOpponentObstacle();
 void updateObstaclesStatus(); 
+void PrintMapState()
 
 
 
