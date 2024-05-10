@@ -684,15 +684,18 @@ void updateObstaclesStatus(){
         
         // endZones
         if(computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY) < myForce.obstacleList[0].size + 0.2){
-            if(endZones[i].zoneID / 3 == myTeamColor){
+            if(endZones[i].zoneID / 3 == myTeamColor && endZones[i].numberOfPlants > 0){
                 endZones[i].numberOfPlants = 0;
                 printf("==============================================================\n");
                 printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
             }
             else{
-                endZones[i].numberOfPlants = 6;
-                printf("==============================================================\n");
-                printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
+                if (endZones[i].numberOfPlants == 0){
+                    endZones[i].numberOfPlants = 6;
+                    printf("==============================================================\n");
+                    printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
+                }
+                
             }
         }
         //printf("dropzones ok\n");
@@ -712,7 +715,31 @@ void updateObstaclesStatus(){
 }
 
 void PrintMapState(){
-    
+    printf("\nPrinting Map State\n");
+    printf("                 ||========||                               ||========||                 \n");
+    printf("                 ||   %d   ||                               ||   %d   ||                 \n", jardinieres[0].numberOfPlants,jardinieres[1].numberOfPlants);
+    printf("      ||=========================================================================||      \n");
+    printf("      ||        |                                                       |        ||      \n");
+    printf("      ||   %d   |                                                       |   %d   ||      \n", endZones[0].numberOfPlants,endZones[3].numberOfPlants);
+    printf("      ||        |                                                       |        ||      \n");
+    printf("||====||--------|                                                       |--------||====||\n");
+    printf("||    ||                                                                         ||    ||\n");
+    printf("|| %d ||%d                                 %d                                  %d|| %d ||\n", jardinieres[2].numberOfPlants,potZones[0].numberOfPots,plantZones[0].numberOfPlants, potZones[1].numberOfPots,jardinieres[3].numberOfPlants);
+    printf("||    ||                                                                         ||    ||\n");
+    printf("||====||--------|                  %d              %d                   |--------||====||\n", plantZones[1].numberOfPlants,plantZones[2].numberOfPlants);
+    printf("      ||        |                                                       |        ||      \n");
+    printf("      ||   %d   |                                                       |   %d   ||      \n", endZones[4].numberOfPlants,endZones[1].numberOfPlants);
+    printf("      ||        |                                                       |        ||      \n");
+    printf("||====||--------|                  %d              %d                   |--------||====||\n", plantZones[3].numberOfPlants,plantZones[4].numberOfPlants);
+    printf("||    ||                                                                         ||    ||\n");
+    printf("|| %d ||%d                                 %d                                  %d|| %d ||\n", jardinieres[4].numberOfPlants,potZones[2].numberOfPots,plantZones[5].numberOfPlants, potZones[3].numberOfPots,jardinieres[5].numberOfPlants);
+    printf("||    ||                                                                         ||    ||\n");
+    printf("||====||--------|                                                       |--------||====||\n");
+    printf("      ||        |                                                       |        ||      \n");
+    printf("      ||   %d   |                                                       |   %d   ||      \n", endZones[5].numberOfPlants,endZones[2].numberOfPlants);
+    printf("      ||        |                  %d              %d                   |        ||      \n", potZones[4].numberOfPots,plantZones[5].numberOfPlants);
+    printf("      ||=========================================================================||      \n");
+printf("\n \n");
 }
 
 
