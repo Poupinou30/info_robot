@@ -47,7 +47,7 @@ uint8_t nbrOfPots = 6;
 // 6 if you want to de-stack the 6th pot
 // 5 if you dont
 
-uint8_t solarDone = 0;
+uint8_t solarDone = 1;
 // 0 if you want to do the solar panels
 // 1 if you dont
 //====================================================//
