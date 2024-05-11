@@ -39,7 +39,7 @@ float timeFromStartOfMatch = 0;
 
 //====================================================//
 // ================== STRATEGY =======================//
-uint8_t startingPoint = 1; 
+uint8_t startingPoint = 6; 
 // 1, 2 3 for blue,
 // 4, 5, 6 for yellow
 
@@ -47,7 +47,7 @@ uint8_t nbrOfPots = 6;
 // 6 if you want to de-stack the 6th pot
 // 5 if you dont
 
-uint8_t solarDone = 1;
+uint8_t solarDone = 0;
 // 0 if you want to do the solar panels
 // 1 if you dont
 //====================================================//

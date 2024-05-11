@@ -224,7 +224,7 @@ void* beacon_data(void* argument){
 
         }
         if(i == counter-1 && object_width < 0.3){
-
+            if(counter > 1){
             if(distance(newa[0],moya/moy_count,newd[0],moyd/moy_count) < objectMaxStep){
                 if(verbose) fprintf(stderr,"Object fusion engaged \n");
                 if(verbose) fprintf(stderr,"distance for fusion is %f \n",distance(newa[0],moya/moy_count,newd[0],moyd/moy_count));
@@ -233,7 +233,7 @@ void* beacon_data(void* argument){
                         //newd[i] = (newd[i]*newWidth[i]+(moyd/moy_count) *object_width)/(object_width+newWidth[i]);
                         newWidth[0] = newWidth[0] + object_width;
                         already_added = 1;
-            }
+            }}
             if(!already_added){
             if(verbose) fprintf(stderr,"object added with moya = %f\ at distance %f  and width %f\n",moya/float(moy_count),moyd/float(moy_count),object_width);
             newa.push_back(moya/float(moy_count));
@@ -520,7 +520,12 @@ void* beacon_data(void* argument){
     //pthread_mutex_lock(&isReadyLock);
     //readyToSend = 1;
     //pthread_mutex_unlock(&isReadyLock);
-    
+    newd.clear(); // Efface tous les éléments
+    newd.shrink_to_fit();  
+    newa.clear(); // Efface tous les éléments
+    newa.shrink_to_fit();  
+    newWidth.clear(); // Efface tous les éléments
+    newWidth.shrink_to_fit();  
     return NULL;
 }
 
@@ -529,8 +534,8 @@ int read_fd;
 
 int main(int argc, const char * argv[]){
     pthread_mutex_lock(&lockMyState);
-    
-
+    fprintf(stderr, "Waiting for gdb to attach (PID: %d)\n", getpid());
+    //sleep(20);
     calibPos.x = 0.13;
     calibPos.y = 0.125;
     calibPos.theta = 0;

@@ -36,6 +36,10 @@ HOME_TREE := .
 
 
 MAKE_TARGETS := sdk main_folder
+CXXFLAGS += -g
+
+CFLAGS=-g -fsanitize=address
+LDFLAGS=-fsanitize=address
 
 include $(HOME_TREE)/mak_def.inc
 

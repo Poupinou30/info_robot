@@ -10,10 +10,7 @@ double l_y = 0.175;
 double l_x = 0.21;
 
 double v_max = 0.2;
-double omega_max_running = 200
-
-
-;
+double omega_max_running = 200;
 double omega_max_fixed = 200;
 
 void retrieveSpeeds(uint8_t* data, double* speed1, double* speed2) {
@@ -318,8 +315,8 @@ void* executeProgram(void* arg){
     child_pid = fork();
     if (child_pid == 0) {
         setpgid(0, 0);
-        fprintf(stderr, "Waiting for gdb to attach (PID: %d)\n", getpid());
-        sleep(10);
+        /*fprintf(stderr, "Waiting for gdb to attach (PID: %d)\n", getpid());
+        sleep(10);*/
         execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
         _exit(EXIT_FAILURE);
     } else if (child_pid < 0) {
@@ -684,15 +681,16 @@ void updateObstaclesStatus(){
         
         // endZones
         if(computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY) < myForce.obstacleList[0].size + 0.2){
-            if(endZones[i].zoneID / 3 == myTeamColor){
+            if(endZones[i].zoneID / 3 == myTeamColor && endZones[i].numberOfPlants>0){
                 endZones[i].numberOfPlants = 0;
                 printf("==============================================================\n");
                 printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
             }
             else{
-                endZones[i].numberOfPlants = 6;
-                printf("==============================================================\n");
-                printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
+                if(endZones[i].numberOfPlants==0){
+                    endZones[i].numberOfPlants = 6;
+                    printf("==============================================================\n");
+                    printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);}
             }
         }
         //printf("dropzones ok\n");
@@ -711,9 +709,7 @@ void updateObstaclesStatus(){
     //printf("solars ok\n");
 }
 
-void PrintMapState(){
-    
-}
+
 
 
 

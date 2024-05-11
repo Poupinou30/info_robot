@@ -672,9 +672,10 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
             destination_set = 0;
-            printf("move<frontPlant> done\n");
+            printf("moveFrontZolar done\n");
         } 
         break;
+
     case SOLAR_SET:
         switch (myActuatorsState)
         {
@@ -700,6 +701,16 @@ void manageGrabbing(plantZone* bestPlantZone){
         break;
 
     case WHEEL_TURN:
+        if(!done){
+            if (myTeamColor == 0) done = setWheelSpeed(-35); 
+            else done = setWheelSpeed(+35);
+        } 
+        if(done){
+            myGrabState = MOVE_SOLAR;
+            done = 0;
+        } 
+        break;
+        /*
         switch(myActuatorsState)
         {
         case SENDING_INSTRUCTION:
@@ -727,6 +738,7 @@ void manageGrabbing(plantZone* bestPlantZone){
 
         }
         break;
+        */
 
     case MOVE_SOLAR:
         if(destination_set == 0){
@@ -734,19 +746,74 @@ void manageGrabbing(plantZone* bestPlantZone){
             myMoveType = GRABBING_MOVE;
             myMovingSubState = SOLARMOVE;
             myControllerState = MOVING;
+            
         }
         else if (destination_set == 1 && arrivedAtDestination == 0){
             myGrabState = MOVE_SOLAR;
         }
         else{
-            myGrabState = FINISHED;
+            myGrabState = TURN_AROUND;
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
+            destination_set = 0;
+            setWheelSpeed(0);
+        }
+
+        break;
+    
+    case TURN_AROUND:
+        if(destination_set == 0){
+            printf("TurnAround started\n");
+            pthread_mutex_lock(&lockFilteredPosition);
+            *destination.x = 1.6; /// à ajuster plus tard en "juste écarte toi"
+            *destination.y = 2.6;
+            *destination.theta = 0;
+            pthread_mutex_unlock(&lockFilteredPosition);
+            destination_set = 1;
+
+            resetErrorLists();
+            myMoveType = DISPLACEMENT_MOVE;
+            myControllerState = MOVING;
+        }
+        else if(destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = TURN_AROUND;
+        }
+        else{
+            myGrabState = RESET_SOLAR;
+            myControllerState = STOPPED;
+            arrivedAtDestination = 0;
             destination_set = 0;
         }
         break;
-        
+
+    case RESET_SOLAR:
+        if(destination_set == 0){
+            printf("resetSolar Started\n");
+            pthread_mutex_lock(&lockFilteredPosition);
+            *destination.x = 2 - 0.225; /// à ajuster plus tard en "juste écarte toi"
+            *destination.y = 3 - 0.2;
+            *destination.theta = 170;
+            pthread_mutex_unlock(&lockFilteredPosition);
+            destination_set = 1;
+
+            resetErrorLists();
+            myMoveType = DISPLACEMENT_MOVE;
+            myControllerState = MOVING;
+        }
+        else if(destination_set == 1 && arrivedAtDestination == 0){
+            myGrabState = RESET_SOLAR;
+        }
+        else{
+            myGrabState = FINISHED;
+            arrivedAtDestination = 0;
+            destination_set = 0;
+        }
+        break;
+    
+
     case FINISHED:
         printf("rentre dans finished\n");
-        setWheelSpeed(0);
+        //setWheelSpeed(0);
         retractForks();
         break;
 
