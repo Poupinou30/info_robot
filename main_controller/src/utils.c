@@ -312,23 +312,26 @@ void* executeProgram(void* arg){
     sprintf(cmd,"/home/pi/Documents/lastGit/info_robot/lidar_dir/output/Linux/Release/main_folder %d %d %d", pipefdLC, pipefdCL, startingPoint);
     //sprintf(cmd,"/home/student/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
 
-    child_pid = fork();
-    if (child_pid == 0) {
-        setpgid(0, 0);
-        /*fprintf(stderr, "Waiting for gdb to attach (PID: %d)\n", getpid());
-        sleep(10);*/
-        execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
-        _exit(EXIT_FAILURE);
-    } else if (child_pid < 0) {
-        fprintf(stderr,"Error occured \n");
-    } else {
-        signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
-        signal(SIGSEGV, handle_sigsegv);  // Ajoutez cette ligne pour gérer SIGSEGV
-        int status;
-        waitpid(child_pid, &status, 0);
+    while(1){
+
+        child_pid = fork();
+        if (child_pid == 0) {
+            setpgid(0, 0);
+            /*fprintf(stderr, "Waiting for gdb to attach (PID: %d)\n", getpid());
+            sleep(10);*/
+            execl("/bin/sh", "sh", "-c", cmd, (char *)NULL);
+            _exit(EXIT_FAILURE);
+        } else if (child_pid < 0) {
+            fprintf(stderr,"Error occured \n");
+        } else {
+            signal(SIGINT, handle_sigint);  // Déplacez cette ligne ici
+            signal(SIGSEGV, handle_sigsegv);  // Ajoutez cette ligne pour gérer SIGSEGV
+            int status;
+            waitpid(child_pid, &status, 0);
+        }
+        
+        fprintf(stderr,"Lidar program stopped, restarting...\n");
     }
-    
-    fprintf(stderr,"Lidar program stopped\n");
     return NULL;
 }
 
