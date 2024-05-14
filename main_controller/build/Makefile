@@ -420,6 +420,33 @@ src/mainStrategy.c.s:
 	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/mainStrategy.c.s
 .PHONY : src/mainStrategy.c.s
 
+src/nextion.o: src/nextion.c.o
+
+.PHONY : src/nextion.o
+
+# target to build an object file
+src/nextion.c.o:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/nextion.c.o
+.PHONY : src/nextion.c.o
+
+src/nextion.i: src/nextion.c.i
+
+.PHONY : src/nextion.i
+
+# target to preprocess a source file
+src/nextion.c.i:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/nextion.c.i
+.PHONY : src/nextion.c.i
+
+src/nextion.s: src/nextion.c.s
+
+.PHONY : src/nextion.s
+
+# target to generate assembly for a file
+src/nextion.c.s:
+	$(MAKE) -f CMakeFiles/main_controller.dir/build.make CMakeFiles/main_controller.dir/src/nextion.c.s
+.PHONY : src/nextion.c.s
+
 src/spi_com.o: src/spi_com.c.o
 
 .PHONY : src/spi_com.o
@@ -543,6 +570,9 @@ help:
 	@echo "... src/mainStrategy.o"
 	@echo "... src/mainStrategy.i"
 	@echo "... src/mainStrategy.s"
+	@echo "... src/nextion.o"
+	@echo "... src/nextion.i"
+	@echo "... src/nextion.s"
 	@echo "... src/spi_com.o"
 	@echo "... src/spi_com.i"
 	@echo "... src/spi_com.s"

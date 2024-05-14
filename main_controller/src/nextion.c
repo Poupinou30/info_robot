@@ -1,4 +1,8 @@
+#ifndef HEADERS
 #include "headers.h"
+#define HEADERS
+#endif
+
 float tempoMyX, tempoMyY, tempoOppX, tempoOppY;
 char myScore[25];
 struct timeval now;
@@ -6,7 +10,7 @@ struct timeval now;
 int initializeUART_nextion(){
     int baud_rate = 9600;
     
-    UART_handle_nextion = serOpen("/dev/ttyAMA0",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
+    int UART_handle_nextion = serOpen("/dev/ttyAMA1",baud_rate,0); //ttyS0 est le port UART, 0 est le flag du mode à utiliser
     if (UART_handle_nextion < 0){
         fprintf(stderr, "Erreur lors de l'ouverture de la connexion UART.\n");
         exit(1);    // Exit the program in case of error
@@ -63,6 +67,9 @@ void handleCommand(int UART_handle,char *string) {
         go = 1;
         enqueue(q, "tm0.en=1");
         nextionStart = 1;
+        printf("############################################################\n");
+        printf("##############           Go go gooo         ################\n");
+        printf("############################################################\n");
         printf("Go go gooo\n");
     }
     else if (strcmp(receivedChars, "<back>") == 0){
@@ -192,6 +199,8 @@ void nextion_communication(int UART_handle){
     gettimeofday(&now, NULL);
     double nowValue = now.tv_sec*1000+now.tv_usec/1000;
 
+    
+
     // Condition obligatoire avant de lancer toute communication
     if(nowValue - (startInitialization.tv_sec*1000+startInitialization.tv_usec/1000) > 3000){
         //On l'envoit slmt au début après ca sert plus à rien
@@ -200,9 +209,10 @@ void nextion_communication(int UART_handle){
             UART_send_commands(UART_handle, isReady);
         }
 
+
         // Enqueue the data every 350ms
         if(nowValue - (endQueue.tv_sec*1000+endQueue.tv_usec/1000) > 350){
-            
+
             // My position
             pthread_mutex_lock(&lockFilteredPosition);
             tempoMyX = *myFilteredPos.x;
@@ -228,7 +238,6 @@ void nextion_communication(int UART_handle){
             // My score
             sprintf(myScore, "score.val=%d", score);
             enqueue(q, myScore);
-            
             gettimeofday(&endQueue, NULL);
         }
         
@@ -255,6 +264,11 @@ void nextion_communication(int UART_handle){
             }
         }
         if (UART_receive(UART_handle, receivedChars)){
+
+            printf("############################################################\n");
+            printf("##############         received char        ################\n");
+            printf("############################################################\n");
+
             printf("received char : %s\n", receivedChars);
             handleCommand(UART_handle, receivedChars);
             receivedChars[0] = '\0';

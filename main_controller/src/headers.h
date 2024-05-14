@@ -390,6 +390,7 @@ int startY;
 int startB;
 extern int go;
 extern bool finish;
+extern uint8_t score;
 
 typedef struct Node {
     char* data;

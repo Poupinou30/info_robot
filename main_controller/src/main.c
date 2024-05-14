@@ -118,7 +118,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
     gettimeofday(&lastExecutionTime, NULL);
     double elapsedTime = 0;
 
-    nextionStart = 0; //NE DOIT PAS RESTER!!!
+    //nextionStart = 0; //NE DOIT PAS RESTER!!!
 
     while (1)
     {
@@ -136,6 +136,8 @@ int main(){//VRAI MAIN STRATEGY UTILE
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
+            nextion_communication(UART_handle_nextion);
+
             if(mySupremeState != WAITING_FOR_START) sendFilteredPos(pipefdCL[1]);
             elapsedTime += currentElapsedTime;
             if (elapsedTime >= 300)
@@ -219,7 +221,7 @@ int mainLOCALTEST(){ //TEST LOCAL
     *destination.y = 0.2;
     *destination.theta = 180;
 
-    nextionStart = 1; //NE DOIT PAS RESTER!!!
+    //nextionStart = 1; //NE DOIT PAS RESTER!!!
     *myFilteredPos.x = 0.5; //On utilise pas le filtre de kalman, on force la position à un endroit pour tester
     *myFilteredPos.y = 0.7;
     *myFilteredPos.theta = 0;
@@ -658,7 +660,7 @@ void initializeMainController(){
     tunePID(60,15,i2c_handle_front,i2c_handle_rear);
 
     //Queue nextion for send commands
-    q = createQueue();
+    Queue* q = createQueue();
     gettimeofday(&endQueue, NULL);
 
     if(startingPoint < 4) myTeamColor =BLUE;
