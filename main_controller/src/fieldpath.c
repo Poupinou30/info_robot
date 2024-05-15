@@ -803,13 +803,16 @@ void myPotentialFieldController(){
                 {
                 case GO_FORWARD_PLANTS:
                     //printf("goForwardPlant\n");
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.32){
+                    float goForwardTempoDistance = computeEuclidianDistance(xStart,yStart,myX,myY);
+                    float tempoGrabSpeed;
+                    if(goForwardTempoDistance > 0.32){
                         myControllerState = STOPPED;
                         // destination_set = 0;
                         arrivedAtDestination = 1;
                     }else{
+                        if(goForwardTempoDistance > 0.28) tempoGrabSpeed = GRAB_SPEED/2; else tempoGrabSpeed = GRAB_SPEED;
                         outputSpeed[0] = 0;
-                        outputSpeed[1] = GRAB_SPEED;
+                        outputSpeed[1] = tempoGrabSpeed;
                         outputSpeed[2] = 0;
                     }
                     break;
