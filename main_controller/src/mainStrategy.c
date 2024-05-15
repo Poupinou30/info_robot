@@ -3,6 +3,7 @@
 #define HEADERS
 #endif
 
+uint8_t matchOver = 0;
 struct timeval now;
 
 
@@ -331,6 +332,10 @@ void defineEndZoneDestination(endZone* bestEndZone){
 };
 
 void gameOverStrategy(){
+    if (matchOver != 0){
+        matchOver = 1;
+        PrintMapState
+    }
     myControllerState = STOPPED;
     setUpperFork(0);
     setGripperPosition(0);
