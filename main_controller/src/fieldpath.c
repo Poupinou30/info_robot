@@ -789,6 +789,9 @@ void myPotentialFieldController(){
             // Calcul de l'angle relatif
             double alpha = (phi - theta_x)*RAD2DEG;
 
+            float goForwardTempoDistance;
+            float tempoGrabSpeed;
+
 
             if(opponentDistance < 0.40 && (((alpha > -90||alpha<90) && outputSpeed[1] > 0)||((alpha > 90||alpha<-90) && outputSpeed[1] < 0))){ 
                 printf("opponent too close\n");
@@ -803,14 +806,13 @@ void myPotentialFieldController(){
                 {
                 case GO_FORWARD_PLANTS:
                     //printf("goForwardPlant\n");
-                    float goForwardTempoDistance = computeEuclidianDistance(xStart,yStart,myX,myY);
-                    float tempoGrabSpeed;
+                    goForwardTempoDistance = computeEuclidianDistance(xStart,yStart,myX,myY);
                     if(goForwardTempoDistance > 0.32){
                         myControllerState = STOPPED;
                         // destination_set = 0;
                         arrivedAtDestination = 1;
                     }else{
-                        if(goForwardTempoDistance > 0.28) tempoGrabSpeed = GRAB_SPEED/2; else tempoGrabSpeed = GRAB_SPEED;
+                        if(goForwardTempoDistance > 0.25) tempoGrabSpeed = GRAB_SPEED/2; else tempoGrabSpeed = GRAB_SPEED;
                         outputSpeed[0] = 0;
                         outputSpeed[1] = tempoGrabSpeed;
                         outputSpeed[2] = 0;

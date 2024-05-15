@@ -12,7 +12,7 @@ grabbingState myGrabState;
 actuationState myActuatorsState;
 uint8_t actuator_reception;
 int done = 0;
-uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0;
+uint8_t done0 = 0, done1 = 0, done2 = 0, done3 = 0, done4 = 0;
 char receivedData[255];
 potZone* bestPotZone;
 jardiniere* bestJardiniere;
@@ -99,7 +99,8 @@ void manageGrabbing(plantZone* bestPlantZone){
                 }
             }
             if(!done3 && done2) done3 = done2 && setUpperFork(0);
-            if(done1 && done2 && done3) myActuatorsState = WAITING_ACTUATORS;
+            if (!done4 && done3) done4 = setGripperPosition(0);
+            if(done1 && done2 && done3 && done4) myActuatorsState = WAITING_ACTUATORS;
             break;
         }
         if(arrivedAtDestination && lidarAcquisitionFlag){
