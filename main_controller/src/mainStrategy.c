@@ -71,7 +71,7 @@ void waitingStrategy(){
 
 void pointsStrategy(){
     // check if it's time to leave
-    float maxSpeed = 0.4;
+    //float maxSpeed = 0.4;
     //fprintf(stderr,"check1\n");
     float SafetyFactor = 3.6; // 3.5-3.8 bonne valeur pour 6_pots en zone + 6 en jard + 6en zone
     gettimeofday(&now, NULL);
@@ -85,7 +85,7 @@ void pointsStrategy(){
     pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     //fprintf(stderr,"check3\n");
-    float TimeNeededToGetHome = distToClosestBase / maxSpeed * SafetyFactor;
+    float TimeNeededToGetHome = distToClosestBase / 0.6 * SafetyFactor;
     //fprintf(stderr,"check10\n");
     timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
@@ -335,5 +335,5 @@ void defineEndZoneDestination(endZone* bestEndZone){
 void gameOverStrategy(){
     myControllerState = STOPPED;
     setUpperFork(0);
-    setGripperPosition(0);
+    setGripperPosition(135);
 }

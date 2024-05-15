@@ -56,14 +56,14 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     if(destination_set) distanceFromDestination = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
 
     if(lidarElapsedTime > 500){
-        v_max = 0.25;
+        v_max = fmin(0.25,MAX_SPEED);
         printf("_____ALERT____\n ___NO_LIDAR___\n");
     } 
     else if (distanceFromOpponent<0.7){
-        v_max = 0.5*distanceFromOpponent*distanceFromOpponent/(0.7*0.7);
+        v_max = MAX_SPEED*distanceFromOpponent*distanceFromOpponent/(0.7*0.7);
     }
     else if(myMoveType == DISPLACEMENT_MOVE && destination_set && distanceFromDestination < 0.15 ) v_max = 0.2;
-    else v_max = 0.5;
+    else v_max = MAX_SPEED;
     pthread_mutex_unlock(&lockFilteredOpponent);
     pthread_mutex_unlock(&lockFilteredPosition);
 
@@ -107,7 +107,7 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
     
 
     for(int i = 0; i<4; i++){
-        if(fabs(wheel_speeds[i]) > 30){
+        if(fabs(wheel_speeds[i]) > 45){
             printf("myWheelSpeed[%d] = %f\n",i,wheel_speeds[i]);
             wheel_speeds[i] = oldWheelSpeeds[i];
         }
@@ -124,9 +124,11 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
     double tempoOmega =  112.5*/*1.043**/radius / (4 * (l_x + l_y)) * (-wheel_speeds[0] + wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
     if(fabs(tempoOmega) < 500) *omega = tempoOmega;
-
-    measuredSpeedX = *v_x;
-    measuredSpeedY = *v_y;
+    pthread_mutex_lock(&lockFilteredPosition);
+    double theta = *myFilteredPos.theta;
+    measuredSpeedX = *v_x * cos(theta*DEG2RAD) - *v_y * sin(theta*DEG2RAD);
+    measuredSpeedY = *v_x * sin(theta*DEG2RAD) + *v_y * cos(theta*DEG2RAD);
+    pthread_mutex_unlock(&lockFilteredPosition);
     measuredSpeedOmega = *omega;
 
     oldWheelSpeeds[0] = wheel_speeds[0];
@@ -479,7 +481,7 @@ void generateLog(){
 }
 
 void writeLog(){
-    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f ; %f ; %f ; %f %f %f %f ; %f %f ; %f %f ; %f %f\n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y, measuredSpeedOmega, filteredSpeedOmega,motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR,measuredSpeedX,measuredSpeedY,filteredSpeedX,filteredSpeedY);
+    fprintf(logFile, "%f %f %f ; %f %f %f ; %f %f %f ; %f %f ; %f %f ; %f ; %f ; %f %f %f %f ; %f %f ; %f %f\n", *myPos.x, *myPos.y, *myPos.theta,*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta,*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta, *myOpponent.x, *myOpponent.y, *myFilteredOpponent.x, *myFilteredOpponent.y, measuredSpeedOmega, filteredSpeedOmega,motorSpeed_FL,motorSpeed_FR,motorSpeed_RL,motorSpeed_RR,measuredSpeedX,measuredSpeedY,filteredSpeedX,filteredSpeedY);
 }
 
 uint8_t checkStartSwitch(){

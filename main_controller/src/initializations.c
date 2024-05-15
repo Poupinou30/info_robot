@@ -240,7 +240,7 @@ void initializeSolarZones(){
     solarZones[0].targetPositionLowX = solarZones[0].posX;
     solarZones[0].targetPositionLowY = solarZones[0].posY - solarOffsetA;
     solarZones[0].targetPositionUpX = solarZones[0].posX;
-    solarZones[0].targetPositionUpY = solarZones[0].posY + solarOffsetB;
+    solarZones[0].targetPositionUpY = solarZones[0].posY + solarOffsetB - 0.01;
 
     solarZones[1].zoneID = 1;
     solarZones[1].posX = 1.82;

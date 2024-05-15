@@ -92,7 +92,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             }
             else if(myActionChoice == PLANTS_POTS_ACTION){
                 if(nbrOfPots == 6){
-                    if(!done2 && done1) done2 = setLowerFork(69);
+                    if(!done2 && done1) done2 = setLowerFork(68);
                 }
                 else{
                     if(!done2 && done1) done2 = setLowerFork(30);
@@ -142,7 +142,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             
         }
         else{
-            myControllerState = STOPPED;
+            // myControllerState = STOPPED;
             myGrabState = GRAB_PLANTS_CLOSE;
             destination_set = 0;
             arrivedAtDestination = 0;
@@ -261,6 +261,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             
         }
         else{
+
             myGrabState = UNSTACK_POT_TAKE;
             destination_set = 0;
             arrivedAtDestination = 0;
@@ -286,10 +287,8 @@ void manageGrabbing(plantZone* bestPlantZone){
                 myActuatorsState = SENDING_INSTRUCTION;
                 myGrabState = UNSTACK_POT_POSITIONING;
                 receivedData[0] = '\0';
-                done1 = 0; done2 = 0; done3 = 0;
                 actuator_reception = 0;
-                //sleep(3);
-                
+                done1 = 0;
             } 
             break;
         }
@@ -702,43 +701,14 @@ void manageGrabbing(plantZone* bestPlantZone){
 
     case WHEEL_TURN:
         if(!done){
-            if (myTeamColor == 0) done = setWheelSpeed(-35); 
-            else done = setWheelSpeed(+35);
+            if (myTeamColor == 0) done = setWheelSpeed(-50); 
+            else done = setWheelSpeed(+50);
         } 
         if(done){
             myGrabState = MOVE_SOLAR;
             done = 0;
         } 
         break;
-        /*
-        switch(myActuatorsState)
-        {
-        case SENDING_INSTRUCTION:
-            printf("wheelTurn started\n");
-            if(!done){
-                if (myTeamColor == 0) done = setWheelSpeed(-35); 
-                else done = setWheelSpeed(+35);
-            }
-            if(done) myActuatorsState = WAITING_ACTUATORS;
-            break;
-        case WAITING_ACTUATORS:
-            if(!actuator_reception){
-                printf("waiting actuators\n");
-                actuator_reception = UART_receive(UART_handle,receivedData);}
-            if(strcmp(receivedData,endMessage) == 0){
-                printf("End message received from actuator\n");
-                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
-                actuator_reception = 0;
-                myActuatorsState = SENDING_INSTRUCTION;
-                myGrabState = MOVE_SOLAR;
-                receivedData[0] = '\0';
-                done = 0;
-            } 
-            break;
-
-        }
-        break;
-        */
 
     case MOVE_SOLAR:
         if(destination_set == 0){
@@ -756,7 +726,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
             destination_set = 0;
-            setWheelSpeed(0);
+            //setWheelSpeed(0);
         }
 
         break;
@@ -765,9 +735,16 @@ void manageGrabbing(plantZone* bestPlantZone){
         if(destination_set == 0){
             printf("TurnAround started\n");
             pthread_mutex_lock(&lockFilteredPosition);
-            *destination.x = 1.6; /// à ajuster plus tard en "juste écarte toi"
-            *destination.y = 2.6;
-            *destination.theta = 0;
+            if (myTeamColor){
+                *destination.x = 1.6; /// à ajuster plus tard en "juste écarte toi"
+                *destination.y = 2.6;
+                *destination.theta = 0;
+            }else{
+                *destination.x = 1.6;
+                *destination.y = 0.4;
+                *destination.theta = 0;
+            }
+            
             pthread_mutex_unlock(&lockFilteredPosition);
             destination_set = 1;
 
@@ -779,7 +756,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myGrabState = TURN_AROUND;
         }
         else{
-            myGrabState = RESET_SOLAR;
+            myGrabState = END_ACTION;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;
             destination_set = 0;
@@ -809,12 +786,36 @@ void manageGrabbing(plantZone* bestPlantZone){
             destination_set = 0;
         }
         break;
+
+    case END_ACTION:
+        switch (myActuatorsState)
+        {
+        case SENDING_INSTRUCTION:
+            if(!done) done = retractForks();
+            if(done) myActuatorsState = WAITING_ACTUATORS;
+            break;
+        
+        case WAITING_ACTUATORS:
+            if(!actuator_reception){
+                actuator_reception = UART_receive(UART_handle,receivedData);}
+            if(strcmp(receivedData,endMessage) == 0){
+                if(VERBOSE) fprintf(stderr,"End message received from actuator\n");
+                actuator_reception = 0;
+                myActuatorsState = SENDING_INSTRUCTION;
+                myGrabState = FINISHED;
+                receivedData[0] = '\0';
+                done = 0;
+            } 
+            break;
+        }
+        break;
     
 
     case FINISHED:
         printf("rentre dans finished\n");
         //setWheelSpeed(0);
-        retractForks();
+
+
         break;
 
     default:

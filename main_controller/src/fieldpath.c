@@ -3,11 +3,11 @@
 #define HEADERS
 #endif
 
-#define GRAB_SPEED 0.2
-#define SOLAR_SPEED 0.1
+#define GRAB_SPEED 0.2 // 0.2 // best value, 0.4 // tips a plant over 
+#define SOLAR_SPEED 0.15 // 0.15
 #define POT_SPEED 0.1
 
-float fixActionDistance = 0.2;
+float fixActionDistance = 0.3;
 float mobileActionDistance = 0.6;
 float myDistanceList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
 float myErrorList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
@@ -356,6 +356,7 @@ void printObstacleLists(){
     }
 }
 struct timeval startOfArrival, now;
+uint8_t moveAwayWall = 0;
 
 void computeForceVector(){
 
@@ -385,10 +386,10 @@ void computeForceVector(){
     float tempoDestTheta = *destination.theta;
     double k_mult_att;
     
-    float k_att_xy = 0.2;
+    float k_att_xy = 0.25; //WAS 0.2
     float k_rep_tang = 0.05;
-    k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
-    float k_att_theta = /*0.3*/ 0.3;
+    k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //WAS 0.25//Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    float k_att_theta = /*0.3*/ 0.4;
     
     float k_repul =0.0002 ;
     //double theta = myTheta
@@ -422,19 +423,50 @@ void computeForceVector(){
     else if(error>180){
         error-=360;
     }
-    if(pow(measuredSpeedX*measuredSpeedX + measuredSpeedY*measuredSpeedY,0.5)< 0.05 && fabs(error) > 15 && (myPosX > 0.25 || myPosX <1.75 || myPosY > 0.25 || myPosY <2.75)){
-        turningMove = 1;
+    
+    if(fabs(error) > 15&& (pow(filteredSpeedX*filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5)< 0.1 || myForceState == MOVE_AWAY_WALL || myForceState == TURNING_MOVE)){
+        printf("in if for turningMove \n");
+        float rotationLimit = 0.3;
+        float rotationLimit2 = 0.3;
+        printf("myPosX = %f myPosY = %f  \n",myPosX,myPosY);
+        printf("conditions : %d %d %d %d %d %d %d %d %d \n",myPosX > rotationLimit2,myPosY > rotationLimit2,myPosX <2-rotationLimit2,myPosY >rotationLimit2,myPosX <2-rotationLimit2,myPosY <3-rotationLimit2,myPosX >rotationLimit2,myPosY <3-rotationLimit2, myForceState != TURNING_MOVE);
+        
+        if(!((myPosX > rotationLimit2 &&myPosY > rotationLimit2) &&  (myPosX <2-rotationLimit2 && myPosY >rotationLimit2) &&  (myPosX <2-rotationLimit2 && myPosY <3-rotationLimit2) &&  (myPosX >rotationLimit2 && myPosY <3-rotationLimit2)) && myForceState != TURNING_MOVE) {
+            myForceState = MOVE_AWAY_WALL;
+            printf("in MOVE_AWAY_WALL \n");
+        }
+        else if((myPosX > rotationLimit &&myPosY > rotationLimit) &&  (myPosX <2-rotationLimit && myPosY >rotationLimit) &&  (myPosX <2-rotationLimit && myPosY <3-rotationLimit) &&  (myPosX >rotationLimit && myPosY <3-rotationLimit) ){
+            myForceState = TURNING_MOVE;
+            printf("in TURNING_MOVE \n");
+        }
+    
+        
         
     }
-    if(fabs(error) < 2) turningMove = 0;
+    else myForceState = CLASSIC;
+    if(fabs(error) < 2) myForceState = CLASSIC;
 
-    if(turningMove){ //ATTENTION ICI ON METS UNIQUEMENT LA FORCE DATTRACTION A 0 PAS LA REPULSION
+    switch (myForceState)
+    {
+    case CLASSIC:
+        MAX_SPEED = 0.7;
+        break;
+    case TURNING_MOVE:
         f_att_x = 0;
         f_att_y = 0;
-        k_att_theta = 0.8;
+        k_att_theta = 1;
+        break;
+    case MOVE_AWAY_WALL:
+        MAX_SPEED = 0.2;
+        f_att_x = -destination_set*k_att_xy * (myPosX- 1);
+        f_att_y = -destination_set*k_att_xy * (myPosY - 1.5);
+        error = 0;
+        break;
+    default:
+        break;
     }
 
-    k_att_theta = k_att_theta * (1+ 3/(0.35+fabs(error)/2)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
+    k_att_theta = k_att_theta * (1+ 3/(0.25+fabs(error)/3)); //Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     
 
     //if(VERBOSE) printf("theta = %f desired = %f error theta  = %f \n",theta,desiredTheta,error);
@@ -790,7 +822,7 @@ void myPotentialFieldController(){
                         
                     }else{
                         outputSpeed[0] = 0;
-                        outputSpeed[1] = POT_SPEED;
+                        outputSpeed[1] = POT_SPEED * 0.7;
                         outputSpeed[2] = 0;
                     }                
                     break;
@@ -889,7 +921,7 @@ void myPotentialFieldController(){
                 case (SOLARMOVE):
                     //printf("euclidian distance = %f\n",computeEuclidianDistance(xStart,yStart,myX,myY));
 
-                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.615 - myTeamColor*0.03 ){
+                    if(computeEuclidianDistance(xStart,yStart,myX,myY) > 0.60 - myTeamColor*0.03 ){
                         //destination_set = 0;
                         arrivedAtDestination = 1;
                         myControllerState = STOPPED;

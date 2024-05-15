@@ -47,7 +47,7 @@ struct timeval gripperPositionSetTime;
 struct timeval currentTime;
 
 int checkCommandReceived(char* expected, char* buffer, int* commandReceivedFlag) {
-    printf("Dans checkCommand et expected = %s", expected);
+    //printf("Dans checkCommand et expected = %s", expected);
     char expectedData[255];
     char withoutCrochet[20];
     sscanf(expected, "<%[^>]>", withoutCrochet);

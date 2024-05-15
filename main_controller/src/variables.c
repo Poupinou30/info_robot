@@ -32,6 +32,9 @@ double measuredSpeedX = 0;
 double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
+forceState myForceState = CLASSIC;
+float MAX_SPEED = 0.7;
+
 
 uint8_t changeOfPlan = 1;
 uint8_t forksCalibrated = 0;
@@ -39,7 +42,7 @@ float timeFromStartOfMatch = 0;
 
 //====================================================//
 // ================== STRATEGY =======================//
-uint8_t startingPoint = 6; 
+uint8_t startingPoint = 3; 
 // 1, 2 3 for blue,
 // 4, 5, 6 for yellow
 
@@ -47,7 +50,7 @@ uint8_t nbrOfPots = 6;
 // 6 if you want to de-stack the 6th pot
 // 5 if you dont
 
-uint8_t solarDone = 1;
+uint8_t solarDone = 0;
 // 0 if you want to do the solar panels
 // 1 if you dont
 //====================================================//

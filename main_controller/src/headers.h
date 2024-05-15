@@ -29,6 +29,7 @@
 #define makeLog 1
 
 #define matchDuration 90 //seconds 
+extern float MAX_SPEED;
 
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
@@ -195,6 +196,7 @@ void enableObstacle(int obstacleID);
 void computeForceVector();
 void myPotentialFieldController();
 void* updateKalman(void* args);
+void updateLidarMeasureNoise();
 void defineInitialPosition();
 position closestPoint(position rect[2], position pos);
 void addRectangleObstacle(double x1, double y1, double x2, double y2, uint8_t moving, int obstacleID);
@@ -316,7 +318,7 @@ void actionStrategy();
 void manageGrabbing(plantZone* bestPlantZone);
 uint8_t checkStartSwitch();
 
-typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,ALIGN_POTS_MOVE,LIFT_POTS,GRAB_ALL_POTS,MOVE_FRONT_JARDINIERE,MOVE_FORWARD_JARDINIERE,LOWER_PLANTS,DROP_PLANTS, DROP_ALL,MOVE_BACK_JARDINIERE, LOWER_DROP,OPEN_DROP, MOVE_BACK_DROP, MOVE_FRONT_SOLAR,WHEEL_TURN,MOVE_SOLAR,SOLAR_SET,TURN_AROUND,RESET_SOLAR,FINISHED } grabbingState;
+typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,GRAB_PLANTS_CLOSE, GRAB_PLANTS_END,MOVE_FRONT_POTS,UNSTACK_POTS_MOVE,UNSTACK_POT_TAKE,UNSTACK_POT_POSITIONING,UNSTACK_POT_DROP,GRAB_POTS_MOVE,ALIGN_POTS_MOVE,LIFT_POTS,GRAB_ALL_POTS,MOVE_FRONT_JARDINIERE,MOVE_FORWARD_JARDINIERE,LOWER_PLANTS,DROP_PLANTS, DROP_ALL,MOVE_BACK_JARDINIERE, LOWER_DROP,OPEN_DROP, MOVE_BACK_DROP, MOVE_FRONT_SOLAR,WHEEL_TURN,MOVE_SOLAR,SOLAR_SET,TURN_AROUND,RESET_SOLAR,END_ACTION,FINISHED } grabbingState;
 extern grabbingState myGrabState;
 typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
 extern actuationState myActuatorsState;
@@ -370,3 +372,6 @@ extern uint8_t nbrOfPots;
 void resetErrorLists();
 
 double computeTimeElapsed(struct timeval start, struct timeval end);
+
+typedef enum {TURNING_MOVE,MOVE_AWAY_WALL,CLASSIC} forceState;
+extern forceState myForceState;

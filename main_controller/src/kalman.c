@@ -42,16 +42,16 @@ double H[11][8] = {
 };
 
 double Q[8][8] = {
-    {0.1, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0.1, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0.01, 0, 0, 0, 0, 0},
+    {0.015, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0.015, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0.05, 0, 0, 0, 0, 0},
     {0, 0, 0, 0.01, 0, 0, 0, 0},
     {0, 0, 0, 0, 0.01, 0, 0, 0},
-    {0, 0, 0, 0, 0, 1, 0, 0},
-    {0, 0, 0, 0, 0, 0, 1, 0},
+    {0, 0, 0, 0, 0, 0.1, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0.1, 0},
     {0, 0, 0, 0, 0, 0, 0, 0.1}
 }; // Bruit de processus
-double R[11] = {1, 1, 1.5,0.7, 0.7, 2, 0.5, 0.5, 0.0001, 0.0001,0.01}; // Bruit de mesure pour chaque variable d'état
+double R[11] = {0.7, 0.7, 0.5,0.7, 0.7, 0.3, 0.5, 0.5, 0.1, 0.1,0.1}; // Bruit de mesure pour chaque variable d'état
 double oldTheta;
 double meanTheta = 0;
 uint8_t thetaForcedFlag = 0;
@@ -160,6 +160,7 @@ void* updateKalman(void* args) {
     filteredSpeedX = x[5];
     filteredSpeedY = x[6];
     filteredSpeedOmega = x[7];
+    //printf("filteredSpeedX = %f et filteredSpeedY = %f et filteredSpeedOmega = %f \n",filteredSpeedX,filteredSpeedY,filteredSpeedOmega);
 
     return NULL;
 }
@@ -178,3 +179,4 @@ void defineInitialPosition(){
 void defineOpponentPosition(float posX, float posY){
     x[3] = posX; x[4] = posY;
 }
+
