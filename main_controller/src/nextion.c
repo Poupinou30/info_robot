@@ -63,7 +63,9 @@ void handleCommand(int UART_handle,char *string) {
     char identifier[50];  // Buffer for the identifier
     int value;            // Integer to store the extracted number
 
-    if (strcmp(receivedChars, "<start>") == 0){
+    sscanf(receivedChars, "<%[^>]>", withoutCrochet);
+
+    if (strcmp(withoutCrochet, "start") == 0){
         go = 1;
         enqueue(q, "tm0.en=1");
         nextionStart = 1;
@@ -72,27 +74,27 @@ void handleCommand(int UART_handle,char *string) {
         printf("############################################################\n");
         printf("Go go gooo\n");
     }
-    else if (strcmp(receivedChars, "<back>") == 0){
+    else if (strcmp(withoutCrochet, "back") == 0){
         go = 0;
         printf("back\n");
-    }else if ((strcmp(receivedChars, "<stop>") == 0)){
+    }else if ((strcmp(withoutCrochet, "stop") == 0)){
         go = 0;
         printf("stop\n");
-    }else if (strcmp(receivedChars, "<finish>") == 0){
+    }else if (strcmp(withoutCrochet, "finish") == 0){
         finish = true;
         printf("finish\n");
     }
-    else if (strcmp(receivedChars, "<blue>") == 0 || strcmp(receivedChars, "<yellow>") == 0) {
-        strcpy(myTeam, receivedChars); // Copie de la valeur de tempoChar dans myTeam
-        printf("Received team: %s\n", receivedChars);
+    else if (strcmp(withoutCrochet, "blue") == 0 || strcmp(withoutCrochet, "yellow") == 0) {
+        strcpy(myTeam, withoutCrochet); // Copie de la valeur de tempoChar dans myTeam
+        printf("Received team: %s\n", withoutCrochet);
         UART_send_commands(UART_handle, "color.en=1");
     }
-    else if (strcmp(receivedChars, "<home>") == 0){
-        strcpy(myPage, receivedChars); // Copie de la valeur de tempoChar dans myTeam
-        printf("myPage: %s\n", receivedChars);
+    else if (strcmp(withoutCrochet, "home") == 0){
+        strcpy(myPage, withoutCrochet); // Copie de la valeur de tempoChar dans myTeam
+        printf("myPage: %s\n", withoutCrochet);
         UART_send_commands(UART_handle, "pageHome.en=1");
     }
-    else if (sscanf(receivedChars, "<%s = %d>", identifier, &value) == 2) {
+    else if (sscanf(withoutCrochet, "%s = %d", identifier, &value) == 2) {
         if (strcmp(identifier, "startY") == 0) {
             startY = value;
             printf("startY: %d\n", startY);
@@ -271,6 +273,7 @@ void nextion_communication(int UART_handle){
 
             printf("received char : %s\n", receivedChars);
             handleCommand(UART_handle, receivedChars);
+            withoutCrochet[0] = '\0';
             receivedChars[0] = '\0';
         }
     }

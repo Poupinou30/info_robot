@@ -383,7 +383,7 @@ extern int UART_handle_nextion;
 
 // Serial input variables
 extern char receivedChars[NUM_CHARS];
-
+char withoutCrochet[NUM_CHARS];
 extern char myTeam[10];
 extern char myPage[25];
 int startY;
