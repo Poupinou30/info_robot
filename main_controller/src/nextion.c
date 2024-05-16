@@ -87,6 +87,11 @@ void handleCommand(int UART_handle,char *string) {
     else if (strcmp(withoutCrochet, "blue") == 0 || strcmp(withoutCrochet, "yellow") == 0) {
         strcpy(myTeam, withoutCrochet); // Copie de la valeur de tempoChar dans myTeam
         printf("Received team: %s\n", withoutCrochet);
+        if (strcmp(receivedChars, "<blue>") == 0){
+            myTeamColor = BLUE;
+        }else {
+            myTeamColor = YELLOW;
+        }
         UART_send_commands(UART_handle, "color.en=1");
     }
     else if (strcmp(withoutCrochet, "home") == 0){
@@ -98,10 +103,20 @@ void handleCommand(int UART_handle,char *string) {
         if (strcmp(identifier, "startY") == 0) {
             startY = value;
             printf("startY: %d\n", startY);
+            if (myTeamColor == YELLOW){
+                OurStartingPoint = value;
+            }else{
+                OppStrartingPoint = value;
+            }
             UART_send_commands(UART_handle, "posY.en=1");
         }else if (strcmp(identifier, "startB") == 0) {
             startB = value;
             printf("startB: %d\n", startB);
+            if (myTeamColor == BLUE){
+                OurStartingPoint = value;
+            }else{
+                OppStrartingPoint = value;
+            }
             UART_send_commands(UART_handle, "posB.en=1");
         }
     }
@@ -241,6 +256,16 @@ void nextion_communication(int UART_handle){
             sprintf(myScore, "score.val=%d", score);
             enqueue(q, myScore);
             gettimeofday(&endQueue, NULL);
+
+            //start of the game
+            if (!checkStartSwitch()){
+                go = 1;
+                enqueue(q, "tm0.en=1");
+                printf("############################################################\n");
+                printf("##############           Go go gooo         ################\n");
+                printf("############################################################\n");
+                printf("Go go gooo\n");
+            }
         }
         
         if(go == 1){

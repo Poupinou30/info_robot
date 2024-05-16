@@ -591,7 +591,7 @@ int main(int argc, const char * argv[]){
         }
         pthread_mutex_unlock(&filteredPositionLock);
 
-        printf("startingPoint = %d and initialPosition = %f %f %f and team = %d\n",startPosition,filteredPos.x,filteredPos.y,filteredPos.theta,myColor);
+        printf("OurStartingPoint = %d and initialPosition = %f %f %f and team = %d\n",startPosition,filteredPos.x,filteredPos.y,filteredPos.theta,myColor);
 
         if(myColor == BLUE){
             beaconRefPosition[0].x = 0.05;
