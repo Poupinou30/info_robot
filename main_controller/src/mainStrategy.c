@@ -52,7 +52,7 @@ potZone* bestPotZone;
 
 void waitingStrategy(){
     myControllerState = STOPPED;
-    printf("readyToGo = %d nextionStart = %d, checkstartSwitch = %d\n", readyToGo, nextionStart, checkStartSwitch());
+    //printf("readyToGo = %d nextionStart = %d, checkstartSwitch = %d\n", readyToGo, nextionStart, checkStartSwitch());
     if(myGrabState != FINISHED){
         myGrabState = CALIB_FORK;
         manageGrabbing(NULL);

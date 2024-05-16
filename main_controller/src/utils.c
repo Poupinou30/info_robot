@@ -166,16 +166,17 @@ int initializeUART(){
     }
     return UART_handle;
 }
-void UART_send(int UART_handle, char* data){
+uint8_t UART_send(int UART_handle, char* data){
 
     char tempoChar[100] = "";
     char tempoChar2[255] = "";
     //if(VERBOSE) printf("Sending '%s' by UART\n",data);
     if(serWrite(UART_handle, data, strlen(data))!=0){
         fprintf(stderr,"Error while writing \n");
+		return 0;	 
     }
     //else if(VERBOSE) printf("UART correctly sent\n");
-    
+    return 1;
 
 }
 
@@ -311,7 +312,7 @@ void* executeProgram(void* arg){
     int pipefdLC = pipesfd[0];
     int pipefdCL = pipesfd[1];
     char cmd[256];
-    sprintf(cmd,"/home/pi/Documents/lastGit/info_robot/lidar_dir/output/Linux/Release/main_folder %d %d %d", pipefdLC, pipefdCL, startingPoint);
+    sprintf(cmd,"/home/pi/Documents/lastGit/info_robot/lidar_dir/output/Linux/Release/main_folder %d %d %d", pipefdLC, pipefdCL, OurStartingPoint);
     //sprintf(cmd,"/home/student/Documents/lab_git_augu/info_robot/lidar_dir/output/Linux/Release/main_folder %d", pipefd);
 
     while(1){
@@ -648,7 +649,7 @@ endZone* computeBestEndZone(){
         
     for (int i = 0; i < 3; i++) {
         float tempoDistance = computeEuclidianDistance(x, y, endZones[3*myTeamColor+i].posX, endZones[3*myTeamColor+i].posY);
-        if(( tempoDistance < smallestDistance) && (endZones[3*myTeamColor+i].zoneID != startingPoint - 1)){
+        if(( tempoDistance < smallestDistance) && (endZones[3*myTeamColor+i].zoneID != OurStartingPoint - 1)){
            bestEndZone = &endZones[3*myTeamColor+i];
            smallestDistance = tempoDistance;
         }
@@ -713,8 +714,3 @@ void updateObstaclesStatus(){
     }
     //printf("solars ok\n");
 }
-
-
-
-
-

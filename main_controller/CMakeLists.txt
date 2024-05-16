@@ -24,6 +24,7 @@ add_executable(main_controller src/main.c
         src/initializations.c
         src/UART.c
         src/lidarManagement.c
+        src/nextion.c
         )
 
 target_include_directories(main_controller PRIVATE ${pigpio_INCLUDE_DIR})

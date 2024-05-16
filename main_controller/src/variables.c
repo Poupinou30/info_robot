@@ -42,7 +42,8 @@ float timeFromStartOfMatch = 0;
 
 //====================================================//
 // ================== STRATEGY =======================//
-uint8_t startingPoint = 6; 
+//uint8_t OurStartingPoint = 1; 
+//uint8_t OppStrartingPoint = 4;
 // 1, 2 3 for blue,
 // 4, 5, 6 for yellow
 
@@ -55,3 +56,16 @@ uint8_t solarDone = 1;
 // 1 if you dont
 //====================================================//
 
+//Nextion
+int UART_handle_nextion;
+uint8_t nextionStart = 0;
+char myTeam[10] = "";
+char myPage[25] = "";
+int go = 2;
+bool finish = false;
+uint8_t score = 0;
+
+uint8_t cameraEnable = 0;
+Queue* q; 
+struct timeval startInitialization, endQueue;
+char receivedChars[NUM_CHARS];

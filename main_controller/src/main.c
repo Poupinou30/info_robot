@@ -118,7 +118,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
     gettimeofday(&lastExecutionTime, NULL);
     double elapsedTime = 0;
 
-    nextionStart = 0; //NE DOIT PAS RESTER!!!
+    //nextionStart = 0; //NE DOIT PAS RESTER!!!
 
     while (1)
     {
@@ -138,6 +138,8 @@ int main(){//VRAI MAIN STRATEGY UTILE
             myPotentialFieldController();
             myOdometry();
             updateKalman(NULL);
+            nextion_communication(UART_handle_nextion);
+
             if(mySupremeState != WAITING_FOR_START) sendFilteredPos(pipefdCL[1]);
             elapsedTime += currentElapsedTime;
             if (elapsedTime >= 300)
@@ -221,7 +223,7 @@ int mainLOCALTEST(){ //TEST LOCAL
     *destination.y = 0.2;
     *destination.theta = 180;
 
-    nextionStart = 1; //NE DOIT PAS RESTER!!!
+    //nextionStart = 1; //NE DOIT PAS RESTER!!!
     *myFilteredPos.x = 0.5; //On utilise pas le filtre de kalman, on force la position à un endroit pour tester
     *myFilteredPos.y = 0.7;
     *myFilteredPos.theta = 0;
@@ -617,13 +619,14 @@ void initializeMainController(){
     spi_handle_front = initializeSPI(0);
     spi_handle_rear = initializeSPI(1);
     UART_handle = initializeUART();
+    UART_handle_nextion = initializeUART_nextion();
     i2c_handle_front = I2C_initialize(0x40);
     i2c_handle_rear = I2C_initialize(0x41);
     initializeLaunchGPIO();
     if(makeLog) generateLog();
     mySupremeState = WAITING_FOR_START;
 
-
+    gettimeofday(&startInitialization, NULL);
 
     //Initialisation variables
     positionReceived = malloc(3*sizeof(float));
@@ -658,8 +661,12 @@ void initializeMainController(){
     //Initialisation PID
     tunePID(60,15,i2c_handle_front,i2c_handle_rear);
 
-    if(startingPoint < 4) myTeamColor =BLUE;
-    else myTeamColor = YELLOW;
+    //Queue nextion for send commands
+    Queue* q = createQueue();
+    gettimeofday(&endQueue, NULL);
+
+    //if(OurStartingPoint < 4) myTeamColor = BLUE;
+    //else myTeamColor = YELLOW;
 }
 
 int mainFINAL(){
