@@ -5,6 +5,11 @@
 
 #include <fcntl.h>
 
+float plantsContactDistance = 0.2;
+float potsContactDistance = 0.2;
+float endZonesContactDistance = 0.15;
+
+
 double radius = 0.03;
 double l_y = 0.175;
 double l_x = 0.21;
@@ -659,54 +664,56 @@ void updateObstaclesStatus(){
     float opponentX = *myFilteredOpponent.x;
     float opponentY = *myFilteredOpponent.y;
     pthread_mutex_unlock(&lockFilteredOpponent);
-    // printf("updating obstacles\n");
+    
 
     for(int i = 0; i<6; i++){
 
         // plantesZones
-        if((computeEuclidianDistance(opponentX, opponentY, plantZones[i].posX, plantZones[i].posY) < myForce.obstacleList[11+i].size + 0.2) && (plantZones[i].numberOfPlants > 0)){
+        float plantsDistance = computeEuclidianDistance(opponentX, opponentY, plantZones[i].posX, plantZones[i].posY);
+        if((plantsDistance < plantsContactDistance) && (plantZones[i].numberOfPlants > 0)){
             
-            printf("==============================================================\n");
-            printf("plantZones[%d].numberOfPlants = %d\n",i,plantZones[i].numberOfPlants);
-            printf("distance = %f, reference = %f\n", computeEuclidianDistance(opponentX, opponentY, plantZones[i].posX, plantZones[i].posY), myForce.obstacleList[11+i].size + 0.2);
-            printf("==============================================================\n");
-
             plantZones[i].numberOfPlants = 0; // update the number of plants
             removeObstacle(11+i); // remove the obstacle
+
+            printf("==============================================================\n");
+            printf("plantZones[%d].numberOfPlants = %d\n",i,plantZones[i].numberOfPlants);
+            printf("distance = %f, reference = %f\n", plantsDistance, plantsContactDistance);
+            printf("==============================================================\n");
         }
 
         // potZones
-        if((computeEuclidianDistance(opponentX, opponentY, potZones[i].posX, potZones[i].posY) < myForce.obstacleList[21+i].size + 0.2) && (potZones[i].numberOfPots > 0)){
-            
-            printf("==============================================================\n");
-            printf("potZones[%d].numberOfPots = %d\n",i,potZones[i].numberOfPots);
-            printf("distance = %f, reference = %f\n", computeEuclidianDistance(opponentX, opponentY, potZones[i].posX, potZones[i].posY), myForce.obstacleList[21+i].size + 0.2);
-            printf("==============================================================\n");
+        float potsDistance = computeEuclidianDistance(opponentX, opponentY, potZones[i].posX, potZones[i].posY);
+        if((potsDistance < potsContactDistance) && (potZones[i].numberOfPots > 0)){
             
             potZones[i].numberOfPots = 0; // update the number of pots
             removeObstacle(21+i); // remove the obstacle
+            printf("==============================================================\n");
+            printf("potZones[%d].numberOfPots = %d\n",i,potZones[i].numberOfPots);
+            printf("distance = %f, reference = %f\n", potsDistance, potsContactDistance);
+            printf("==============================================================\n");            
         }
         
         // endZones
-        if(computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY) < 0.15){
+        float endZonesDistance = computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY);
+        if(endZonesDistance < endZonesContactDistance){
             if(endZones[i].zoneID / 3 == myTeamColor && endZones[i].numberOfPlants > 0){
                 
+                endZones[i].numberOfPlants = 0; // update the number of plants to zero cuz the opponent is in our endzone
                 printf("==============================================================\n");
                 printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
-                printf("distance = %f, reference = %f\n", computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY),0.15);
+                printf("distance = %f, reference = %f\n", endZonesDistance,endZonesContactDistance);
                 printf("==============================================================\n");
-
-                endZones[i].numberOfPlants = 0; // update the number of plants to zero cuz the opponent is in our endzone
 
             }
             else{
                 if (endZones[i].numberOfPlants == 0){
+
+                    endZones[i].numberOfPlants = 6; // update the number of plants to 6 cuz the opponent is in their endzone
                     printf("==============================================================\n");
                     printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
                     printf("distance = %f, reference = %f\n", computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY),0.15);
                     printf("==============================================================\n");
-
-                    endZones[i].numberOfPlants = 6; // update the number of plants to 6 cuz the opponent is in their endzone
+                    
                 }
                 
             }
@@ -752,7 +759,7 @@ void PrintMapState(){
     printf("      ||   %d   |                                                       |   %d   ||      \n", endZones[5].numberOfPlants,endZones[2].numberOfPlants);
     printf("      ||        |                  %d              %d                   |        ||      \n", potZones[4].numberOfPots,potZones[5].numberOfPlants);
     printf("      ||=========================================================================||      \n");
-printf("\n \n");
+    printf("\n\n");
 }
 
 

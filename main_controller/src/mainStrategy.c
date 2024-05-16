@@ -114,22 +114,11 @@ void pointsStrategy(){
             printf("======================================================================================\n");
     }
     
-    else{ // let's earn some points
-        
-        //fprintf(stderr,"check10.1\n");
-        
+    else{
         if(changeOfPlan){
-            //fprintf(stderr,"check10.2\n");
             defineBestAction();
             changeOfPlan = 0;
-            //fprintf(stderr,"check5\n");
-            /*todo: faut set changeOfPlan quand:
-            - on a fini une action
-            - l'adversaire arrive avant nous à notre target
-            - l'aversaire nous bloque le chemin trop longtemps
-            */
         }
-        //fprintf(stderr,"check10.3\n");
         actionStrategy();
     }
 };
