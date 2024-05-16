@@ -21,6 +21,77 @@ uint8_t *SPI_reception_buffer_front;
 int spi_handle_front;
 int spi_handle_rear;
 
+int main(){ // Test pour le rapport
+    initializeMainController();
+
+     struct timeval lastExecutionTime, currentTime;
+    gettimeofday(&lastExecutionTime, NULL);
+    double elapsedTime = 0;
+
+    nextionStart = 0; 
+    myOdometryPos.x = 0;
+    myOdometryPos.y = 0;
+    myOdometryPos.theta = 0;
+
+    while (1)
+    {
+        gettimeofday(&currentTime, NULL);
+        double currentElapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
+        currentElapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
+
+        if (currentElapsedTime >= 30)
+        {
+            if(myOdometryPos.y < 0.5) processInstructionNew(0,0.2,0,i2c_handle_front,i2c_handle_rear);
+            else if(myOdometryPos.y < 1) processInstructionNew(0,0.4,0,i2c_handle_front,i2c_handle_rear);
+            else if(myOdometryPos.y < 1.5) processInstructionNew(0,0.6,0,i2c_handle_front,i2c_handle_rear);
+            else if (myOdometryPos.y < 2) processInstructionNew(0,0.8,0,i2c_handle_front,i2c_handle_rear);
+
+            if(makeLog) writeLog();
+            
+            // printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
+            mainStrategy();
+            
+            myOdometry();
+            if(mySupremeState != WAITING_FOR_START) sendFilteredPos(pipefdCL[1]);
+            elapsedTime += currentElapsedTime;
+            if (elapsedTime >= 300)
+            {
+                
+                
+                if(VERBOSE){
+                    printf("====================================================\n");
+                    printf("timeElapsed = %f\n",timeFromStartOfMatch);
+                    printf("my position: x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
+                    //printf("odo_position: x = %f y = %f theta = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
+                    //printf("lidar_position: x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
+                    printf("myDestination x = %f y = %f\n",*destination.x,*destination.y);
+                    printf("my opponent: x = %f y = %f \n",*myFilteredOpponent.x,*myFilteredOpponent.y);
+                    printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
+                    printf("\n");
+                    printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
+                    printf("          myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
+                    printf("          forksDeployed = %d\n",forksDeployed);
+                    //printf("obstacle 14 enabled? = %d\n",myObstacleList[14].enabled);
+                    printf("\n");
+                    
+                }
+                elapsedTime = 0;
+            }
+
+            gettimeofday(&lastExecutionTime, NULL);
+            //ON EST ARRIVE A DESTINATION?
+            //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
+            
+            //printf("conditions = %d %d %d %d \n",measuredSpeedX < 0.03 , measuredSpeedY < 0.03 , measuredSpeedOmega < 0.1 , lidarElapsedTime < 200);
+            //printf("time elapsed = %lf \n",lidarElapsedTime);
+            //if(VERBOSE) printf("myControllerState = %d \n",myControllerState);
+         
+
+
+        }
+    }
+
+}
 
 int mainFORKS(){
     initializeMainController();
