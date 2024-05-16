@@ -5,6 +5,7 @@
 
 float tempoMyX, tempoMyY, tempoOppX, tempoOppY;
 char myScore[25];
+char myTime[30];
 struct timeval now;
 
 int initializeUART_nextion(){
@@ -64,6 +65,12 @@ void handleCommand(int UART_handle,char *string) {
     int value;            // Integer to store the extracted number
 
     sscanf(receivedChars, "<%[^>]>", withoutCrochet);
+
+    printf("############################################################\n");
+    printf("##############     without crochet char     ################\n");
+    printf("############################################################\n");
+
+    printf("without crochet char : %s\n", withoutCrochet);
 
     if (strcmp(withoutCrochet, "start") == 0){
         go = 1;
@@ -228,7 +235,7 @@ void nextion_communication(int UART_handle){
 
 
         // Enqueue the data every 350ms
-        if(nowValue - (endQueue.tv_sec*1000+endQueue.tv_usec/1000) > 350){
+        if(nowValue - (endQueue.tv_sec*1000+endQueue.tv_usec/1000) > 500){
 
             // My position
             pthread_mutex_lock(&lockFilteredPosition);
@@ -255,6 +262,17 @@ void nextion_communication(int UART_handle){
             // My score
             sprintf(myScore, "score.val=%d", score);
             enqueue(q, myScore);
+            gettimeofday(&endQueue, NULL);
+
+            //Time Elapsed
+            printf("############################################################\n");
+            printf("##############         Time Elapsed         ################\n");
+            printf("############################################################\n");
+
+            printf("Time Elapsed : %d\n", (int) timeFromStartOfMatch);
+
+            sprintf(myTime, "timer.val=%d", (int) timeFromStartOfMatch);
+            enqueue(q, myTime);
             gettimeofday(&endQueue, NULL);
 
             //start of the game

@@ -60,7 +60,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
 
     if(lidarElapsedTime > 500){
         v_max = 0.25;
-        printf("_____ALERT____\n ___NO_LIDAR___\n");
+        //printf("___NO_LIDAR___\n");
     } 
     else if (distanceFromOpponent<0.7){
         v_max = 0.5*distanceFromOpponent*distanceFromOpponent/(0.7*0.7);
