@@ -55,10 +55,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     double distanceFromDestination;
     if(destination_set) distanceFromDestination = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
 
-    if(lidarElapsedTime > 500){
-        v_max = 0.25;
-        printf("_____ALERT____\n ___NO_LIDAR___\n");
-    } 
+
     else if (distanceFromOpponent<0.7){
         v_max = 0.5*distanceFromOpponent*distanceFromOpponent/(0.7*0.7);
     }
@@ -239,7 +236,7 @@ void tunePIDOLD(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t 
 
 void tunePID(float Ki, float Kp, int i2c_handle_front, int i2c_handle_rear){
     char toSend[100]; char toReceiveFront[100]; char toReceiveRear[100];
-    sprintf(toSend,"<setCoeff-%f-%f>",Kp,Ki); //Vitesses en ticks par seconde
+    sprintf(toSend,"<sC-%f-%f>",Kp,Ki); //Vitesses en ticks par seconde
     I2C_send(toSend,toReceiveFront,i2c_handle_front);
     I2C_send(toSend,toReceiveRear,i2c_handle_rear);
 }

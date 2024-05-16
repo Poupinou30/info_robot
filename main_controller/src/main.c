@@ -29,56 +29,46 @@ int main(){ // Test pour le rapport
     double elapsedTime = 0;
 
     nextionStart = 0; 
-    myOdometryPos.x = 0;
-    myOdometryPos.y = 0;
-    myOdometryPos.theta = 0;
+    *myOdometryPos.x = 0;
+    *myOdometryPos.y = 0;
+    *myOdometryPos.theta = 0;
+    *myFilteredPos.x = 0;
+    *myFilteredPos.y = 0;
+    *myFilteredPos.theta = 0;
+    *myFilteredOpponent.x = 0;
+    *myFilteredOpponent.y = 0;
+    *myPos.x = 0;
+    *myPos.y = 0;
+    *myPos.theta = 0;
+
+    
 
     while (1)
     {
         gettimeofday(&currentTime, NULL);
-        double currentElapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
+        double currentElapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec)*1000; // Convert to milliseconds
         currentElapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
-
-        if (currentElapsedTime >= 30)
+        
+        
+        if (currentElapsedTime >= 2)
         {
-            if(myOdometryPos.y < 0.5) processInstructionNew(0,0.2,0,i2c_handle_front,i2c_handle_rear);
-            else if(myOdometryPos.y < 1) processInstructionNew(0,0.4,0,i2c_handle_front,i2c_handle_rear);
-            else if(myOdometryPos.y < 1.5) processInstructionNew(0,0.6,0,i2c_handle_front,i2c_handle_rear);
-            else if (myOdometryPos.y < 2) processInstructionNew(0,0.8,0,i2c_handle_front,i2c_handle_rear);
+            printf("currentElapsedTime = %f \n",currentElapsedTime);
+            gettimeofday(&lastExecutionTime, NULL);
+            if(*myOdometryPos.theta < 350){
+            if(*myOdometryPos.theta < 20) processInstructionNew(0.0,0.0,30,i2c_handle_front,i2c_handle_rear);
+            else if(*myOdometryPos.theta <50) processInstructionNew(0.0,0,50,i2c_handle_front,i2c_handle_rear);
+            else if(*myOdometryPos.theta < 100) processInstructionNew(0.0,0,90,i2c_handle_front,i2c_handle_rear);
+            else if (*myOdometryPos.theta < 340) processInstructionNew(0.0,0,150,i2c_handle_front,i2c_handle_rear);
+            else if (*myOdometryPos.theta < 350) processInstructionNew(0,0.0,0,i2c_handle_front,i2c_handle_rear);}
 
             if(makeLog) writeLog();
             
-            // printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
-            mainStrategy();
             
             myOdometry();
-            if(mySupremeState != WAITING_FOR_START) sendFilteredPos(pipefdCL[1]);
-            elapsedTime += currentElapsedTime;
-            if (elapsedTime >= 300)
-            {
-                
-                
-                if(VERBOSE){
-                    printf("====================================================\n");
-                    printf("timeElapsed = %f\n",timeFromStartOfMatch);
-                    printf("my position: x = %f y = %f theta = %f \n",*myFilteredPos.x,*myFilteredPos.y,*myFilteredPos.theta);
-                    //printf("odo_position: x = %f y = %f theta = %f \n",*myOdometryPos.x,*myOdometryPos.y,*myOdometryPos.theta);
-                    //printf("lidar_position: x = %f y = %f theta = %f \n",*myPos.x,*myPos.y,*myPos.theta);
-                    printf("myDestination x = %f y = %f\n",*destination.x,*destination.y);
-                    printf("my opponent: x = %f y = %f \n",*myFilteredOpponent.x,*myFilteredOpponent.y);
-                    printf("myForce x = %f y = %f theta = %f \n",f_tot_x,f_tot_y, f_theta);
-                    printf("\n");
-                    printf("myStates: mySupremeState = %d, myActionChoice = %d, destination_set = %d \n ",mySupremeState, myActionChoice,destination_set);
-                    printf("          myControllerState = %d, myGrabState = %d, myMoveType = %d\n ",myControllerState, myGrabState, myMoveType);
-                    printf("          forksDeployed = %d\n",forksDeployed);
-                    //printf("obstacle 14 enabled? = %d\n",myObstacleList[14].enabled);
-                    printf("\n");
-                    
-                }
-                elapsedTime = 0;
-            }
+            //elapsedTime += currentElapsedTime;
+            
 
-            gettimeofday(&lastExecutionTime, NULL);
+            
             //ON EST ARRIVE A DESTINATION?
             //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
             
@@ -165,7 +155,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int main(){//VRAI MAIN STRATEGY UTILE
+int mainStrat(){//VRAI MAIN STRATEGY UTILE
     initializeMainController();
 
     int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
@@ -909,14 +899,14 @@ void processInstructionNew(float v_x, float v_y, float omega, int i2c_handle_fro
     double speedTab[4];
     convertsVelocity(v_x,v_y,omega,speedTab);
     char toSendFront[100]; char toSendRear[100]; char toReceiveFront[100]; char toReceiveRear[100];
-    sprintf(toSendFront,"<setSpeed-%d-%d>",(int) (speedTab[0]/(2*_Pi) *114688),(int) (speedTab[1]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
-    sprintf(toSendRear,"<setSpeed-%d-%d>",(int) (speedTab[2]/(2*_Pi) *114688),(int) (speedTab[3]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
+    sprintf(toSendFront,"<sS-%d-%d>",(int) (speedTab[0]/(2*_Pi) *114688),(int) (speedTab[1]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
+    sprintf(toSendRear,"<sS-%d-%d>",(int) (speedTab[2]/(2*_Pi) *114688),(int) (speedTab[3]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
     I2C_send(toSendFront,toReceiveFront,i2c_handle_front);
     I2C_send(toSendRear,toReceiveRear,i2c_handle_rear);
     int tempoSpeedFL, tempoSpeedFR, tempoSpeedRL, tempoSpeedRR;
     //if(VERBOSE) printf("received 1 = '%s' and 2 = '%s'", toReceiveFront,toReceiveRear);
-    sscanf(toReceiveFront, "<measuredSpeed-%d-%d>", &tempoSpeedFL, &tempoSpeedFR);
-    sscanf(toReceiveRear, "<measuredSpeed-%d-%d>", &tempoSpeedRL, &tempoSpeedRR);
+    sscanf(toReceiveFront, "<mS-%d-%d>", &tempoSpeedFL, &tempoSpeedFR);
+    sscanf(toReceiveRear, "<mS-%d-%d>", &tempoSpeedRL, &tempoSpeedRR);
     /*if(VERBOSE){
         printf("tempoSpeedFL = %d FR = %d RL = %d RR = %d \n",tempoSpeedFL,tempoSpeedFR,tempoSpeedRL,tempoSpeedRR);
     }*/
