@@ -39,6 +39,7 @@ void mainStrategy(){
         returnToBaseStrategy();
         break;
     case GAME_OVER:
+        
         gameOverStrategy();
 
     default:
@@ -321,9 +322,9 @@ void defineEndZoneDestination(endZone* bestEndZone){
 };
 
 void gameOverStrategy(){
-    if (matchOver != 0){
+    if (matchOver != 1){
         matchOver = 1;
-        PrintMapState
+        PrintMapState();
     }
     myControllerState = STOPPED;
     setUpperFork(0);

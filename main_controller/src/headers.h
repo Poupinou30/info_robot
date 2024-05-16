@@ -28,7 +28,7 @@
 #define timeDelay 30 //ms
 #define makeLog 1
 
-#define matchDuration 600 //seconds 
+#define matchDuration 25 //seconds 
 
 extern float* positionReceived;
 extern pthread_mutex_t lockPosition;
