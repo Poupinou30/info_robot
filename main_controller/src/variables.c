@@ -42,7 +42,7 @@ float timeFromStartOfMatch = 0;
 
 //====================================================//
 // ================== STRATEGY =======================//
-uint8_t startingPoint = 3; 
+uint8_t startingPoint = 6; 
 // 1, 2 3 for blue,
 // 4, 5, 6 for yellow
 

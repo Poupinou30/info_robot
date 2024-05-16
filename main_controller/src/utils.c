@@ -241,7 +241,7 @@ void tunePIDOLD(int spi_handle_front,int spi_handle_rear, uint16_t Kp_m, int8_t 
 
 void tunePID(float Ki, float Kp, int i2c_handle_front, int i2c_handle_rear){
     char toSend[100]; char toReceiveFront[100]; char toReceiveRear[100];
-    sprintf(toSend,"<setCoeff-%f-%f>",Kp,Ki); //Vitesses en ticks par seconde
+    sprintf(toSend,"<sC-%f-%f>",Kp,Ki); //Vitesses en ticks par seconde
     I2C_send(toSend,toReceiveFront,i2c_handle_front);
     I2C_send(toSend,toReceiveRear,i2c_handle_rear);
 }

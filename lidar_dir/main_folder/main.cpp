@@ -9,7 +9,7 @@ float* myX; float* myY;
 #endif
 
 #define baliseRadius 0.04
-#define MAX_OBJECTS 200
+#define MAX_OBJECTS 1000
 #define MAX_LIDAR_POINTS 8192
 
 #include <fcntl.h>
@@ -158,7 +158,7 @@ void* beacon_data(void* argument){
     double object_width = 0;
     uint8_t already_added = 0;
 
-    for (int i=1; i<counter;++i){
+    for (int i=0; i<counter;++i){
         actualDistance = distance(refa, a[i],refd, d[i]);
 
         if(actualDistance <= objectMaxStep){

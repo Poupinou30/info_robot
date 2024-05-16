@@ -9,11 +9,27 @@
 
 float fixActionDistance = 0.3;
 float mobileActionDistance = 0.6;
-float myDistanceList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY};
-float myErrorList[20] = {INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY}; //Listes rotatives afin de faire une moyenne temporelle sur l'erreur et la distance avec la destination
+
+
+float myDistanceList[50] = {
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY
+};
+
+float myErrorList[50] = {
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+    INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY
+};
+
 
 void resetErrorLists(){
-    for (int i = 0; i < 20; ++i) {
+    for (int i = 0; i < 50; ++i) {
         myDistanceList[i] = INFINITY;
         myErrorList[i] = INFINITY;
     }
@@ -379,6 +395,7 @@ void computeForceVector(){
     float f_repul_tan_y = 0;
     float f_repul_norm_x = 0;
     float f_repul_norm_y = 0;
+    float closestObstacleDistance = INFINITY;
     
     double distanceFromDest = computeEuclidianDistance(myPosX,*myFilteredPos.y,*destination.x,*destination.y);
     float tempoDestX = *destination.x;
@@ -424,7 +441,7 @@ void computeForceVector(){
         error-=360;
     }
     
-    if(fabs(error) > 15&& (pow(filteredSpeedX*filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5)< 0.1 || myForceState == MOVE_AWAY_WALL || myForceState == TURNING_MOVE)){
+    if(fabs(error) > 15&& (pow(filteredSpeedX*filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5)< 0.15 || myForceState == MOVE_AWAY_WALL || myForceState == TURNING_MOVE)){
         printf("in if for turningMove \n");
         float rotationLimit = 0.3;
         float rotationLimit2 = 0.3;
@@ -473,21 +490,22 @@ void computeForceVector(){
 
 
     //ROTATING LIST POUR MOYENNE
-    for (int i = 0; i < 19; ++i) {
+    for (int i = 0; i < 49; ++i) {
         myDistanceList[i] = myDistanceList[i+1];
         myErrorList[i] = myErrorList[i+1];
     }
-    myDistanceList[19] = distanceFromDest;
-    myErrorList[19] = error;
+    myDistanceList[49] = distanceFromDest;
+    myErrorList[49] = error;
+    //On a fait rotater la liste
 
     float averageDistanceFromDest = 0;
     float averageError = 0;
-    for(int i = 0; i<20; i++ ){
+    for(int i = 0; i<50; i++ ){
         averageDistanceFromDest+=myDistanceList[i];
         averageError += myErrorList[i];
     }
-    averageDistanceFromDest = averageDistanceFromDest/20;
-    averageError = averageError/20;
+    averageDistanceFromDest = averageDistanceFromDest/50;
+    averageError = averageError/50;
     
 
     if(averageDistanceFromDest < 0.0175 && fabs(averageError) < 1){
@@ -627,6 +645,8 @@ void computeForceVector(){
             if(tempoObstacle->obstacleID == 0) distanceFromOpponent = distance;
             
             if(distance < actionDistance){
+                if(distance<closestObstacleDistance) closestObstacleDistance = distance;
+                
                 // printf("obstacle #%d at distance = %f and position x = %f y = %f \n",tempoObstacle->obstacleID,distance,tempoX,tempoY);
                 
                 if(myPosX > tempoX) sign_f_rep_x = -1;
@@ -698,6 +718,7 @@ void computeForceVector(){
 
 
             }
+            if(closestObstacleDistance != INFINITY) MAX_SPEED = 0.7*(closestObstacleDistance/fixActionDistance);
     }}
     free(tempoPoint1.x);
     free(tempoPoint1.y);

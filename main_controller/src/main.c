@@ -126,8 +126,10 @@ int main(){//VRAI MAIN STRATEGY UTILE
         double currentElapsedTime = (currentTime.tv_sec - lastExecutionTime.tv_sec) * 1000.0; // Convert to milliseconds
         currentElapsedTime += (currentTime.tv_usec - lastExecutionTime.tv_usec) / 1000.0; // Convert to milliseconds
 
-        if (currentElapsedTime >= 30)
+        if (currentElapsedTime >= timeDelay)
         {
+            gettimeofday(&lastExecutionTime, NULL);
+            //printf("currentElapsedTime = %lf\n",currentElapsedTime);
             if(makeLog) writeLog();
             
             // printf("myGrabbingState = %d and mySupremeState = %d \n",myGrabState,mySupremeState);
@@ -140,6 +142,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
             elapsedTime += currentElapsedTime;
             if (elapsedTime >= 300)
             {
+                
                 
                 
                 if(VERBOSE){
@@ -162,7 +165,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
                 elapsedTime = 0;
             }
 
-            gettimeofday(&lastExecutionTime, NULL);
+            
             //ON EST ARRIVE A DESTINATION?
             //if(VERBOSE) printf("my euclidian distance = %f \n",computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y));
             
@@ -177,7 +180,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field            
 
             pthread_mutex_lock(&lidarFlagLock);
-            if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.2 && fabs(filteredSpeedOmega)<1) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.2 && fabs(filteredSpeedOmega)<10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -838,14 +841,14 @@ void processInstructionNew(float v_x, float v_y, float omega, int i2c_handle_fro
     double speedTab[4];
     convertsVelocity(v_x,v_y,omega,speedTab);
     char toSendFront[100]; char toSendRear[100]; char toReceiveFront[100]; char toReceiveRear[100];
-    sprintf(toSendFront,"<setSpeed-%d-%d>",(int) (speedTab[0]/(2*_Pi) *114688),(int) (speedTab[1]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
-    sprintf(toSendRear,"<setSpeed-%d-%d>",(int) (speedTab[2]/(2*_Pi) *114688),(int) (speedTab[3]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
+    sprintf(toSendFront,"<sS-%d-%d>",(int) (speedTab[0]/(2*_Pi) *114688),(int) (speedTab[1]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
+    sprintf(toSendRear,"<sS-%d-%d>",(int) (speedTab[2]/(2*_Pi) *114688),(int) (speedTab[3]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
     I2C_send(toSendFront,toReceiveFront,i2c_handle_front);
     I2C_send(toSendRear,toReceiveRear,i2c_handle_rear);
     int tempoSpeedFL, tempoSpeedFR, tempoSpeedRL, tempoSpeedRR;
     //if(VERBOSE) printf("received 1 = '%s' and 2 = '%s'", toReceiveFront,toReceiveRear);
-    sscanf(toReceiveFront, "<measuredSpeed-%d-%d>", &tempoSpeedFL, &tempoSpeedFR);
-    sscanf(toReceiveRear, "<measuredSpeed-%d-%d>", &tempoSpeedRL, &tempoSpeedRR);
+    sscanf(toReceiveFront, "<mS-%d-%d>", &tempoSpeedFL, &tempoSpeedFR);
+    sscanf(toReceiveRear, "<mS-%d-%d>", &tempoSpeedRL, &tempoSpeedRR);
     /*if(VERBOSE){
         printf("tempoSpeedFL = %d FR = %d RL = %d RR = %d \n",tempoSpeedFL,tempoSpeedFR,tempoSpeedRL,tempoSpeedRR);
     }*/

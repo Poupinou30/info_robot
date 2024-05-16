@@ -18,9 +18,9 @@ double P[8][8] = {
 
 // Matrices constantes pour le filtre de Kalman
 double F[8][8] = {
-    {1, 0, 0, 0, 0, 0.03, 0, 0}, //La position x est influencée par le vitesse en x
-    {0, 1, 0, 0, 0, 0, 0.03, 0}, //Idem Y
-    {0, 0, 1, 0, 0, 0, 0, 0.03}, //Idem omega
+    {1, 0, 0, 0, 0, timeDelay/1000, 0, 0}, //La position x est influencée par le vitesse en x
+    {0, 1, 0, 0, 0, 0, timeDelay/1000, 0}, //Idem Y
+    {0, 0, 1, 0, 0, 0, 0, timeDelay/1000}, //Idem omega
     {0, 0, 0, 1, 0, 0, 0, 0},
     {0, 0, 0, 0, 1, 0, 0, 0},
     {0, 0, 0, 0, 0, 1, 0, 0},
