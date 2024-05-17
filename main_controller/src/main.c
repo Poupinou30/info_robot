@@ -665,8 +665,8 @@ void initializeMainController(){
     Queue* q = createQueue();
     gettimeofday(&endQueue, NULL);
 
-    //if(OurStartingPoint < 4) myTeamColor = BLUE;
-    //else myTeamColor = YELLOW;
+    if(OurStartingPoint < 4) myTeamColor = BLUE;
+    else myTeamColor = YELLOW;
 }
 
 int mainFINAL(){
