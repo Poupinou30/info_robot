@@ -54,12 +54,7 @@ int main(){ // Test pour le rapport
         {
             printf("currentElapsedTime = %f \n",currentElapsedTime);
             gettimeofday(&lastExecutionTime, NULL);
-            if(*myOdometryPos.theta < 350){
-            if(*myOdometryPos.theta < 20) processInstructionNew(0.0,0.0,30,i2c_handle_front,i2c_handle_rear);
-            else if(*myOdometryPos.theta <50) processInstructionNew(0.0,0,50,i2c_handle_front,i2c_handle_rear);
-            else if(*myOdometryPos.theta < 100) processInstructionNew(0.0,0,90,i2c_handle_front,i2c_handle_rear);
-            else if (*myOdometryPos.theta < 340) processInstructionNew(0.0,0,150,i2c_handle_front,i2c_handle_rear);
-            else if (*myOdometryPos.theta < 350) processInstructionNew(0,0.0,0,i2c_handle_front,i2c_handle_rear);}
+            processInstructionNew(0.1,0,0,i2c_handle_front,i2c_handle_rear);
 
             if(makeLog) writeLog();
             
