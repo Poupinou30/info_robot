@@ -64,8 +64,7 @@ void convertsVelocity(double v_x, double v_y, double omega, double* output_speed
     if(destination_set) distanceFromDestination = computeEuclidianDistance(*myFilteredPos.x,*myFilteredPos.y,*destination.x,*destination.y);
 
     if(lidarElapsedTime > 500){
-        v_max = 0.25;
-        printf("_____ALERT____\n ___NO_LIDAR___\n");
+        v_max = 0.25;²x²
     } 
     else if (distanceFromOpponent<0.7){
         v_max = 0.5*distanceFromOpponent*distanceFromOpponent/(0.7*0.7);
@@ -519,6 +518,7 @@ plantZone* computeBestPlantsZone(){ // attention j'ai eu la flemme, il regarde p
         }
     }
     printf("BestPlantZone found: zoneID = %d at distance %f\n\n",bestPlantZone->zoneID,smallestDistance);
+    if (bestPlantZone->numberOfPlants == 0) return NULL;
     return bestPlantZone;
 }
 
@@ -547,13 +547,14 @@ potZone* computeBestPotsZone(){
         }
     }
     printf("BestPotsZone found: zoneID = %d at distance %f\n\n",bestPotZone->zoneID,smallestDistance);
+    if (bestPotZone->numberOfPots == 0) return NULL;
     return bestPotZone;
 }
 
 endZone* computeBestDropZone(){
     printf("\nComputing best dropzone\n");
     endZone* bestDropZone = NULL;
-    int number_of_plants = 37;
+    int number_of_plants = 6;
     float smallestDistance = INFINITY;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
@@ -578,6 +579,7 @@ endZone* computeBestDropZone(){
         }
     }
     printf("BestDropZone found: zoneID = %d at distance %f\n\n",bestDropZone->zoneID,smallestDistance);
+    if(smallestDistance == INFINITY) return NULL;
     return bestDropZone;
 }
 
@@ -617,7 +619,41 @@ jardiniere* computeBestJardiniere(){
         } 
     }
     printf("BestJardiniere found: zoneID = %d at distance %f\n\n",bestJardiniere->zoneID,smallestDistance);
+    if(smallestDistance == INFINITY) return NULL;
     return bestJardiniere;
+}
+
+endZone* computeBestStealZone(){
+    printf("\nComputing best stealzone\n");
+    endZone* bestStealZone = NULL;
+    int number_of_plants = 0;
+    float smallestDistance = INFINITY;
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    
+    for (int i = 0; i < 3; i++) {
+        double distance = computeEuclidianDistance(x, y, endZones[3*(1-myTeamColor)+i].posX, endZones[3*(1-myTeamColor)+i].posY);
+        printf("stealZone %d: %d plants\n", 3*(1-myTeamColor)+i,endZones[3*(1-myTeamColor)+i].numberOfPlants);
+        printf("distance = %f\n",distance);
+        if(endZones[3*(1-myTeamColor)+i].numberOfPlants > number_of_plants){
+            number_of_plants = endZones[3*(1-myTeamColor)+i].numberOfPlants;
+            bestStealZone = &endZones[3*(1-myTeamColor)+i];
+            smallestDistance = distance;
+        }else{
+            if (endZones[3*(1-myTeamColor)+i].numberOfPlants == number_of_plants){
+                if(distance < smallestDistance){
+                    bestStealZone = &endZones[3*(1-myTeamColor)+i];
+                    smallestDistance = distance;
+                }
+            }
+        }
+    }
+    printf("BestStealZone found: zoneID = %d at distance %f\n\n",bestStealZone->zoneID,smallestDistance);
+    if(smallestDistance == INFINITY) return NULL;
+    return bestStealZone;
+
 }
 
 solarZone* computeBestSolarZone(){
@@ -673,6 +709,7 @@ void updateObstaclesStatus(){
         if((plantsDistance < plantsContactDistance) && (plantZones[i].numberOfPlants > 0)){
             
             plantZones[i].numberOfPlants = 0; // update the number of plants
+            hasPlants = 1; // the opponent now has plants
             removeObstacle(11+i); // remove the obstacle
 
             printf("==============================================================\n");
@@ -706,15 +743,21 @@ void updateObstaclesStatus(){
 
             }
             else{
-                if (endZones[i].zoneID / 3 != myTeamColor && endZones[i].numberOfPlants == 0){
+                if (endZones[i].zoneID / 3 != myTeamColor && endZones[i].numberOfPlants == 0 && hasPlants){
 
                     endZones[i].numberOfPlants = 6; // update the number of plants to 6 cuz the opponent is in their endzone
+                    hasPlants = 0; // the opponent doesn't have any plants anymore
                     printf("==============================================================\n");
                     printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
                     printf("distance = %f, reference = %f\n", endZonesDistance,endZonesContactDistance);
                     printf("==============================================================\n");
+                }else{
+                    if (endZones[i].zoneID / 3 != myTeamColor && endZones[i].numberOfPlants == 0){
+                        printf("==============================================================\n");
+                        printf("the opponent is in their endzone but they don't have any plants\n");
+                        printf("==============================================================\n");
+                    }
                 }
-                
             }
         }
     }   
