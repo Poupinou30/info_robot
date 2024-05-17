@@ -297,6 +297,7 @@ void handle_sigint(int sig);
 
 extern double totalTime;
 FILE* logFile;
+FILE* i2cFile;
 
 //LOG AND OTHERS
 void generateLog();
@@ -359,7 +360,7 @@ void defineJardiniereDestination(jardiniere* bestJardiniere);
 void defineBestAction();
 
 
-
+extern double outputSpeed[3];
 
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
 uint8_t forksDeployed;

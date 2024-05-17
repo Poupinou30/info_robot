@@ -29,6 +29,7 @@ double motorSpeed_RR = 0;
 movingState myControllerState = STOPPED;
 
 double measuredSpeedX = 0;
+
 double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
@@ -55,3 +56,4 @@ uint8_t solarDone = 1;
 // 1 if you dont
 //====================================================//
 
+double outputSpeed[3] = {0, 0, 0};

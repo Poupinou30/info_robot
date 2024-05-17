@@ -85,7 +85,7 @@ void pointsStrategy(){
     pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     //fprintf(stderr,"check3\n");
-    float TimeNeededToGetHome = distToClosestBase / 0.6 * SafetyFactor;
+    float TimeNeededToGetHome = fmin(distToClosestBase / 0.6 * SafetyFactor, 3);
     //fprintf(stderr,"check10\n");
     timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){

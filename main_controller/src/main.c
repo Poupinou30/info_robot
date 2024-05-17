@@ -95,6 +95,11 @@ mainTestCorde(){
 }
 
 int main(){//VRAI MAIN STRATEGY UTILE
+
+    //debug i2c
+    i2cFile = fopen("../logFiles/logI2C.txt", "w");
+    //fin debug
+
     initializeMainController();
 
     int pipefdLC[2]; //PIPE LIDAR->CONTROLLER
@@ -180,7 +185,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field            
 
             pthread_mutex_lock(&lidarFlagLock);
-            if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.2 && fabs(filteredSpeedOmega)<10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
@@ -665,7 +670,7 @@ void initializeMainController(){
 int mainFINAL(){
 
     initializeMainController();
-    double* outputSpeed = malloc(sizeof(double)*4);
+    //double* outputSpeed = malloc(sizeof(double)*4);
     uint8_t *dataFront = (uint8_t*) malloc(sizeof(uint8_t)*4);
     uint8_t *dataRear = (uint8_t*) malloc(sizeof(uint8_t)*4);
     struct timeval now, end, endPrint;
@@ -736,7 +741,7 @@ int mainFINAL(){
         fprintf(stderr,"Initial force Theta  = %lf \n",f_theta);
 
         convertsSpeedToRobotFrame(f_tot_x,f_tot_y,f_theta,speedTabRobotFrame);
-        myPotentialFieldController(outputSpeed,dataFront,dataRear,spi_handle_front,spi_handle_rear);
+        //myPotentialFieldController(outputSpeed,dataFront,dataRear,spi_handle_front,spi_handle_rear);
 
             //fprintf(stderr,"refreshed %d times \n",refreshCounter);
 
@@ -843,6 +848,7 @@ void processInstructionNew(float v_x, float v_y, float omega, int i2c_handle_fro
     char toSendFront[100]; char toSendRear[100]; char toReceiveFront[100]; char toReceiveRear[100];
     sprintf(toSendFront,"<sS-%d-%d>",(int) (speedTab[0]/(2*_Pi) *114688),(int) (speedTab[1]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
     sprintf(toSendRear,"<sS-%d-%d>",(int) (speedTab[2]/(2*_Pi) *114688),(int) (speedTab[3]/(2*_Pi) *114688)); //Vitesses en ticks par seconde
+    fprintf(i2cFile,"%s to send Front %s to send Rear vx = %f vy = %f\n",toSendFront,toSendRear,v_x,v_y);
     I2C_send(toSendFront,toReceiveFront,i2c_handle_front);
     I2C_send(toSendRear,toReceiveRear,i2c_handle_rear);
     int tempoSpeedFL, tempoSpeedFR, tempoSpeedRL, tempoSpeedRR;
