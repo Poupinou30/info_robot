@@ -71,3 +71,4 @@ Queue* q;
 struct timeval startInitialization, endQueue;
 char receivedChars[NUM_CHARS];
 double outputSpeed[3] = {0, 0, 0};
+uint8_t sleepForTests = 0;

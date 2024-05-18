@@ -109,6 +109,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = STOPPED;
             destination_set = 0;
             arrivedAtDestination = 0;
+            if(sleepForTests) sleep(30);
         } 
         break;
 
@@ -234,6 +235,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myMoveType = DISPLACEMENT_MOVE;
         }
         else if(arrivedAtDestination){
+            if(sleepForTests) sleep(30);
             if (nbrOfPots ==6){
                 myGrabState = UNSTACK_POTS_MOVE;
             }
@@ -672,6 +674,7 @@ void manageGrabbing(plantZone* bestPlantZone){
             myControllerState = MOVING;
         }
         if(arrivedAtDestination && lidarAcquisitionFlag){
+            if(sleepForTests) sleep(30);
             myGrabState = WHEEL_TURN;
             myControllerState = STOPPED;
             arrivedAtDestination = 0;

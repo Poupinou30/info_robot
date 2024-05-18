@@ -7,7 +7,7 @@
 #define SOLAR_SPEED 0.15 // 0.15
 #define POT_SPEED 0.1
 
-float fixActionDistance = 0.23;
+float fixActionDistance = 0.27;
 float mobileActionDistance = 0.4;
 
 

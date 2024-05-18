@@ -216,8 +216,7 @@ void updateObstaclesStatus();
 void PrintMapState();
 
 
-
-
+extern uint8_t sleepForTests;
 void resetOdometry();
 void myOdometry();
 
