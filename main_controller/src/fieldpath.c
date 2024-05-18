@@ -508,7 +508,7 @@ void computeForceVector(){
     averageError = averageError/50;
     
 
-    if(averageDistanceFromDest < 0.0175 && fabs(averageError) < 1){
+    if(averageDistanceFromDest < 0.01 && fabs(averageError) < 1){
         arrivedAtDestination = 1;
         
     }

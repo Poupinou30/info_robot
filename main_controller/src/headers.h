@@ -28,7 +28,7 @@
 #define timeDelay 20 //ms
 #define makeLog 1
 
-#define matchDuration 90 //seconds 
+#define matchDuration 91 //seconds 
 extern float MAX_SPEED;
 
 extern float* positionReceived;
@@ -350,7 +350,7 @@ jardiniere* computeBestJardiniere();
 endZone* computeBestStealZone();
 solarZone* computeBestSolarZone();
 endZone* computeBestEndZone();
-void definePlantsDestination(plantZone* bestPlantZone, endZone* computeBestStealZone);
+void definePlantsDestination(plantZone* bestPlantZone);
 void definePotsDestination(potZone* bestPotZone);
 void definedropZoneDestination(endZone* bestDropZone);
 void defineJardiniereDestination(jardiniere* bestJardiniere);

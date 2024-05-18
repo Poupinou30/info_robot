@@ -18,6 +18,7 @@ potZone* bestPotZone;
 jardiniere* bestJardiniere;
 solarZone* bestSolarZone;
 endZone* bestDropZone;
+endZone* bestStealZone;
 struct timeval commandSended;
 struct timeval actualTime;
 uint8_t timeStarted = 0;
@@ -78,7 +79,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         
         if(destination_set != 1){
             printf("moveFrontPlants started\n");
-            definePlantsDestination(bestPlantZone,bestStealZone);
+            definePlantsDestination(bestPlantZone);
             removeObstacle(bestPlantZone->obstacleID);
             destination_set = 1;
             resetErrorLists();
