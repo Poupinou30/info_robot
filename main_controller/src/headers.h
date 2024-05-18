@@ -304,6 +304,7 @@ void handle_sigint(int sig);
 
 extern double totalTime;
 FILE* logFile;
+FILE* i2cFile;
 
 //LOG AND OTHERS
 void generateLog();
@@ -329,7 +330,7 @@ typedef enum {MOVE_FRONT_PLANTS, CALIB_FORK,GRAB_PLANTS_INIT, GRAB_PLANTS_MOVE,G
 extern grabbingState myGrabState;
 typedef enum {SENDING_INSTRUCTION,WAITING_ACTUATORS} actuationState;
 extern actuationState myActuatorsState;
-typedef enum {JARD, DROP}choice;
+typedef enum {JARD,DROP}choice;
 choice myChoice;
 supremeState mySupremeState;
 actionChoice myActionChoice;
@@ -338,6 +339,7 @@ moveType myMoveType;
 uint8_t arrivedAtDestination;
 extern uint8_t changeOfPlan;
 teamColor myTeamColor;
+uint8_t hasPlants;
 
 struct timeval startOfMatch;
 extern uint8_t nextionStart;
@@ -352,13 +354,15 @@ plantZone* computeBestPlantsZone();
 potZone* computeBestPotsZone();
 endZone* computeBestDropZone();
 jardiniere* computeBestJardiniere();
+endZone* computeBestStealZone();
 solarZone* computeBestSolarZone();
 endZone* computeBestEndZone();
-void definePlantsDestination(plantZone* bestPlantZone);
+void definePlantsDestination(plantZone* bestPlantZone, endZone* computeBestStealZone);
 void definePotsDestination(potZone* bestPotZone);
 void definedropZoneDestination(endZone* bestDropZone);
 void defineJardiniereDestination(jardiniere* bestJardiniere);
 void ChooseDropOrJardiniere(endZone* bestDropZone, jardiniere* bestJardiniere);
+void defineStealDestination(endZone* bestStealZone);
 void defineSolarDestination(solarZone* bestSolarZone);
 void defineEndZoneDestination(endZone* bestEndZone);
 void defineJardiniereDestination(jardiniere* bestJardiniere);
@@ -366,7 +370,7 @@ void defineJardiniereDestination(jardiniere* bestJardiniere);
 void defineBestAction();
 
 
-
+extern double outputSpeed[3];
 
 double filteredSpeedX, filteredSpeedY, filteredSpeedOmega;
 uint8_t forksDeployed;

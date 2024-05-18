@@ -5,6 +5,11 @@
 
 #include <fcntl.h>
 
+float plantsContactDistance = 0.2;
+float potsContactDistance = 0.2;
+float endZonesContactDistance = 0.15;
+
+
 double radius = 0.03;
 double l_y = 0.175;
 double l_x = 0.21;
@@ -517,6 +522,7 @@ plantZone* computeBestPlantsZone(){ // attention j'ai eu la flemme, il regarde p
         }
     }
     printf("BestPlantZone found: zoneID = %d at distance %f\n\n",bestPlantZone->zoneID,smallestDistance);
+    if (bestPlantZone->numberOfPlants == 0) return NULL;
     return bestPlantZone;
 }
 
@@ -545,13 +551,14 @@ potZone* computeBestPotsZone(){
         }
     }
     printf("BestPotsZone found: zoneID = %d at distance %f\n\n",bestPotZone->zoneID,smallestDistance);
+    if (bestPotZone->numberOfPots == 0) return NULL;
     return bestPotZone;
 }
 
 endZone* computeBestDropZone(){
     printf("\nComputing best dropzone\n");
     endZone* bestDropZone = NULL;
-    int number_of_plants = 37;
+    int number_of_plants = 6;
     float smallestDistance = INFINITY;
     pthread_mutex_lock(&lockFilteredPosition);
     float x = *myFilteredPos.x;
@@ -576,6 +583,7 @@ endZone* computeBestDropZone(){
         }
     }
     printf("BestDropZone found: zoneID = %d at distance %f\n\n",bestDropZone->zoneID,smallestDistance);
+    if(smallestDistance == INFINITY) return NULL;
     return bestDropZone;
 }
 
@@ -615,7 +623,41 @@ jardiniere* computeBestJardiniere(){
         } 
     }
     printf("BestJardiniere found: zoneID = %d at distance %f\n\n",bestJardiniere->zoneID,smallestDistance);
+    if(smallestDistance == INFINITY) return NULL;
     return bestJardiniere;
+}
+
+endZone* computeBestStealZone(){
+    printf("\nComputing best stealzone\n");
+    endZone* bestStealZone = NULL;
+    int number_of_plants = 0;
+    float smallestDistance = INFINITY;
+    pthread_mutex_lock(&lockFilteredPosition);
+    float x = *myFilteredPos.x;
+    float y = *myFilteredPos.y;
+    pthread_mutex_unlock(&lockFilteredPosition);
+    
+    for (int i = 0; i < 3; i++) {
+        double distance = computeEuclidianDistance(x, y, endZones[3*(1-myTeamColor)+i].posX, endZones[3*(1-myTeamColor)+i].posY);
+        printf("stealZone %d: %d plants\n", 3*(1-myTeamColor)+i,endZones[3*(1-myTeamColor)+i].numberOfPlants);
+        printf("distance = %f\n",distance);
+        if(endZones[3*(1-myTeamColor)+i].numberOfPlants > number_of_plants){
+            number_of_plants = endZones[3*(1-myTeamColor)+i].numberOfPlants;
+            bestStealZone = &endZones[3*(1-myTeamColor)+i];
+            smallestDistance = distance;
+        }else{
+            if (endZones[3*(1-myTeamColor)+i].numberOfPlants == number_of_plants){
+                if(distance < smallestDistance){
+                    bestStealZone = &endZones[3*(1-myTeamColor)+i];
+                    smallestDistance = distance;
+                }
+            }
+        }
+    }
+    printf("BestStealZone found: zoneID = %d at distance %f\n\n",bestStealZone->zoneID,smallestDistance);
+    if(smallestDistance == INFINITY) return NULL;
+    return bestStealZone;
+
 }
 
 solarZone* computeBestSolarZone(){
@@ -662,44 +704,66 @@ void updateObstaclesStatus(){
     float opponentX = *myFilteredOpponent.x;
     float opponentY = *myFilteredOpponent.y;
     pthread_mutex_unlock(&lockFilteredOpponent);
-    // printf("updating obstacles\n");
+    
 
     for(int i = 0; i<6; i++){
 
         // plantesZones
-        if((computeEuclidianDistance(opponentX, opponentY, plantZones[i].posX, plantZones[i].posY) < myForce.obstacleList[0].size + 0.2) && (plantZones[i].numberOfPlants > 0)){
-            plantZones[i].numberOfPlants = 0;
+        float plantsDistance = computeEuclidianDistance(opponentX, opponentY, plantZones[i].posX, plantZones[i].posY);
+        if((plantsDistance < plantsContactDistance) && (plantZones[i].numberOfPlants > 0)){
+            
+            plantZones[i].numberOfPlants = 0; // update the number of plants
+            hasPlants = 1; // the opponent now has plants
+            removeObstacle(11+i); // remove the obstacle
+
             printf("==============================================================\n");
             printf("plantZones[%d].numberOfPlants = %d\n",i,plantZones[i].numberOfPlants);
-            printf("distance = %f\n",myForce.obstacleList[0].size + 0.2);
-            removeObstacle(11+i);
+            printf("distance = %f, reference = %f\n", plantsDistance, plantsContactDistance);
+            printf("==============================================================\n");
         }
-        // printf("plants ok\n");
 
         // potZones
-        if((computeEuclidianDistance(opponentX, opponentY, potZones[i].posX, potZones[i].posY) < myForce.obstacleList[0].size + 0.2) && (potZones[i].numberOfPots > 0)){
-            potZones[i].numberOfPots = 0;
+        float potsDistance = computeEuclidianDistance(opponentX, opponentY, potZones[i].posX, potZones[i].posY);
+        if((potsDistance < potsContactDistance) && (potZones[i].numberOfPots > 0)){
+            
+            potZones[i].numberOfPots = 0; // update the number of pots
+            removeObstacle(21+i); // remove the obstacle
             printf("==============================================================\n");
             printf("potZones[%d].numberOfPots = %d\n",i,potZones[i].numberOfPots);
-            printf("distance = %f\n",myForce.obstacleList[0].size + 0.2);
-            removeObstacle(21+i);
+            printf("distance = %f, reference = %f\n", potsDistance, potsContactDistance);
+            printf("==============================================================\n");            
         }
         
         // endZones
-        if(computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY) < myForce.obstacleList[0].size + 0.2){
-            if(endZones[i].zoneID / 3 == myTeamColor && endZones[i].numberOfPlants>0){
-                endZones[i].numberOfPlants = 0;
+        float endZonesDistance = computeEuclidianDistance(opponentX, opponentY, endZones[i].posX, endZones[i].posY);
+        if(endZonesDistance < endZonesContactDistance){
+            if(endZones[i].zoneID / 3 == myTeamColor && endZones[i].numberOfPlants > 0){
+                
+                endZones[i].numberOfPlants = 0; // update the number of plants to zero cuz the opponent is in our endzone
                 printf("==============================================================\n");
                 printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
+                printf("distance = %f, reference = %f\n", endZonesDistance,endZonesContactDistance);
+                printf("==============================================================\n");
+
             }
             else{
-                if(endZones[i].numberOfPlants==0){
-                    endZones[i].numberOfPlants = 6;
+                if (endZones[i].zoneID / 3 != myTeamColor && endZones[i].numberOfPlants == 0 && hasPlants){
+
+                    endZones[i].numberOfPlants = 6; // update the number of plants to 6 cuz the opponent is in their endzone
+                    hasPlants = 0; // the opponent doesn't have any plants anymore
                     printf("==============================================================\n");
-                    printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);}
+                    printf("endZones[%d].numberOfPlants = %d\n",i,endZones[i].numberOfPlants);
+                    printf("distance = %f, reference = %f\n", endZonesDistance,endZonesContactDistance);
+                    printf("==============================================================\n");
+                }else{
+                    if (endZones[i].zoneID / 3 != myTeamColor && endZones[i].numberOfPlants == 0){
+                        printf("==============================================================\n");
+                        printf("the opponent is in their endzone but they don't have any plants\n");
+                        printf("==============================================================\n");
+                    }
+                }
             }
         }
-        //printf("dropzones ok\n");
     }   
 
     for(int i = 0; i<3; i++){
@@ -714,3 +778,34 @@ void updateObstaclesStatus(){
     }
     //printf("solars ok\n");
 }
+
+void PrintMapState(){
+    printf("\nPrinting Map State\n");
+    printf("                 ||========||                               ||========||                 \n");
+    printf("                 ||   %d    ||                               ||   %d    ||                 \n", jardinieres[0].numberOfPlants,jardinieres[1].numberOfPlants);
+    printf("      ||=========================================================================||      \n");
+    printf("      ||        |                                                       |        ||      \n");
+    printf("      ||   %d    |                                                       |   %d    ||      \n", endZones[0].numberOfPlants,endZones[3].numberOfPlants);
+    printf("      ||        |                                                       |        ||      \n");
+    printf("||====||--------|                                                       |--------||====||\n");
+    printf("||    ||                                   %d                                     ||    ||\n", plantZones[0].numberOfPlants);
+    printf("|| %d  ||%d                                                                       %d|| %d  ||\n", jardinieres[2].numberOfPlants,potZones[0].numberOfPots, potZones[1].numberOfPots,jardinieres[3].numberOfPlants);
+    printf("||    ||                        %d                     %d                          ||    ||\n", plantZones[1].numberOfPlants,plantZones[2].numberOfPlants);
+    printf("||====||--------|                                                       |--------||====||\n");
+    printf("      ||        |                                                       |        ||      \n");
+    printf("      ||   %d    |                                                       |   %d    ||      \n", endZones[4].numberOfPlants,endZones[1].numberOfPlants);
+    printf("      ||        |                                                       |        ||      \n");
+    printf("||====||--------|                                                       |--------||====||\n");
+    printf("||    ||                        %d                     %d                          ||    ||\n", plantZones[3].numberOfPlants,plantZones[4].numberOfPlants);
+    printf("|| %d  ||%d                                                                       %d|| %d  ||\n", jardinieres[4].numberOfPlants,potZones[2].numberOfPots, potZones[3].numberOfPots,jardinieres[5].numberOfPlants);
+    printf("||    ||                                   %d                                     ||    ||\n", plantZones[5].numberOfPlants);
+    printf("||====||--------|                                                       |--------||====||\n");
+    printf("      ||        |                                                       |        ||      \n");
+    printf("      ||   %d    |                                                       |   %d    ||      \n", endZones[5].numberOfPlants,endZones[2].numberOfPlants);
+    printf("      ||        |                  %d               %d                    |        ||      \n", potZones[4].numberOfPots,potZones[5].numberOfPots);
+    printf("      ||=========================================================================||      \n");
+    printf("\n\n");
+}
+
+
+

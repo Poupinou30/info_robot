@@ -78,7 +78,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         
         if(destination_set != 1){
             printf("moveFrontPlants started\n");
-            definePlantsDestination(bestPlantZone);
+            definePlantsDestination(bestPlantZone,bestStealZone);
             removeObstacle(bestPlantZone->obstacleID);
             destination_set = 1;
             resetErrorLists();
@@ -422,8 +422,11 @@ void manageGrabbing(plantZone* bestPlantZone){
         if(destination_set != 1){
             bestJardiniere = computeBestJardiniere();
             bestDropZone = computeBestDropZone();
+            bestStealZone = computeBestStealZone();
             ChooseDropOrJardiniere(bestDropZone,bestJardiniere);
-    
+            if (changeOfPlan){
+                break;
+            }
             destination_set = 1;
             resetErrorLists();
             myMoveType = DISPLACEMENT_MOVE;

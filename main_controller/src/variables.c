@@ -29,6 +29,7 @@ double motorSpeed_RR = 0;
 movingState myControllerState = STOPPED;
 
 double measuredSpeedX = 0;
+
 double measuredSpeedY = 0;
 double measuredSpeedOmega = 0;
 
@@ -69,3 +70,4 @@ uint8_t cameraEnable = 0;
 Queue* q; 
 struct timeval startInitialization, endQueue;
 char receivedChars[NUM_CHARS];
+double outputSpeed[3] = {0, 0, 0};

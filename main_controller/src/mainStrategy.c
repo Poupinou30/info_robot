@@ -3,6 +3,7 @@
 #define HEADERS
 #endif
 
+uint8_t matchOver = 0;
 struct timeval now;
 
 
@@ -37,6 +38,7 @@ void mainStrategy(){
         returnToBaseStrategy();
         break;
     case GAME_OVER:
+        
         gameOverStrategy();
 
     default:
@@ -48,6 +50,8 @@ void mainStrategy(){
 
 plantZone* bestPlantZone;
 potZone* bestPotZone;
+endZone* bestStealZone;
+
 
 
 void waitingStrategy(){
@@ -85,7 +89,7 @@ void pointsStrategy(){
     pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     //fprintf(stderr,"check3\n");
-    float TimeNeededToGetHome = distToClosestBase / 0.6 * SafetyFactor;
+    float TimeNeededToGetHome = fmin(distToClosestBase / 0.6 * SafetyFactor, 3);
     //fprintf(stderr,"check10\n");
     timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
@@ -112,22 +116,11 @@ void pointsStrategy(){
             printf("======================================================================================\n");
     }
     
-    else{ // let's earn some points
-        
-        //fprintf(stderr,"check10.1\n");
-        
+    else{
         if(changeOfPlan){
-            //fprintf(stderr,"check10.2\n");
             defineBestAction();
             changeOfPlan = 0;
-            //fprintf(stderr,"check5\n");
-            /*todo: faut set changeOfPlan quand:
-            - on a fini une action
-            - l'adversaire arrive avant nous à notre target
-            - l'aversaire nous bloque le chemin trop longtemps
-            */
         }
-        //fprintf(stderr,"check10.3\n");
         actionStrategy();
     }
 };
@@ -138,14 +131,14 @@ void actionStrategy(){
     {
     case PLANTS_ACTION:
         printf("myGrabstate = %d\n", myGrabState);
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);
         else{
             printf("changeOfPlant 1\n");
              changeOfPlan = 1;
         }
         break;
     case PLANTS_POTS_ACTION:
-        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED) manageGrabbing(bestPlantZone);
         else{
             printf("changeOfPlant 2\n");
             changeOfPlan = 1;
@@ -153,7 +146,7 @@ void actionStrategy(){
         //todo: faut une diff dans manageGrabbing pour savoir si on est en train de prendre des pots ou juste les plantes
         break;
     case SOLAR_PANELS_ACTION: 
-        if(myGrabState != FINISHED || forksDeployed) manageGrabbing(bestPlantZone);//CHANGER  NULL PAR BESTPOTZONE
+        if(myGrabState != FINISHED || forksDeployed) manageGrabbing(bestPlantZone);
         else{
             changeOfPlan = 1;
             printf("changeOfPlant 3\n");
@@ -207,7 +200,8 @@ void defineBestAction(){
     }
     else{
         bestPlantZone = computeBestPlantsZone();
-        if((bestPlantZone->numberOfPlants > 2 /*&& timeFromStartOfMatch < 30*/) ){
+        bestStealZone = computeBestStealZone();
+        if((bestPlantZone != NULL /*&& timeFromStartOfMatch < 30*/) ){
             printf("ACTION CHOSEN: PLANTS_POTS_ACTION\n");
             myActionChoice = PLANTS_POTS_ACTION;
             myGrabState = MOVE_FRONT_PLANTS;
@@ -268,16 +262,29 @@ void ChooseDropOrJardiniere(endZone* bestDropZone, jardiniere* bestJardiniere){
     float myX = *myFilteredPos.x;
     float myY = *myFilteredPos.y;
     pthread_mutex_unlock(&lockFilteredPosition);
-    float distToDrop = computeEuclidianDistance(myX, myY, bestDropZone->dropPositionX, bestDropZone->dropPositionY);
-    float distToJardiniere = computeEuclidianDistance(myX, myY, bestJardiniere->posX, bestJardiniere->posY);
-
-    if (distToDrop * 2  < distToJardiniere){
-        myChoice = DROP;
-        defineDropDestination(bestDropZone); // la jardinère est trop loin, on va poser les plantes
+    
+    if (bestDropZone == NULL && bestJardiniere == NULL){
+        solarDone = 0;
+        changeOfPlan = 1;
     }
     else{
-        myChoice = JARD;
-        defineJardiniereDestination(bestJardiniere); // la jardinère est suffisamment proche, on préfère aller là
+        if (bestJardiniere == NULL){
+            myChoice = DROP;
+            defineDropDestination(bestDropZone);
+        }
+        else{
+            float distToDrop = computeEuclidianDistance(myX, myY, bestDropZone->dropPositionX, bestDropZone->dropPositionY);
+            float distToJardiniere = computeEuclidianDistance(myX, myY, bestJardiniere->posX, bestJardiniere->posY);
+            
+            if (distToDrop * 2  < distToJardiniere){
+                myChoice = DROP;
+                defineDropDestination(bestDropZone); // la jardinère est trop loin, on va poser les plantes
+            }
+            else{
+                myChoice = JARD;
+                defineJardiniereDestination(bestJardiniere); // la jardinère est suffisamment proche, on préfère aller là
+            }
+        }
     }
 }
 
@@ -303,6 +310,13 @@ void defineJardiniereDestination(jardiniere* bestJardiniere){
     pthread_mutex_unlock(&lockFilteredPosition);
 };
 
+void defineStealDestination(endZone* bestStealZone){
+    pthread_mutex_lock(&lockFilteredPosition);
+    *destination.x = bestStealZone->dropPositionX;
+    *destination.y = bestStealZone->dropPositionY;
+    *destination.theta = bestStealZone->dropPositionTheta;
+    pthread_mutex_unlock(&lockFilteredPosition);
+};
 
 
 void defineSolarDestination(solarZone* bestSolarZone){
@@ -333,6 +347,10 @@ void defineEndZoneDestination(endZone* bestEndZone){
 };
 
 void gameOverStrategy(){
+    if (matchOver != 1){
+        matchOver = 1;
+        PrintMapState();
+    }
     myControllerState = STOPPED;
     setUpperFork(0);
     setGripperPosition(135);

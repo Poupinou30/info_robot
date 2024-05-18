@@ -442,19 +442,19 @@ void computeForceVector(){
     }
     
     if(fabs(error) > 15&& (pow(filteredSpeedX*filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5)< 0.15 || myForceState == MOVE_AWAY_WALL || myForceState == TURNING_MOVE)){
-        printf("in if for turningMove \n");
+        //printf("in if for turningMove \n");
         float rotationLimit = 0.3;
         float rotationLimit2 = 0.3;
-        printf("myPosX = %f myPosY = %f  \n",myPosX,myPosY);
-        printf("conditions : %d %d %d %d %d %d %d %d %d \n",myPosX > rotationLimit2,myPosY > rotationLimit2,myPosX <2-rotationLimit2,myPosY >rotationLimit2,myPosX <2-rotationLimit2,myPosY <3-rotationLimit2,myPosX >rotationLimit2,myPosY <3-rotationLimit2, myForceState != TURNING_MOVE);
+        //printf("myPosX = %f myPosY = %f  \n",myPosX,myPosY);
+        //printf("conditions : %d %d %d %d %d %d %d %d %d \n",myPosX > rotationLimit2,myPosY > rotationLimit2,myPosX <2-rotationLimit2,myPosY >rotationLimit2,myPosX <2-rotationLimit2,myPosY <3-rotationLimit2,myPosX >rotationLimit2,myPosY <3-rotationLimit2, myForceState != TURNING_MOVE);
         
         if(!((myPosX > rotationLimit2 &&myPosY > rotationLimit2) &&  (myPosX <2-rotationLimit2 && myPosY >rotationLimit2) &&  (myPosX <2-rotationLimit2 && myPosY <3-rotationLimit2) &&  (myPosX >rotationLimit2 && myPosY <3-rotationLimit2)) && myForceState != TURNING_MOVE) {
             myForceState = MOVE_AWAY_WALL;
-            printf("in MOVE_AWAY_WALL \n");
+            //printf("in MOVE_AWAY_WALL \n");
         }
         else if((myPosX > rotationLimit &&myPosY > rotationLimit) &&  (myPosX <2-rotationLimit && myPosY >rotationLimit) &&  (myPosX <2-rotationLimit && myPosY <3-rotationLimit) &&  (myPosX >rotationLimit && myPosY <3-rotationLimit) ){
             myForceState = TURNING_MOVE;
-            printf("in TURNING_MOVE \n");
+            //printf("in TURNING_MOVE \n");
         }
     
         
@@ -645,7 +645,7 @@ void computeForceVector(){
             if(tempoObstacle->obstacleID == 0) distanceFromOpponent = distance;
             
             if(distance < actionDistance){
-                if(distance<closestObstacleDistance) closestObstacleDistance = distance;
+                if(distance<closestObstacleDistance && distance < 0.3) closestObstacleDistance = distance;
                 
                 // printf("obstacle #%d at distance = %f and position x = %f y = %f \n",tempoObstacle->obstacleID,distance,tempoX,tempoY);
                 
@@ -718,7 +718,7 @@ void computeForceVector(){
 
 
             }
-            if(closestObstacleDistance != INFINITY) MAX_SPEED = 0.7*(closestObstacleDistance/fixActionDistance);
+            if(closestObstacleDistance != INFINITY) MAX_SPEED = 0.7*(closestObstacleDistance/0.3);
     }}
     free(tempoPoint1.x);
     free(tempoPoint1.y);
@@ -769,9 +769,10 @@ float myTheta;
 float myXOpponent;
 float myYOpponent;
 float opponentDistance;
+//double outputSpeed[3];
 
 void myPotentialFieldController(){
-    double outputSpeed[3];
+    
     if(myControllerState == MOVING){ 
         //printf("myMoveType = %d \n",myMoveType);
         switch(myMoveType)
@@ -978,7 +979,7 @@ void myPotentialFieldController(){
             break;
         }
     }
-    else{
+    if(myControllerState == STOPPED){
         outputSpeed[0] = 0;
         outputSpeed[1] = 0;
         outputSpeed[2] = 0;
