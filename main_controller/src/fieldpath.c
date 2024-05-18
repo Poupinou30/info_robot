@@ -7,7 +7,7 @@
 #define SOLAR_SPEED 0.15 // 0.15
 #define POT_SPEED 0.1
 
-float fixActionDistance = 0.3;
+float fixActionDistance = 0.23;
 float mobileActionDistance = 0.6;
 
 
@@ -404,11 +404,11 @@ void computeForceVector(){
     double k_mult_att;
     
     float k_att_xy = 0.25; //WAS 0.2
-    float k_rep_tang = 0.05;
+    float k_rep_tang = 0.03;
     k_att_xy = k_att_xy * (1+ 1/(0.25+distanceFromDest/4)); //WAS 0.25//Rajouté pour booster la force d'attraction lorsqu'on approche de la destination
     float k_att_theta = /*0.3*/ 0.4;
     
-    float k_repul =0.0002 ;
+    float k_repul =0.00012 ;
     //double theta = myTheta
     pthread_mutex_lock(&lockDestination);
     
@@ -645,7 +645,7 @@ void computeForceVector(){
             if(tempoObstacle->obstacleID == 0) distanceFromOpponent = distance;
             
             if(distance < actionDistance){
-                if(distance<closestObstacleDistance && distance < 0.3) closestObstacleDistance = distance;
+                if(distance<closestObstacleDistance && distance < 0.25) closestObstacleDistance = distance;
                 
                 // printf("obstacle #%d at distance = %f and position x = %f y = %f \n",tempoObstacle->obstacleID,distance,tempoX,tempoY);
                 
@@ -718,7 +718,7 @@ void computeForceVector(){
 
 
             }
-            if(closestObstacleDistance != INFINITY) MAX_SPEED = 0.7*(closestObstacleDistance/0.3);
+            if(closestObstacleDistance != INFINITY) MAX_SPEED = 0.7*(closestObstacleDistance/0.25);
     }}
     free(tempoPoint1.x);
     free(tempoPoint1.y);

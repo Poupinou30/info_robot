@@ -32,7 +32,7 @@
 #define timeDelay 20 //ms
 #define makeLog 1
 
-#define matchDuration 91 //seconds 
+#define matchDuration 500 //seconds 
 extern float MAX_SPEED;
 #define NUM_CHARS 100 // for the nextion									
 
