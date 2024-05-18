@@ -94,7 +94,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int main(){//VRAI MAIN STRATEGY UTILE
+int mainMAIN(){//VRAI MAIN STRATEGY UTILE
 
     //debug i2c
     i2cFile = fopen("../logFiles/logI2C.txt", "w");
@@ -188,11 +188,11 @@ int main(){//VRAI MAIN STRATEGY UTILE
 
             pthread_mutex_lock(&lidarFlagLock);
             if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 200){
-                resetOdometry();
+                //resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
             else{
-                lidarAcquisitionFlag = 0;
+                lidarAcquisitionFlag = 1;
             }
             pthread_mutex_unlock(&lidarFlagLock);
         }
@@ -710,6 +710,7 @@ int mainFINAL(){
     pthread_t pipeComThread;
     pthread_create(&pipeComThread,NULL,receptionPipe,&pipefd);
     fprintf(stderr,"Thread for capture launched \n");
+    
     while(readyToGo != 1){
         fprintf(stderr,"waiting for position acquisition \n");
         sleep(1);
