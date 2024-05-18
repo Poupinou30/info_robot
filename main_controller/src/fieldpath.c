@@ -669,8 +669,8 @@ void computeForceVector(){
                     double angleDiff = angle - myTheta*DEG2RAD;
                     if(angleDiff > M_PI) angleDiff -= 2*M_PI;
                     if(angleDiff < -M_PI) angleDiff += 2*M_PI;
-                    f_repul_tan_x = f_repul_x + k_rep_tang * k_reduc_repul * sign_f_rep_x * sin(angleDiff) * (1/(distance) - 1/(actionDistance));
-                    f_repul_tan_y = f_repul_y + k_rep_tang * k_reduc_repul * sign_f_rep_y * cos(angleDiff) * (1/(distance) - 1/(actionDistance));
+                    f_repul_tan_x =  k_rep_tang * k_reduc_repul * sign_f_rep_x * sin(angleDiff) * (1/(distance) - 1/(actionDistance));
+                    f_repul_tan_y = k_rep_tang * k_reduc_repul * sign_f_rep_y * cos(angleDiff) * (1/(distance) - 1/(actionDistance));
                 }
                 else { // Si l'obstacle est contre un mur, on contourne toujours vers l'intérieur de l'arène
                     // Calculer la direction du centre de l'arène par rapport à la position actuelle du robot
