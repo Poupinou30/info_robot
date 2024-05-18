@@ -51,9 +51,9 @@ void resetOdometry(){
     //printf("odometry resetted \n");
     pthread_mutex_lock(&lockFilteredPosition);
     pthread_mutex_lock(&lockPosition);
-    *myOdometryPos.x = (*myPos.x);
-    *myOdometryPos.y = (*myPos.y);
-    /*if(lidarAcquisitionFlag)*/ *myOdometryPos.theta = (0*(*myFilteredPos.theta)+*myPos.theta);
+    *myOdometryPos.x = (1.675);
+    *myOdometryPos.y = (0.33);
+    /*if(lidarAcquisitionFlag)*/ *myOdometryPos.theta = 0;
     /*else *myOdometryPos.theta = (3*(*myFilteredPos.theta)+*myPos.theta)/4;*/
     pthread_mutex_unlock(&lockFilteredPosition);
     pthread_mutex_unlock(&lockPosition);

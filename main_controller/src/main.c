@@ -94,7 +94,7 @@ mainTestCorde(){
     printf("Valeur GPIO %d \n",gpioRead(25));
 }
 
-int mainMAIN(){//VRAI MAIN STRATEGY UTILE
+int main(){//VRAI MAIN STRATEGY UTILE
 
     //debug i2c
     i2cFile = fopen("../logFiles/logI2C.txt", "w");

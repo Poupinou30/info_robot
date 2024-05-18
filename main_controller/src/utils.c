@@ -118,7 +118,7 @@ void computeSpeedFromOdometry(double* wheel_speeds, double *v_x, double *v_y, do
         }
     }
 
-    *v_x = 1.02*1.04*radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
+    *v_x = 1.02*1.04*0.91*radius/1.0744 / 4 * (wheel_speeds[0] - wheel_speeds[1] - wheel_speeds[2] + wheel_speeds[3]);
 
     *v_y = 1.0167*radius / 4 * (wheel_speeds[0] + wheel_speeds[1] + wheel_speeds[2] + wheel_speeds[3]);
 
