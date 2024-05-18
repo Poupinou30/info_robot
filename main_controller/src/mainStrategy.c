@@ -89,7 +89,7 @@ void pointsStrategy(){
     pthread_mutex_unlock(&lockFilteredPosition);
     float distToClosestBase = computeEuclidianDistance(x, y, bestEndZone->posX, bestEndZone->posY);
     //fprintf(stderr,"check3\n");
-    float TimeNeededToGetHome = fmin(distToClosestBase / 0.6 * SafetyFactor, 3);
+    float TimeNeededToGetHome = fmax(distToClosestBase / 0.6 * SafetyFactor, 3);
     //fprintf(stderr,"check10\n");
     timeFromStartOfMatch = now.tv_sec + now.tv_usec/1000000 - startOfMatch.tv_sec - startOfMatch.tv_usec/1000000;
     if(timeFromStartOfMatch > matchDuration - TimeNeededToGetHome){
@@ -200,24 +200,20 @@ void defineBestAction(){
     }
     else{
         bestPlantZone = computeBestPlantsZone();
-        bestStealZone = computeBestStealZone();
-        if((bestPlantZone != NULL /*&& timeFromStartOfMatch < 30*/) ){
+        bestStealZone = computeBestStealZone(); 
+        if((bestPlantZone != NULL  || bestStealZone != NULL /*&& timeFromStartOfMatch < 30*/) ){
             printf("ACTION CHOSEN: PLANTS_POTS_ACTION\n");
             myActionChoice = PLANTS_POTS_ACTION;
             myGrabState = MOVE_FRONT_PLANTS;
         }
         else{
-            printf("ACTION CHOSEN: PLANTS_ACTION\n");
-            myActionChoice = PLANTS_ACTION;
+            solarDone = 0;
+            printf("ACTION CHOSEN: Solar Panels\n");
+            myActionChoice = SOLAR_PANELS_ACTION;
+            myGrabState = SOLAR_SET;
         }
-        myGrabState = MOVE_FRONT_PLANTS;
     }
-    
-    
-    
-    
 };
-
 void definePlantsDestination(plantZone* bestPlantZone){
     pthread_mutex_lock(&lockFilteredPosition);
     if(*myFilteredPos.y < bestPlantZone->posY) {

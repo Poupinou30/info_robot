@@ -18,6 +18,7 @@ potZone* bestPotZone;
 jardiniere* bestJardiniere;
 solarZone* bestSolarZone;
 endZone* bestDropZone;
+endZone* bestStealZone;
 struct timeval commandSended;
 struct timeval actualTime;
 uint8_t timeStarted = 0;

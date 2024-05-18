@@ -506,6 +506,7 @@ plantZone* computeBestPlantsZone(){ // attention j'ai eu la flemme, il regarde p
     pthread_mutex_unlock(&lockFilteredPosition);
     
     for (int i = 0; i < 5; i++) {
+        //if(i!=4){
         double distanceFromPlant = computeEuclidianDistance(x, y, plantZones[i].posX, plantZones[i].posY);
         printf("  plantZone %d numberOfPlants = %d\n",i,plantZones[i].numberOfPlants);
         printf("  distance from plantzone = %f\n",distanceFromPlant);
@@ -519,7 +520,7 @@ plantZone* computeBestPlantsZone(){ // attention j'ai eu la flemme, il regarde p
                 smallestDistance = distanceFromPlant;
                 numberOfPlants = plantZones[i].numberOfPlants;
             }
-        }
+        }//}
     }
     printf("BestPlantZone found: zoneID = %d at distance %f\n\n",bestPlantZone->zoneID,smallestDistance);
     if (bestPlantZone->numberOfPlants == 0) return NULL;

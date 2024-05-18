@@ -187,7 +187,7 @@ int main(){//VRAI MAIN STRATEGY UTILE
             updateOpponentObstacle(); //Mets a jour la position de l'ennemi dans le potential field            
 
             pthread_mutex_lock(&lidarFlagLock);
-            if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<10) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 150){
+            if(myMoveType != GRABBING_MOVE&&((pow(filteredSpeedX *filteredSpeedX + filteredSpeedY*filteredSpeedY,0.5) < 0.4 && fabs(filteredSpeedOmega)<20) /*||fabs(*myPos.theta - *myOdometryPos.theta)> 5*/ )&& lidarElapsedTime < 200){
                 resetOdometry();
                 lidarAcquisitionFlag = 1;
             }
