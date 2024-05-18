@@ -78,7 +78,7 @@ void manageGrabbing(plantZone* bestPlantZone){
         
         if(destination_set != 1){
             printf("moveFrontPlants started\n");
-            definePlantsDestination(bestPlantZone,bestStealZone);
+            definePlantsDestination(bestPlantZone);
             removeObstacle(bestPlantZone->obstacleID);
             destination_set = 1;
             resetErrorLists();
