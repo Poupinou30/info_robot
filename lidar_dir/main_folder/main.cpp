@@ -70,6 +70,12 @@ void *safe_malloc(size_t size, int id) {
     return ptr;
 }
 
+bool isAngleWithinTolerance(float angle, float target, float tolerance) {
+    float diff = fmod(angle - target + 360, 360);
+    return diff <= tolerance || diff >= (360 - tolerance);
+}
+
+
 double distance (double a1,double a2,double d1,double d2){
     double dist= sqrt(pow(d1,2)+pow(d2,2) - (2*d1*d2*cos((a1-a2)*M_PI/180)));
     return dist;
@@ -305,8 +311,18 @@ void* beacon_data(void* argument){
                 if(angle_horlogique2<0) angle_horlogique2+=360;
                 if(angle_horlogique2 > 360) angle_horlogique2+=-360;
 
-                uint8_t condition = (beaconTab[0].angle > (angle_horlogique0 - angleTolerance) && beaconTab[0].angle < (angle_horlogique0 + angleTolerance)) && (beaconTab[1].angle > (angle_horlogique1 - angleTolerance) && beaconTab[1].angle < (angle_horlogique1 + angleTolerance)) && (beaconTab[2].angle > (angle_horlogique2 - angleTolerance) && beaconTab[2].angle < (angle_horlogique2 + angleTolerance))  && triangle<=perimetre+triangleErrorTolerance && triangle>=perimetre-triangleErrorTolerance && dij<=longSideLength+isoceleTolerance && dij>=longSideLength-isoceleTolerance && djk<=longSideLength+isoceleTolerance && djk>=longSideLength-isoceleTolerance && dik>=shortSideLength-isoceleTolerance && dik<=shortSideLength+isoceleTolerance;
-                actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
+                uint8_t condition = isAngleWithinTolerance(beaconTab[0].angle, angle_horlogique0, angleTolerance) &&
+                                    isAngleWithinTolerance(beaconTab[1].angle, angle_horlogique1, angleTolerance) &&
+                                    isAngleWithinTolerance(beaconTab[2].angle, angle_horlogique2, angleTolerance) &&
+                                    triangle <= perimetre + triangleErrorTolerance &&
+                                    triangle >= perimetre - triangleErrorTolerance &&
+                                    dij <= longSideLength + isoceleTolerance &&
+                                    dij >= longSideLength - isoceleTolerance &&
+                                    djk <= longSideLength + isoceleTolerance &&
+                                    djk >= longSideLength - isoceleTolerance &&
+                                    dik >= shortSideLength - isoceleTolerance &&
+                                    dik <= shortSideLength + isoceleTolerance;
+                                actualError = fabs(triangle-perimetre) + fabs(fabs(dij-djk));
 
                 debugBalises[0][0] = angle_horlogique0;
                 debugBalises[1][0] = angle_horlogique1;

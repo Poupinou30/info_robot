@@ -8,7 +8,7 @@
 #define POT_SPEED 0.1
 
 float fixActionDistance = 0.23;
-float mobileActionDistance = 0.6;
+float mobileActionDistance = 0.4;
 
 
 float myDistanceList[50] = {
@@ -645,6 +645,7 @@ void computeForceVector(){
             if(tempoObstacle->obstacleID == 0) distanceFromOpponent = distance;
             
             if(distance < actionDistance){
+                
                 if(distance<closestObstacleDistance && distance < 0.25) closestObstacleDistance = distance;
                 
                 // printf("obstacle #%d at distance = %f and position x = %f y = %f \n",tempoObstacle->obstacleID,distance,tempoX,tempoY);
@@ -712,7 +713,7 @@ void computeForceVector(){
                 f_repul_x = f_repul_x + f_repul_norm_x + f_repul_tan_x;
                 f_repul_y = f_repul_y + f_repul_norm_y + f_repul_tan_y;
 
-                //printf("\n \nRepulsion force for obstacle #%d at distance = %f and position x = %f y = %f : x_normal = %f y_normal = %f x_tangent = %f y_tangent = %f totalX = %f totalY = %f\n",tempoObstacle->obstacleID,distance,tempoObstacle->posX,tempoObstacle->posY,f_repul_norm_x,f_repul_norm_y,f_repul_tan_x,f_repul_tan_y, f_repul_x,f_repul_y);
+                printf("\n \nRepulsion force for obstacle #%d at distance = %f and position x = %f y = %f : x_normal = %f y_normal = %f x_tangent = %f y_tangent = %f totalX = %f totalY = %f\n",tempoObstacle->obstacleID,distance,tempoObstacle->posX,tempoObstacle->posY,f_repul_norm_x,f_repul_norm_y,f_repul_tan_x,f_repul_tan_y, f_repul_x,f_repul_y);
 
 
 
